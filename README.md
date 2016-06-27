@@ -1,4 +1,4 @@
-**Legentries Command Line Interface**
+**Logentries Command Line Interface**
 ==================
 This document provides an overview of installing and using the Logentries Command Line Interface.
 The CLI is build on the Logentries REST APIs and provides a tool to interact directly with the Logentries service outside of the UI. It is in beta and currently supports log event querying and account user management. New functionality will be continually added.
