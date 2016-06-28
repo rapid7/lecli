@@ -1,3 +1,4 @@
+from __future__ import division
 import json
 import time
 
@@ -5,17 +6,24 @@ import datetime
 import requests
 from termcolor import colored
 
-import apiutils
+from lecli import apiutils
 
 
 def _url(path):
+    """
+    Get rest query url of a specific path.
+    """
     return 'https://rest.logentries.com/query/' + path + '/'
 
 
 def response_error(response):
+    """
+    Check response if it has any errors.
+    """
     if response.headers.get('X-RateLimit-Remaining') is not None:
         if int(response.headers['X-RateLimit-Remaining']) == 0:
-            print 'Error: Rate Limit Reached, will reset in ' + response.headers.get('X-RateLimit-Reset') + ' seconds'
+            print 'Error: Rate Limit Reached, will reset in ' + response.headers.get(
+                'X-RateLimit-Reset') + ' seconds'
             return True
 
     try:
@@ -26,8 +34,9 @@ def response_error(response):
 
     if response.status_code == 200:
         if response.headers['Content-Type'] != 'application/json':
-                print 'Unexpected Content Type Received in Response: ' + response.headers['Content-Type']
-                return True
+            print 'Unexpected Content Type Received in Response: ' + response.headers[
+                'Content-Type']
+            return True
         else:
             return False
 
@@ -35,6 +44,10 @@ def response_error(response):
 
 
 def handle_response(response):
+    """
+    Handle response. Exit if it has any errors, continue if status code is 202, print response
+    if status code is 200.
+    """
     if response_error(response) is True:  # Check response has no errors
         exit(1)
     elif response.status_code == 200:
@@ -51,6 +64,9 @@ def handle_response(response):
 
 
 def continue_request(response):
+    """
+    Continue making request to the url in the response.
+    """
     time.sleep(1)  # Wait for 1 second before hitting continue endpoint to prevent hitting API limit
     if 'links' in response.json():
         continue_url = response.json()['links'][0]['href']
@@ -59,6 +75,9 @@ def continue_request(response):
 
 
 def fetch_results(provided_url):
+    """
+    Make the get request to the url and return the response.
+    """
     try:
         response = requests.get(provided_url, headers=apiutils.generate_headers('rw'))
         return response
@@ -68,7 +87,9 @@ def fetch_results(provided_url):
 
 
 def get_recent_events(log_keys, last_x_seconds=200):
-
+    """
+    Get recent events belonging to provided log_keys in the last_x_seconds.
+    """
     to_ts = int(time.time()) * 1000
     from_ts = (int(time.time()) - last_x_seconds) * 1000
 
@@ -76,7 +97,8 @@ def get_recent_events(log_keys, last_x_seconds=200):
     payload = {"logs": log_keys, "leql": leql}
 
     try:
-        response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'), json=payload)
+        response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
+                                 json=payload)
         handle_response(response)
     except requests.exceptions.RequestException as error:
         print error
@@ -84,7 +106,9 @@ def get_recent_events(log_keys, last_x_seconds=200):
 
 
 def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=None):
-
+    """
+    Get events belonging to log_keys and within the time range provided.
+    """
     if date_from is not None and date_to is not None:
         from_ts = int(time.mktime(time.strptime(date_from, "%Y-%m-%d %H:%M:%S"))) * 1000
         to_ts = int(time.mktime(time.strptime(date_to, "%Y-%m-%d %H:%M:%S"))) * 1000
@@ -96,7 +120,8 @@ def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=N
     payload = {"logs": log_keys, "leql": leql}
 
     try:
-        response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'), json=payload)
+        response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
+                                 json=payload)
         handle_response(response)
     except requests.exceptions.RequestException as error:
         print error
@@ -104,7 +129,9 @@ def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=N
 
 
 def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=None, date_to=None):
-
+    """
+    Post query to Logentries.
+    """
     if date_from is not None and date_to is not None:
         from_ts = int(time.mktime(time.strptime(date_from, "%Y-%m-%d %H:%M:%S"))) * 1000
         to_ts = int(time.mktime(time.strptime(date_to, "%Y-%m-%d %H:%M:%S"))) * 1000
@@ -116,7 +143,8 @@ def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=N
     payload = {"logs": log_keys, "leql": leql}
 
     try:
-        response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'), json=payload)
+        response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
+                                 json=payload)
         handle_response(response)
     except requests.exceptions.RequestException as error:
         print error
@@ -124,6 +152,9 @@ def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=N
 
 
 def print_response(response):
+    """
+    Print response in a human readable way.
+    """
     if 'events' in response.json():
         prettyprint_events(response)
     elif 'statistics' in response.json():
@@ -131,16 +162,22 @@ def print_response(response):
 
 
 def prettyprint_events(response):
+    """
+    Print events in a human readable way.
+    """
     data = response.json()
 
     for event in data['events']:
-        print event['timestamp']/1000
-        time_value = datetime.datetime.fromtimestamp(event['timestamp']/1000)
+        print event['timestamp'] / 1000
+        time_value = datetime.datetime.fromtimestamp(event['timestamp'] / 1000)
         human_ts = time_value.strftime('%Y-%m-%d %H:%M:%S')
         print colored(str(human_ts), 'red') + '\t' + colored(event['message'], 'white')
 
 
 def prettyprint_statistics(response):
+    """
+    Print statistics in a human readable way.
+    """
     data = response.json()
 
     # Extract keys
@@ -161,7 +198,7 @@ def prettyprint_statistics(response):
 
         print 'Timeseries: '
         for index, value in enumerate(data['statistics']['timeseries'].get(timeseries_key)):
-            timestamp = (time_from + (time_range/num_timeseries_values) * (index + 1)) / 1000
+            timestamp = (time_from + (time_range / num_timeseries_values) * (index + 1)) / 1000
             time_value = datetime.datetime.fromtimestamp(timestamp)
             human_ts = time_value.strftime('%Y-%m-%d %H:%M:%S')
             print human_ts + ': ' + str(value.values()[0])

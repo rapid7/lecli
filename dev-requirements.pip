@@ -7,3 +7,4 @@ requests==2.9.1
 pytz==2016.4
 termcolor==1.1.0
 tabulate==0.7.5
+appdirs==1.4.0

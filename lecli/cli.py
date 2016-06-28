@@ -1,15 +1,16 @@
 import click
 
-import apiutils
-import queryapi
-import userapi
+from lecli import apiutils
+from lecli import queryapi
+from lecli import userapi
 
 
 @click.group()
-@click.version_option(version=0.1)
+@click.version_option(version=0.2)
 def cli():
     """Logentries Command Line Interface"""
-    pass
+    # load configs from config.ini file in user_config_dir depending on running OS
+    apiutils.load_config()
 
 
 @cli.command()
@@ -106,7 +107,8 @@ def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
 @click.option('-g', '--loggroup', default=None,
               help='Name of log group defined in config file')
 @click.option('-t', '--timewindow', default=1200,
-              help='Time window from now to now-X in seconds over which events will be returned (Defaults to 20 mins)')
+              help='Time window from now to now-X in seconds over which events will be returned '
+                   '(Defaults to 20 mins)')
 def recentevents(logkeys, lognick, loggroup, timewindow):
     """Get recent log events"""
 
@@ -119,7 +121,8 @@ def recentevents(logkeys, lognick, loggroup, timewindow):
         queryapi.get_recent_events(logkeys, timewindow)
 
     else:
-        click.echo('Example usage: lecli recentevents \'12345678-aaaa-bbbb-1234-1234cb123456\' -t 200')
+        click.echo(
+            'Example usage: lecli recentevents \'12345678-aaaa-bbbb-1234-1234cb123456\' -t 200')
         click.echo('Example usage: lecli recentevents -n mynicknamedlog -t 200')
         click.echo('Example usage: lecli recentevents -g myloggroup -t 200')
 
