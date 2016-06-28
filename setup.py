@@ -11,6 +11,6 @@ setup(
     license='MIT',
     install_requires=['click==6.6', 'requests==2.9.1', 'pytz==2016.4', 'termcolor==1.1.0',
                       'tabulate==0.7.5'],
-    entry_points={'console_scripts': ['lecli = lecli.lecli:cli']},
+    entry_points={'console_scripts': ['lecli = lecli.cli:cli']},
     zip_safe=False
 )

@@ -1,16 +1,19 @@
 import ConfigParser
 import base64
-import datetime
 import hashlib
 import hmac
 
+import datetime
 
-configfile = 'config.ini'
+CONFIG_FILE = 'config.ini'
 
 
 def get_ro_apikey():
+    """
+    Get read-only api key from the config file.
+    """
     config = ConfigParser.ConfigParser()
-    config.read(configfile)
+    config.read(CONFIG_FILE)
     ro_apikey = None
     try:
         ro_apikey = config.get('Auth', 'ro_api_key')
@@ -23,8 +26,11 @@ def get_ro_apikey():
 
 
 def get_rw_apikey():
+    """
+    Get read-write api key from the config file.
+    """
     config = ConfigParser.ConfigParser()
-    config.read(configfile)
+    config.read(CONFIG_FILE)
     rw_apikey = None
     try:
         rw_apikey = config.get('Auth', 'rw_api_key')
@@ -37,8 +43,11 @@ def get_rw_apikey():
 
 
 def get_owner_apikey():
+    """
+    Get owner api key from the config file.
+    """
     config = ConfigParser.ConfigParser()
-    config.read(configfile)
+    config.read(CONFIG_FILE)
     owner_apikey = None
     try:
         owner_apikey = config.get('Auth', 'owner_api_key')
@@ -51,8 +60,11 @@ def get_owner_apikey():
 
 
 def get_owner_apikey_id():
+    """
+    Get owner api key id from the config file.
+    """
     config = ConfigParser.ConfigParser()
-    config.read(configfile)
+    config.read(CONFIG_FILE)
     owner_apikey_id = None
     try:
         owner_apikey_id = config.get('Auth', 'owner_api_key_id')
@@ -65,8 +77,11 @@ def get_owner_apikey_id():
 
 
 def get_account_resource_id():
+    """
+    Get account resource id from the config file.
+    """
     config = ConfigParser.ConfigParser()
-    config.read(configfile)
+    config.read(CONFIG_FILE)
     account_resource_id = None
     try:
         account_resource_id = config.get('Auth', 'account_resource_id')
@@ -78,42 +93,57 @@ def get_account_resource_id():
     return account_resource_id
 
 
-def get_named_logkey_group(group):
+def get_named_logkey_group(name):
+    """
+    Get named log-key group from the config file.
+
+    :param name: name of the group
+    """
     config = ConfigParser.ConfigParser()
-    config.read(configfile)
+    config.read(CONFIG_FILE)
     groups = dict(config.items('LogGroups'))
 
-    if group in groups:
-        logkeys = filter(None, str(groups[group]).splitlines())
+    if name in groups:
+        logkeys = filter(None, str(groups[name]).splitlines())
         for logkey in logkeys:
             if len(logkey) != 36:
                 print 'Error: Logkey is not of correct length.'
                 return
         return logkeys
     else:
-        print 'Error: No group with name ' + '\'' + group + '\''
+        print 'Error: No group with name ' + '\'' + name + '\''
         return None
 
 
-def get_named_logkey(nick):
+def get_named_logkey(name):
+    """
+    Get named log-key from the config file.
+
+    :param name: name of the log key
+    """
     config = ConfigParser.ConfigParser()
-    config.read(configfile)
+    config.read(CONFIG_FILE)
     nicknames = dict(config.items('LogNicknames'))
 
-    if nick in nicknames:
-        logkey = (nicknames[nick],)
+    if name in nicknames:
+        logkey = (nicknames[name],)
         if len(logkey[0]) != 36:
             print 'Error: Logkey is not of correct length. '
         else:
             return logkey
     else:
-        print 'Error: No nickname with name ' + '\'' + nick + '\''
+        print 'Error: No nickname with name ' + '\'' + name + '\''
         return None
 
 
 def get_query_from_nickname(qnick):
+    """
+    Get named query from config file.
+
+    :param qnick: query nick
+    """
     config = ConfigParser.ConfigParser()
-    config.read(configfile)
+    config.read(CONFIG_FILE)
     qnicknames = dict(config.items('QueryNicknames'))
 
     if qnick in qnicknames:
@@ -125,6 +155,9 @@ def get_query_from_nickname(qnick):
 
 
 def generate_headers(api_key_type, method=None, action=None, body=None):
+    """
+    Generate request headers according to api_key_type that is being used.
+    """
     headers = None
 
     if api_key_type is 'ro':
@@ -144,12 +177,17 @@ def generate_headers(api_key_type, method=None, action=None, body=None):
         headers = {
             "Date": date_h,
             "Content-Type": content_type_h,
-            "authorization-api-key": "%s:%s" % (get_owner_apikey_id().encode('utf8'), base64.b64encode(signature))
+            "authorization-api-key": "%s:%s" % (
+                get_owner_apikey_id().encode('utf8'), base64.b64encode(signature))
         }
     return headers
 
 
 def gensignature(api_key, date, content_type, request_method, query_path, request_body):
+    """
+    Generate owner access signature.
+
+    """
     hashed_body = base64.b64encode(hashlib.sha256(request_body).digest())
     canonical_string = request_method + content_type + date + query_path + hashed_body
 
