@@ -6,11 +6,18 @@ import hmac
 
 
 configfile = 'config.ini'
+config = ConfigParser.ConfigParser()
 
+def load_config():
+  files_read = config.read(configfile)
+  if len(files_read) != 1:
+    print "Error: Config file '%s' not found" % configfile
+    exit(1)
+  if not config.has_section('Auth'):
+    print "Error: Config file '%s' is missing Auth section" % configfile
+    exit(1)
 
 def get_ro_apikey():
-    config = ConfigParser.ConfigParser()
-    config.read(configfile)
     ro_apikey = None
     try:
         ro_apikey = config.get('Auth', 'ro_api_key')
@@ -23,8 +30,6 @@ def get_ro_apikey():
 
 
 def get_rw_apikey():
-    config = ConfigParser.ConfigParser()
-    config.read(configfile)
     rw_apikey = None
     try:
         rw_apikey = config.get('Auth', 'rw_api_key')
@@ -37,8 +42,6 @@ def get_rw_apikey():
 
 
 def get_owner_apikey():
-    config = ConfigParser.ConfigParser()
-    config.read(configfile)
     owner_apikey = None
     try:
         owner_apikey = config.get('Auth', 'owner_api_key')
@@ -51,8 +54,6 @@ def get_owner_apikey():
 
 
 def get_owner_apikey_id():
-    config = ConfigParser.ConfigParser()
-    config.read(configfile)
     owner_apikey_id = None
     try:
         owner_apikey_id = config.get('Auth', 'owner_api_key_id')
@@ -65,8 +66,6 @@ def get_owner_apikey_id():
 
 
 def get_account_resource_id():
-    config = ConfigParser.ConfigParser()
-    config.read(configfile)
     account_resource_id = None
     try:
         account_resource_id = config.get('Auth', 'account_resource_id')
@@ -79,8 +78,6 @@ def get_account_resource_id():
 
 
 def get_named_logkey_group(group):
-    config = ConfigParser.ConfigParser()
-    config.read(configfile)
     groups = dict(config.items('LogGroups'))
 
     if group in groups:
@@ -96,8 +93,6 @@ def get_named_logkey_group(group):
 
 
 def get_named_logkey(nick):
-    config = ConfigParser.ConfigParser()
-    config.read(configfile)
     nicknames = dict(config.items('LogNicknames'))
 
     if nick in nicknames:
@@ -112,8 +107,6 @@ def get_named_logkey(nick):
 
 
 def get_query_from_nickname(qnick):
-    config = ConfigParser.ConfigParser()
-    config.read(configfile)
     qnicknames = dict(config.items('QueryNicknames'))
 
     if qnick in qnicknames:
@@ -158,3 +151,5 @@ def gensignature(api_key, date, content_type, request_method, query_path, reques
     digest.update(canonical_string)
 
     return digest.digest()
+
+load_config()
