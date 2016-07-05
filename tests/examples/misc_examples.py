@@ -27,3 +27,7 @@ DATE_TO = '2016-05-18 11:09:59'
 MOCK_QUERYAPI_URL = 'http://mydummylink.com/query/'
 
 MOCK_USERAPI_URL = 'http://mydummylink.com/user'
+
+MOCK_TEAMSAPI_URL = 'http://mydummyurl.com/teams'
+
+TEST_TEAM_ID = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'

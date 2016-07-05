@@ -4,7 +4,7 @@ import httpretty
 import requests
 from mock import patch
 
-from lecli import queryapi
+from lecli import query_api
 from examples import response_examples as resp_ex
 from examples import misc_examples as misc_ex
 
@@ -25,7 +25,7 @@ def test_prettyprint_statistics_groups(capsys):
                            content_type='application/json',
                            body=json.dumps(resp_ex.group_response))
     response = requests.get(misc_ex.MOCK_QUERYAPI_URL)
-    queryapi.prettyprint_statistics(response)
+    query_api.prettyprint_statistics(response)
 
     out, err = capsys.readouterr()
     for group in response.json()['statistics']['groups']:
@@ -42,7 +42,7 @@ def test_prettyprint_statistics_timeseries(capsys):
                            content_type='application/json',
                            body=json.dumps(resp_ex.ts_response))
     response = requests.get(misc_ex.MOCK_QUERYAPI_URL)
-    queryapi.prettyprint_statistics(response)
+    query_api.prettyprint_statistics(response)
 
     out, err = capsys.readouterr()
     assert "Total" in out
@@ -58,7 +58,7 @@ def test_prettyprint_events(capsys):
                            content_type='application/json',
                            body=json.dumps(resp_ex.events_response))
     response = requests.get(misc_ex.MOCK_QUERYAPI_URL)
-    queryapi.prettyprint_events(response)
+    query_api.prettyprint_events(response)
 
     out, err = capsys.readouterr()
 
@@ -70,7 +70,7 @@ def test_prettyprint_events(capsys):
 
 
 @patch('lecli.apiutils.generate_headers')
-@patch('lecli.queryapi._url')
+@patch('lecli.query_api._url')
 def test_post_query_with_time(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
     mocked_url.return_value = misc_ex.MOCK_QUERYAPI_URL
@@ -78,7 +78,7 @@ def test_post_query_with_time(mocked_url, mocked_generate_headers, capsys):
     httpretty.register_uri(httpretty.POST, misc_ex.MOCK_QUERYAPI_URL,
                            content_type='application/json',
                            body=json.dumps(resp_ex.events_response))
-    queryapi.post_query(misc_ex.TEST_LOG_GROUP, misc_ex.TEST_QUERY, time_from=misc_ex.TIME_FROM, time_to=misc_ex.TIME_TO)
+    query_api.post_query(misc_ex.TEST_LOG_GROUP, misc_ex.TEST_QUERY, time_from=misc_ex.TIME_FROM, time_to=misc_ex.TIME_TO)
 
     out, err = capsys.readouterr()
 
@@ -91,14 +91,14 @@ def test_post_query_with_time(mocked_url, mocked_generate_headers, capsys):
 
 
 @patch('lecli.apiutils.generate_headers')
-@patch('lecli.queryapi._url')
+@patch('lecli.query_api._url')
 def test_post_query_with_date(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
     mocked_url.return_value = misc_ex.MOCK_QUERYAPI_URL
     httpretty.register_uri(httpretty.POST, misc_ex.MOCK_QUERYAPI_URL,
                            content_type='application/json',
                            body=json.dumps(resp_ex.events_response))
-    queryapi.post_query(misc_ex.TEST_LOG_GROUP, misc_ex.TEST_QUERY, date_from=misc_ex.DATE_FROM, date_to=misc_ex.DATE_TO)
+    query_api.post_query(misc_ex.TEST_LOG_GROUP, misc_ex.TEST_QUERY, date_from=misc_ex.DATE_FROM, date_to=misc_ex.DATE_TO)
 
     out, err = capsys.readouterr()
 
@@ -111,7 +111,7 @@ def test_post_query_with_date(mocked_url, mocked_generate_headers, capsys):
 
 
 @patch('lecli.apiutils.generate_headers')
-@patch('lecli.queryapi._url')
+@patch('lecli.query_api._url')
 def test_get_events(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
     mocked_url.return_value = misc_ex.MOCK_QUERYAPI_URL
@@ -119,7 +119,7 @@ def test_get_events(mocked_url, mocked_generate_headers, capsys):
     httpretty.register_uri(httpretty.POST, misc_ex.MOCK_QUERYAPI_URL,
                            content_type='application/json',
                            body=json.dumps(resp_ex.events_response))
-    queryapi.get_events(misc_ex.TEST_LOG_GROUP, misc_ex.TEST_QUERY, date_from=misc_ex.DATE_FROM, date_to=misc_ex.DATE_TO)
+    query_api.get_events(misc_ex.TEST_LOG_GROUP, misc_ex.TEST_QUERY, date_from=misc_ex.DATE_FROM, date_to=misc_ex.DATE_TO)
 
     out, err = capsys.readouterr()
 
@@ -132,7 +132,7 @@ def test_get_events(mocked_url, mocked_generate_headers, capsys):
 
 
 @patch('lecli.apiutils.generate_headers')
-@patch('lecli.queryapi._url')
+@patch('lecli.query_api._url')
 def test_get_recent_events(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
     mocked_url.return_value = misc_ex.MOCK_QUERYAPI_URL
@@ -140,7 +140,7 @@ def test_get_recent_events(mocked_url, mocked_generate_headers, capsys):
     httpretty.register_uri(httpretty.POST, misc_ex.MOCK_QUERYAPI_URL,
                            content_type='application/json',
                            body=json.dumps(resp_ex.events_response))
-    queryapi.get_recent_events(misc_ex.TEST_LOG_GROUP)
+    query_api.get_recent_events(misc_ex.TEST_LOG_GROUP)
 
     out, err = capsys.readouterr()
 
@@ -160,7 +160,7 @@ def test_fetch_results(mocked_generate_headers):
                            content_type='application/json',
                            body=json.dumps(resp_ex.events_response))
 
-    response = queryapi.fetch_results(dest_url).json()
+    response = query_api.fetch_results(dest_url).json()
 
     assert mocked_generate_headers.called
     assert "Message contents1" in response['events'][0]['message']
@@ -171,7 +171,7 @@ def test_fetch_results(mocked_generate_headers):
 
 
 @patch('lecli.apiutils.generate_headers')
-@patch('lecli.queryapi.handle_response')
+@patch('lecli.query_api.handle_response')
 def test_continue_request(mocked_headers, mocked_response_handle):
     setup_httpretty()
 
@@ -186,7 +186,7 @@ def test_continue_request(mocked_headers, mocked_response_handle):
                            content_type='application/json')
 
     resp = requests.get(misc_ex.MOCK_QUERYAPI_URL)
-    queryapi.continue_request(resp)
+    query_api.continue_request(resp)
 
     assert mocked_response_handle.called
     assert mocked_headers.called
@@ -202,7 +202,7 @@ def test_handle_response(capsys):
                            content_type='application/json',
                            body=json.dumps(resp_ex.events_response))
     resp = requests.get(misc_ex.MOCK_QUERYAPI_URL)
-    queryapi.handle_response(resp)
+    query_api.handle_response(resp)
 
     out, err = capsys.readouterr()
 
@@ -221,7 +221,7 @@ def test_response_error_status(capsys):
                            content_type='application/json',
                            status=405)
     resp = requests.get(misc_ex.MOCK_QUERYAPI_URL)
-    queryapi.response_error(resp)
+    query_api.response_error(resp)
 
     out, err = capsys.readouterr()
     assert "Request Error: " in out
@@ -237,7 +237,7 @@ def test_response_error_content_type(capsys):
                            content_type='text/html',
                            status=200)
     resp = requests.get(misc_ex.MOCK_QUERYAPI_URL)
-    queryapi.response_error(resp)
+    query_api.response_error(resp)
 
     out, err = capsys.readouterr()
     assert "Unexpected Content Type Received in Response: " in out
