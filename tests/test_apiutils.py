@@ -1,7 +1,7 @@
 import ConfigParser
 import hmac
 
-from mock import patch
+from mock import patch, Mock
 
 from lecli import apiutils
 from examples import misc_examples as misc_ex
@@ -54,14 +54,16 @@ def test_generate_header_owner(mocked_owner_apikey, mocked_owner_apikey_id):
 
 
 def test_get_valid_ro_apikey():
-    with patch.object(ConfigParser.ConfigParser, 'get', return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):
+    with patch.object(ConfigParser.ConfigParser, 'get',
+                      return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):
         ro_api_key = apiutils.get_ro_apikey()
 
         assert ro_api_key == misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
 
 def test_get_invalid_ro_apikey(capsys):
-    with patch.object(ConfigParser.ConfigParser, 'get', return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
+    with patch.object(ConfigParser.ConfigParser, 'get',
+                      return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
         ro_api_key = apiutils.get_ro_apikey()
         out, err = capsys.readouterr()
 
@@ -70,14 +72,17 @@ def test_get_invalid_ro_apikey(capsys):
 
 
 def test_get_valid_rw_apikey():
-    with patch.object(ConfigParser.ConfigParser, 'get', return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):
+    with patch.object(ConfigParser.ConfigParser, 'get',
+                      return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):
         rw_api_key = apiutils.get_rw_apikey()
 
         assert rw_api_key == misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
 
 def test_get_invalid_rw_apikey(capsys):
-    with patch.object(ConfigParser.ConfigParser, 'get', return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
+    with patch.object(ConfigParser.ConfigParser, 'get',
+                      return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
+        apiutils.load_config = Mock()
         rw_api_key = apiutils.get_rw_apikey()
         out, err = capsys.readouterr()
 
@@ -86,14 +91,17 @@ def test_get_invalid_rw_apikey(capsys):
 
 
 def test_get_valid_owner_apikey():
-    with patch.object(ConfigParser.ConfigParser, 'get', return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):
+    with patch.object(ConfigParser.ConfigParser, 'get',
+                      return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):
         owner_api_key = apiutils.get_owner_apikey()
 
         assert owner_api_key == misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
 
 def test_get_invalid_owner_apikey(capsys):
-    with patch.object(ConfigParser.ConfigParser, 'get', return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
+    with patch.object(ConfigParser.ConfigParser, 'get',
+                      return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
+        apiutils.load_config = Mock()
         owner_api_key = apiutils.get_owner_apikey()
         out, err = capsys.readouterr()
 
@@ -102,14 +110,17 @@ def test_get_invalid_owner_apikey(capsys):
 
 
 def test_get_valid_owner_apikey_id():
-    with patch.object(ConfigParser.ConfigParser, 'get', return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):
+    with patch.object(ConfigParser.ConfigParser, 'get',
+                      return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):
         owner_api_key_id = apiutils.get_owner_apikey_id()
 
         assert owner_api_key_id == misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
 
 def test_get_invalid_owner_apikey_id(capsys):
-    with patch.object(ConfigParser.ConfigParser, 'get', return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
+    with patch.object(ConfigParser.ConfigParser, 'get',
+                      return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
+        apiutils.load_config = Mock()
         owner_api_key_id = apiutils.get_owner_apikey_id()
         out, err = capsys.readouterr()
 
@@ -118,14 +129,16 @@ def test_get_invalid_owner_apikey_id(capsys):
 
 
 def test_get_valid_account_resource_id():
-    with patch.object(ConfigParser.ConfigParser, 'get', return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):
+    with patch.object(ConfigParser.ConfigParser, 'get',
+                      return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):
         account_resource_id = apiutils.get_account_resource_id()
 
         assert account_resource_id == misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
 
 def test_get_invalid_account_resource_id(capsys):
-    with patch.object(ConfigParser.ConfigParser, 'get', return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
+    with patch.object(ConfigParser.ConfigParser, 'get',
+                      return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
         account_resource_id = apiutils.get_account_resource_id()
         out, err = capsys.readouterr()
 
@@ -134,13 +147,15 @@ def test_get_invalid_account_resource_id(capsys):
 
 
 def test_get_valid_named_logkey():
-    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick', misc_ex.TEST_LOG_KEY)]):
+    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
+                                                                         misc_ex.TEST_LOG_KEY)]):
         logkey = apiutils.get_named_logkey('test-logkey-nick')
         assert logkey == (misc_ex.TEST_LOG_KEY,)
 
 
 def test_get_invalid_named_logkey(capsys):
-    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick', misc_ex.TEST_LOG_KEY)]):
+    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
+                                                                         misc_ex.TEST_LOG_KEY)]):
         nick_to_query = 'test-logkey-nick_invalid'
         logkey = apiutils.get_named_logkey(nick_to_query)
         out, err = capsys.readouterr()

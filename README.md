@@ -8,7 +8,16 @@ The CLI is build on the Logentries REST APIs and provides a tool to interact dir
 
 `pip install <url_to_your_repository>`
 
-**Note** Your repository should contain your config.ini file or you can alter it after the installation.
+**Note** 
+Lecli will look for config.ini file depending on your operating system.
+
+If you're running on OSX, path to your configuration file should be:
+    
+    /Users/<username>/Library/Application Support/lecli/config.ini
+    
+If you're running on Debian, path to your configuration file should be:
+    
+    /home/<username>/.config/lecli/config.ini
 
 **Configuration File**
 ----------------
