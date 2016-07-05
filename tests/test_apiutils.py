@@ -53,6 +53,14 @@ def test_generate_header_owner(mocked_owner_apikey, mocked_owner_apikey_id):
     assert misc_ex.TEST_APIKEY_WITH_VALID_LENGTH in headers['authorization-api-key']
 
 
+@patch('lecli.apiutils.get_ro_apikey')
+def test_generate_headers_user_agent(mocked_ro_apikey):
+    mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
+    headers = apiutils.generate_headers(api_key_type='ro')
+    assert "User-Agent" in headers
+    assert headers['User-Agent'] == 'lecli'
+
+
 def test_get_valid_ro_apikey():
     with patch.object(ConfigParser.ConfigParser, 'get',
                       return_value=misc_ex.TEST_APIKEY_WITH_VALID_LENGTH):

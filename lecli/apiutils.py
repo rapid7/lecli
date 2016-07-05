@@ -184,6 +184,9 @@ def generate_headers(api_key_type, method=None, action=None, body=None):
             "authorization-api-key": "%s:%s" % (
                 get_owner_apikey_id().encode('utf8'), base64.b64encode(signature))
         }
+
+    headers['User-Agent'] = 'lecli'
+
     return headers
 
 
