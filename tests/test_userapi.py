@@ -3,7 +3,7 @@ import requests
 from mock import patch
 from tabulate import tabulate
 
-from lecli import userapi
+from lecli import user_api
 from examples import misc_examples as misc_ex
 
 
@@ -11,8 +11,9 @@ from examples import misc_examples as misc_ex
 @patch('lecli.apiutils.get_account_resource_id')
 @patch('lecli.apiutils.get_owner_apikey_id')
 @patch('lecli.apiutils.get_owner_apikey')
-@patch('lecli.userapi._url')
-def test_get_owner(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, mocked_account_resource_id, capsys):
+@patch('lecli.user_api._url')
+def test_get_owner(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
+                   mocked_account_resource_id, capsys):
     mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
     mocked_owner_apikey_id.return_value = misc_ex.TEST_OWNER_APIKEY_ID
     mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
@@ -22,7 +23,7 @@ def test_get_owner(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, mock
                            body='{"owners": "ownerinfo"}',
                            content_type='application/json', )
 
-    userapi.get_owner()
+    user_api.get_owner()
 
     out, err = capsys.readouterr()
     assert tabulate("ownerinfo") in out
@@ -32,8 +33,9 @@ def test_get_owner(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, mock
 @patch('lecli.apiutils.get_account_resource_id')
 @patch('lecli.apiutils.get_owner_apikey_id')
 @patch('lecli.apiutils.get_owner_apikey')
-@patch('lecli.userapi._url')
-def test_delete_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, mocked_account_resource_id, capsys):
+@patch('lecli.user_api._url')
+def test_delete_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
+                     mocked_account_resource_id, capsys):
     mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
     mocked_owner_apikey_id.return_value = misc_ex.TEST_OWNER_APIKEY_ID
     mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
@@ -42,7 +44,7 @@ def test_delete_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, mo
     dest_url = misc_ex.MOCK_USERAPI_URL + '/' + str(misc_ex.TEST_USER_ID)
     httpretty.register_uri(httpretty.DELETE, dest_url, status=204)
 
-    userapi.delete_user(misc_ex.TEST_USER_ID)
+    user_api.delete_user(misc_ex.TEST_USER_ID)
 
     out, err = capsys.readouterr()
     assert 'Deleted user' in out
@@ -52,8 +54,9 @@ def test_delete_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, mo
 @patch('lecli.apiutils.get_account_resource_id')
 @patch('lecli.apiutils.get_owner_apikey_id')
 @patch('lecli.apiutils.get_owner_apikey')
-@patch('lecli.userapi._url')
-def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, mocked_account_resource_id, capsys):
+@patch('lecli.user_api._url')
+def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
+                           mocked_account_resource_id, capsys):
     mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
     mocked_owner_apikey_id.return_value = misc_ex.TEST_OWNER_APIKEY_ID
     mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
@@ -65,7 +68,7 @@ def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_
                            status=200,
                            content_type='application/json')
 
-    userapi.add_existing_user(misc_ex.TEST_USER_ID)
+    user_api.add_existing_user(misc_ex.TEST_USER_ID)
 
     out, err = capsys.readouterr()
     assert "Added user to account" in out
@@ -75,8 +78,9 @@ def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_
 @patch('lecli.apiutils.get_account_resource_id')
 @patch('lecli.apiutils.get_owner_apikey_id')
 @patch('lecli.apiutils.get_owner_apikey')
-@patch('lecli.userapi._url')
-def test_add_new_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, mocked_account_resource_id, capsys):
+@patch('lecli.user_api._url')
+def test_add_new_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
+                      mocked_account_resource_id, capsys):
     mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
     mocked_owner_apikey_id.return_value = misc_ex.TEST_OWNER_APIKEY_ID
     mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
@@ -87,7 +91,7 @@ def test_add_new_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, m
                            status=200,
                            content_type='application/json')
 
-    userapi.add_new_user("first_name", "last_name", "email")
+    user_api.add_new_user("first_name", "last_name", "email")
 
     out, err = capsys.readouterr()
     assert "Added user to account" in out
@@ -97,8 +101,9 @@ def test_add_new_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, m
 @patch('lecli.apiutils.get_account_resource_id')
 @patch('lecli.apiutils.get_owner_apikey_id')
 @patch('lecli.apiutils.get_owner_apikey')
-@patch('lecli.userapi._url')
-def test_list_users(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, mocked_account_resource_id, capsys):
+@patch('lecli.user_api._url')
+def test_list_users(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
+                    mocked_account_resource_id, capsys):
     mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
     mocked_owner_apikey_id.return_value = misc_ex.TEST_OWNER_APIKEY_ID
     mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
@@ -108,7 +113,7 @@ def test_list_users(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id, moc
                            body='{"users":"userinfo"}',
                            content_type="application/json")
 
-    userapi.list_users()
+    user_api.list_users()
 
     out, err = capsys.readouterr()
     assert tabulate("userinfo") in out
@@ -123,7 +128,7 @@ def test_handle_create_user_response_status_200_with_success(mocked_account_reso
                            body=misc_ex.DUMMY_USER_CONTENT)
     response = requests.get(misc_ex.MOCK_USERAPI_URL)
 
-    userapi.handle_create_user_response(response)
+    user_api.handle_create_user_response(response)
 
     out, err = capsys.readouterr()
     assert "Added user to account" in out
@@ -137,7 +142,7 @@ def test_handle_create_user_response_status_200_with_already_exists_error(mocked
                            status=200)
     response = requests.get(misc_ex.MOCK_USERAPI_URL)
 
-    userapi.handle_create_user_response(response)
+    user_api.handle_create_user_response(response)
 
     out, err = capsys.readouterr()
     assert "Error: User already in account" in out
@@ -152,7 +157,7 @@ def test_handle_create_user_response_status_201(mocked_account_resource_id, caps
                            body=misc_ex.DUMMY_USER_CONTENT)
     response = requests.get(misc_ex.MOCK_USERAPI_URL)
 
-    userapi.handle_create_user_response(response)
+    user_api.handle_create_user_response(response)
 
     out, err = capsys.readouterr()
     assert "Added user to account" in out

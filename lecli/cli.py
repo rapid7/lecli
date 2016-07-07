@@ -1,8 +1,9 @@
 import click
 
 from lecli import apiutils
-from lecli import queryapi
-from lecli import userapi
+from lecli import query_api
+from lecli import team_api
+from lecli import user_api
 
 
 @click.group()
@@ -11,6 +12,52 @@ def cli():
     """Logentries Command Line Interface"""
     # load configs from config.ini file in user_config_dir depending on running OS
     apiutils.load_config()
+
+
+@cli.command()
+def getteams():
+    """Get teams that is associated with this account"""
+    team_api.get_teams()
+
+
+@cli.command()
+@click.argument('teamid', type=click.STRING, default=None)
+def getteam(teamid):
+    """Get team with the provided id"""
+    if teamid is not None:
+        team_api.get_team(teamid)
+
+@cli.command()
+@click.argument('name', type=click.STRING, default=None)
+def createteam(name):
+    """Create a team with the provided name"""
+    if name is not None:
+        team_api.create_team(name)
+
+
+@cli.command()
+@click.argument('teamid', type=click.STRING, default=None)
+def deleteteam(teamid):
+    """Create a team with the provided name"""
+    team_api.delete_team(teamid)
+
+
+@cli.command()
+@click.argument('teamid', type=click.STRING, default=None)
+@click.argument('name', type=click.STRING, default=None)
+def renameteam(teamid, name):
+    """Update the team with the provided id with name and user.
+    This will add the user to this team if it exists"""
+    team_api.rename_team(teamid, name)
+
+
+@cli.command()
+@click.argument('teamid', type=click.STRING, default=None)
+@click.argument('userid', type=click.STRING, default=None)
+def addusertoteam(teamid, userid):
+    """Update the team with the provided id with name and user.
+    This will add the user to this team if it exists"""
+    team_api.add_user_to_team(teamid, userid)
 
 
 @cli.command()
@@ -46,9 +93,9 @@ def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefro
         leql = apiutils.get_query_from_nickname(querynick)
 
     if all([logkeys, leql, timefrom, timeto]):
-        queryapi.post_query(logkeys, leql, time_from=timefrom, time_to=timeto)
+        query_api.post_query(logkeys, leql, time_from=timefrom, time_to=timeto)
     elif all([logkeys, leql, datefrom, dateto]):
-        queryapi.post_query(logkeys, leql, date_from=datefrom, date_to=dateto)
+        query_api.post_query(logkeys, leql, date_from=datefrom, date_to=dateto)
     else:
         click.echo("Example usage: lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q "
                    "'where(method=GET) calculate(count)' -f 1465370400 -t 1465370500")
@@ -86,9 +133,9 @@ def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
         logkeys = apiutils.get_named_logkey_group(loggroup)
 
     if all([logkeys, timefrom, timeto]):
-        queryapi.get_events(logkeys, time_from=timefrom, time_to=timeto)
+        query_api.get_events(logkeys, time_from=timefrom, time_to=timeto)
     elif all([logkeys, datefrom, dateto]):
-        queryapi.get_events(logkeys, date_from=datefrom, date_to=dateto)
+        query_api.get_events(logkeys, date_from=datefrom, date_to=dateto)
     else:
         click.echo("Example usage: lecli events 12345678-aaaa-bbbb-1234-1234cb123456 "
                    "-f 1465370400 -t 1465370500")
@@ -118,7 +165,7 @@ def recentevents(logkeys, lognick, loggroup, timewindow):
         logkeys = apiutils.get_named_logkey_group(loggroup)
 
     if all([logkeys, timewindow]):
-        queryapi.get_recent_events(logkeys, timewindow)
+        query_api.get_recent_events(logkeys, timewindow)
 
     else:
         click.echo(
@@ -131,7 +178,7 @@ def recentevents(logkeys, lognick, loggroup, timewindow):
 def userlist():
     """Get list of users in account"""
 
-    userapi.list_users()
+    user_api.list_users()
 
 
 @cli.command()
@@ -155,17 +202,17 @@ def useradd(first, last, email, userid, force):
 
     elif first and last and email is not None:
         if force:
-            userapi.add_new_user(first, last, email)
+            user_api.add_new_user(first, last, email)
         else:
             if click.confirm('Please confirm you want to add user ' + first + ' ' + last):
-                userapi.add_new_user(first, last, email)
+                user_api.add_new_user(first, last, email)
 
     elif userid is not None:
         if force:
-            userapi.add_existing_user(userid)
+            user_api.add_existing_user(userid)
         else:
             if click.confirm('Please confirm you want to add user with user ID ' + userid):
-                userapi.add_existing_user(userid)
+                user_api.add_existing_user(userid)
 
 
 @cli.command()
@@ -177,14 +224,14 @@ def userdel(userid):
         click.echo('Example usage: lecli userdel -u 12345678-aaaa-bbbb-1234-1234cb123456')
 
     else:
-        userapi.delete_user(userid)
+        user_api.delete_user(userid)
 
 
 @cli.command()
 def getowner():
     """Get account owner details"""
 
-    userapi.get_owner()
+    user_api.get_owner()
 
 
 if __name__ == '__main__':

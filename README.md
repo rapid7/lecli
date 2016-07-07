@@ -158,3 +158,37 @@ The getowner command allows you to retrieve the details of the account owner, th
 ```
 lecli getowner
 ```
+
+**Team Management**
+-------------------
+Team management requires a valid read-write API key in your configuration file. The configuration file must contain a valid account_resource_id and rw_api_key in Auth section.
+
+####Get Teams
+Get all teams associated with this accounts.
+
+     lecli getteams
+     
+####Get a Specific Team
+Get a specific team by providing team UUID.
+
+    lecli getteam 12345678-aaaa-bbbb-1234-1234cb123456
+    
+####Create a New Team
+Create a new team with the given name.
+
+    lecli createateam 'My New Team Name'
+    
+####Delete a Team
+Delete a team with the given UUID.
+
+    lecli deleteteam 12345678-aaaa-bbbb-1234-1234cb123456
+    
+####Rename a Team
+Rename a team with the given UUID to given name.
+
+    lecli renameteam 12345678-aaaa-bbbb-1234-1234cb123456 'My New Team Name'
+
+####Add User to a Team
+Add a new user to a team with the given UUID and user UUID respectively.
+
+    lecli renameteam 12345678-aaaa-bbbb-1234-1234cb123456 12345678-aaaa-bbbb-1234-1234cb12345c

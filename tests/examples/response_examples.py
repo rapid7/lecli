@@ -1,13 +1,12 @@
 links = {
-  'links': [
-    {
-      'rel': 'Self',
-      'href': 'http://mydummylink.com/query/sample-continuity-suffix'
-    }
-  ],
-  'id': 'sample-continuity-id',
+    'links': [
+        {
+            'rel': 'Self',
+            'href': 'http://mydummylink.com/query/sample-continuity-suffix'
+        }
+    ],
+    'id': 'sample-continuity-id',
 }
-
 
 group_response = {
     'statistics': {
@@ -97,5 +96,19 @@ events_response = {
         {'timestamp': 1432080000011, 'message': 'Message contents1'},
         {'timestamp': 1432080000021, 'message': 'Message contents2'},
         {'timestamp': 1432080000033, 'message': 'Message contents3'}
+    ]
+}
+
+team_response = {
+    'id': '123456789012345678901234567890123456',
+    'name': 'my_team',
+    'users': [
+        {
+            'id': '123456789012345678901234567890123456',
+            'links': {
+                'href': 'https://dummy.link',
+                'ref': 'Self'
+            }
+        }
     ]
 }
