@@ -1,3 +1,5 @@
+import json
+
 import httpretty
 import requests
 from mock import patch
@@ -64,7 +66,7 @@ def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_
 
     dest_url = misc_ex.MOCK_USERAPI_URL + '/' + str(misc_ex.TEST_USER_ID)
     httpretty.register_uri(httpretty.POST, dest_url,
-                           body=misc_ex.DUMMY_USER_CONTENT,
+                           body=json.dumps(misc_ex.DUMMY_USER_CONTENT),
                            status=200,
                            content_type='application/json')
 
@@ -87,7 +89,7 @@ def test_add_new_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
     mocked_url.return_value = misc_ex.MOCK_USERAPI_URL
 
     httpretty.register_uri(httpretty.POST, misc_ex.MOCK_USERAPI_URL,
-                           body=misc_ex.DUMMY_USER_CONTENT,
+                           body=json.dumps(misc_ex.DUMMY_USER_CONTENT),
                            status=200,
                            content_type='application/json')
 
@@ -125,7 +127,7 @@ def test_handle_create_user_response_status_200_with_success(mocked_account_reso
     httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USERAPI_URL,
                            content_type="application/json",
                            status=200,
-                           body=misc_ex.DUMMY_USER_CONTENT)
+                           body=json.dumps(misc_ex.DUMMY_USER_CONTENT))
     response = requests.get(misc_ex.MOCK_USERAPI_URL)
 
     user_api.handle_create_user_response(response)
@@ -139,13 +141,14 @@ def test_handle_create_user_response_status_200_with_success(mocked_account_reso
 def test_handle_create_user_response_status_200_with_already_exists_error(mocked_account_resource_id, capsys):
     httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USERAPI_URL,
                            content_type="application/json",
-                           status=200)
+                           status=201,
+                           body=json.dumps(misc_ex.DUMMY_USER_CONTENT))
     response = requests.get(misc_ex.MOCK_USERAPI_URL)
 
     user_api.handle_create_user_response(response)
 
     out, err = capsys.readouterr()
-    assert "Error: User already in account" in out
+    assert "Added user to account" in out
 
 
 @httpretty.activate
@@ -154,7 +157,7 @@ def test_handle_create_user_response_status_201(mocked_account_resource_id, caps
     httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USERAPI_URL,
                            content_type="application/json",
                            status=201,
-                           body=misc_ex.DUMMY_USER_CONTENT)
+                           body=json.dumps(misc_ex.DUMMY_USER_CONTENT))
     response = requests.get(misc_ex.MOCK_USERAPI_URL)
 
     user_api.handle_create_user_response(response)
