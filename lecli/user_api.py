@@ -70,21 +70,15 @@ def handle_create_user_response(response):
         exit(1)
 
     if response.status_code == 200:
-        try:
-            print 'Added user to account:\n' + \
-              'Name: ' + response.json()['first_name'] + ' ' + response.json()['last_name'] + '\n' \
-              'Login: ' + response.json()['login_name'] + '\n' \
-              'Email: ' + response.json()['email'] + '\n' \
-              'User ID: ' + response.json()['id']
-        except ValueError:
-            print 'Error: User already in account'
+        user = response.json()['user']
+        print 'Added user to account:\nName: %s %s \nLogin: %s \nEmail: %s \nUser ID: %s' % \
+              (user['first_name'], user['last_name'], user['login_name'], user['email'], user['id'])
 
     if response.status_code == 201:
-        print 'Added user to account:\n' + \
-              'Name: ' + response.json()['first_name'] + ' ' + response.json()['last_name'] + '\n' \
-              'Login: ' + response.json()['login_name'] + '\n' \
-              'Email: ' + response.json()['email'] + '\n' \
-              'User ID: ' + response.json()['id']
+        print response.json()
+        user = response.json()['user']
+        print 'Added user to account:\nName: %s %s \nLogin: %s \nEmail: %s \nUser ID: %s' % \
+              (user['first_name'], user['last_name'], user['login_name'], user['email'], user['id'])
 
     if response.status_code == 403:
         print "User you attempted to add is the account owner"
@@ -109,16 +103,17 @@ def add_new_user(first_name, last_name, email):
     Add a new user to the current account.
     """
     action = 'management/accounts/' + str(apiutils.get_account_resource_id()) + '/users'
-    body = {
-        "email": str(email),
-        "first_name": str(first_name),
-        "last_name": str(last_name)
+    json_content = {
+        "user": {"email": str(email),
+                 "first_name": str(first_name),
+                 "last_name": str(last_name)
+                 }
     }
-    body = json.dumps(body, separators=(',', ':'))
+    body = json.dumps(json_content)
     headers = apiutils.generate_headers('owner', method='POST', action=action, body=body)
 
     try:
-        response = requests.request('POST', _url('user'), data=body, headers=headers)
+        response = requests.request('POST', _url('user'), json=json_content, headers=headers)
         handle_create_user_response(response)
     except requests.exceptions.RequestException as error:
         print error

@@ -3,11 +3,11 @@ TEST_OWNER_APIKEY_ID = 'test_owner_apikey_id'
 TEST_ACCOUNT_RESOURCE_ID = 'test_account_resource_id'
 
 TEST_USER_ID = "test_user_id"
-DUMMY_USER_CONTENT = '{"first_name": "", ' \
-                     '"last_name": "", ' \
-                     '"login_name": "", ' \
-                     '"email": "", ' \
-                     '"id": ""}'
+DUMMY_USER_CONTENT = {"user": {"first_name": "",
+                               "last_name": "",
+                               "login_name": "",
+                               "email": "",
+                               "id": ""}}
 
 TEST_APIKEY_WITH_VALID_LENGTH = '123456789012345678901234567890123456'
 TEST_APIKEY_WITH_INVALID_LENGTH = '123456789012345678901234567890123456_invalid'
