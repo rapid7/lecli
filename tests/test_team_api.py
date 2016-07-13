@@ -127,3 +127,26 @@ def test_add_user_to_team(mocked_url, mocked_rw_apikey, mocked_account_resource_
 
     assert "Added user with id: '%s' to team\n" % user_id_to_add == out
 
+@httpretty.activate
+@patch('lecli.apiutils.get_account_resource_id')
+@patch('lecli.apiutils.get_rw_apikey')
+@patch('lecli.team_api._url')
+def test_add_user_to_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
+    test_team_id = misc_ex.TEST_TEAM_ID
+    mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
+    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
+    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
+    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_TEAMSAPI_URL + "/" + test_team_id,
+                           status=200,
+                           body=json.dumps({'team': resp_ex.team_response}),
+                           content_type='application/json')
+    httpretty.register_uri(httpretty.PUT, misc_ex.MOCK_TEAMSAPI_URL + "/" + test_team_id,
+                           status=200,
+                           content_type='application/json')
+
+    user_id_to_add = "user_id"
+    team_api.delete_user_from_team(test_team_id, user_id_to_add)
+    out, err = capsys.readouterr()
+
+    assert "Deleted user with id: '%s' from team" % user_id_to_add in out
+

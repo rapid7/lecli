@@ -6,10 +6,14 @@ The CLI is build on the Logentries REST APIs and provides a tool to interact dir
 **Installation**
 ----------------
 
-`pip install <url_to_your_repository>`
+`pip install <url to repository>`
+
+or 
+
+`pip install <path to project directory>`
 
 **Note** 
-Lecli will look for config.ini file depending on your operating system.
+Lecli will look for the path of your config.ini file depending on your operating system:
 
 If you're running on OSX, path to your configuration file should be:
     
@@ -18,6 +22,8 @@ If you're running on OSX, path to your configuration file should be:
 If you're running on Debian, path to your configuration file should be:
     
     /home/<username>/.config/lecli/config.ini
+
+We are using `appdirs` library for this and you can always refer to its user_config_dir attribute for locating the configuration file.
 
 **Configuration File**
 ----------------
@@ -171,24 +177,29 @@ Get all teams associated with this accounts.
 ####Get a Specific Team
 Get a specific team by providing team UUID.
 
-    lecli getteam 12345678-aaaa-bbbb-1234-1234cb123456
+    lecli getteam <team id>
     
 ####Create a New Team
 Create a new team with the given name.
 
-    lecli createateam 'My New Team Name'
+    lecli createateam <new name>
     
 ####Delete a Team
 Delete a team with the given UUID.
 
-    lecli deleteteam 12345678-aaaa-bbbb-1234-1234cb123456
+    lecli deleteteam <team id>
     
 ####Rename a Team
 Rename a team with the given UUID to given name.
 
-    lecli renameteam 12345678-aaaa-bbbb-1234-1234cb123456 'My New Team Name'
+    lecli renameteam <team id> <team name>
 
 ####Add User to a Team
 Add a new user to a team with the given UUID and user UUID respectively.
 
-    lecli renameteam 12345678-aaaa-bbbb-1234-1234cb123456 12345678-aaaa-bbbb-1234-1234cb12345c
+    lecli addusertoteam <team id> <user id>
+
+####Delete User from a Team
+Add a new user to a team with the given UUID and user UUID respectively.
+
+    lecli deleteuserfromteam <team id> <user id>

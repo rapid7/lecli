@@ -57,7 +57,16 @@ def renameteam(teamid, name):
 def addusertoteam(teamid, userid):
     """Update the team with the provided id with name and user.
     This will add the user to this team if it exists"""
-    team_api.add_user_to_team(teamid, userid)
+    team_api.add_user_to_team(teamid, userid)\
+
+
+@cli.command()
+@click.argument('teamid', type=click.STRING, default=None)
+@click.argument('userid', type=click.STRING, default=None)
+def deleteuserfromteam(teamid, userid):
+    """Update the team with the provided id with name and user.
+    This will add the user to this team if it exists"""
+    team_api.delete_user_from_team(teamid, userid)
 
 
 @cli.command()
