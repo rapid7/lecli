@@ -90,9 +90,6 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# Configuration
-lecli/config.ini
-
 *.pyc
 bin/
 .idea

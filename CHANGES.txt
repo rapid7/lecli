@@ -1,3 +1,7 @@
 v0.2, 20/06/2016  -- Unit testing for lecli.
                      Directory structure refactoring for main python modules.
                      CHANGES, COPYING, MANIFEST files added.
+v0.3, 14/07/2016  -- Teams API support with create/delete/rename teams and adding/deleting users
+                     from teams.
+                     Configuration file loading during installation.
+                     Travis-tox-pylint support.

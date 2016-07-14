@@ -47,6 +47,9 @@ def print_teams(response):
 
 
 def handle_get_teams_response(response):
+    """
+    Handle get teams response.
+    """
     if response_error(response):
         exit(1)
     elif response.status_code == 200:
@@ -110,6 +113,9 @@ def create_team(name):
 
 
 def delete_team(team_id):
+    """
+    Delete a team with the provided team ID.
+    """
     url = _url() + '/' + team_id
     headers = apiutils.generate_headers('rw')
 
@@ -126,6 +132,9 @@ def delete_team(team_id):
 
 
 def rename_team(team_id, team_name):
+    """
+    Rename team with the provided team_id.
+    """
     url = _url() + '/' + team_id
     params = {
         'team': {
@@ -153,6 +162,9 @@ def rename_team(team_id, team_name):
 
 
 def add_user_to_team(team_id, user_id):
+    """
+    Add user with the provided user_id to team with provided team_id.
+    """
     headers = apiutils.generate_headers('rw')
     params = {'teamid': team_id}
     try:
@@ -192,6 +204,9 @@ def add_user_to_team(team_id, user_id):
 
 
 def delete_user_from_team(team_id, user_id):
+    """
+    Delete a user from a team.
+    """
     headers = apiutils.generate_headers('rw')
     params = {'teamid': team_id}
     try:

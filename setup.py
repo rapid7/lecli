@@ -1,8 +1,14 @@
+import os
+
+from appdirs import user_config_dir
 from setuptools import setup, find_packages
+import lecli
+
+config_path = user_config_dir(lecli.__name__)
 
 setup(
     name='logentries-lecli',
-    version='0.2',
+    version=lecli.__version__,
     author='John Fitzpatrick, Safa Topal',
     author_email='john.fitzpatrick@rapid7.com, safa.topal@rapid7.com',
     description='Logentries Command Line Interface',
@@ -12,5 +18,6 @@ setup(
     install_requires=['click==6.6', 'requests==2.9.1', 'pytz==2016.4', 'termcolor==1.1.0',
                       'tabulate==0.7.5', 'appdirs==1.4.0'],
     entry_points={'console_scripts': ['lecli = lecli.cli:cli']},
-    zip_safe=False
+    zip_safe=False,
+    data_files=[(config_path, [os.path.join(lecli.__name__, 'config.ini')])]
 )

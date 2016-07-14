@@ -7,11 +7,13 @@ import os
 import datetime
 from appdirs import user_config_dir
 
+import lecli
+
 CONFIG = ConfigParser.ConfigParser()
 
 
 def load_config():
-    config_file = os.path.join(user_config_dir('lecli'), 'config.ini')
+    config_file = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
     files_read = CONFIG.read(config_file)
     if len(files_read) != 1:
         print "Error: Config file '%s' not found" % config_file
