@@ -67,9 +67,9 @@ The command also accepts epoch time with second granularity. Epoch format time p
 Example usage: 
 ```
 lecli events 12345678-aaaa-bbbb-1234-1234cb123456 -f 1465370400 -t 1465370500
-lecli events 12345678-aaaa-bbbb-1234-1234cb123456--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
-lecli events --loggroup myloggroup--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
-lecli events --lognick mynicknamedlog--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
+lecli events 12345678-aaaa-bbbb-1234-1234cb123456 --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
+lecli events --loggroup myloggroup --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
+lecli events --lognick mynicknamedlog --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
 ```
 
 ####Query
