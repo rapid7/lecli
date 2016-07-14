@@ -75,7 +75,6 @@ def handle_create_user_response(response):
               (user['first_name'], user['last_name'], user['login_name'], user['email'], user['id'])
 
     if response.status_code == 201:
-        print response.json()
         user = response.json()['user']
         print 'Added user to account:\nName: %s %s \nLogin: %s \nEmail: %s \nUser ID: %s' % \
               (user['first_name'], user['last_name'], user['login_name'], user['email'], user['id'])
