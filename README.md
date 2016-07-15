@@ -6,6 +6,10 @@ The CLI is build on the Logentries REST APIs and provides a tool to interact dir
 **Installation**
 ----------------
 
+`pip install logentries-lecli`
+
+or
+
 `pip install <url to repository>`
 
 or 
@@ -13,7 +17,11 @@ or
 `pip install <path to project directory>`
 
 **Note** 
-Lecli will look for the path of your config.ini file depending on your operating system:
+
+
+A dummy config file will be created in config directory during installation. You should edit this file with your API keys after the installation is complete.
+
+Depending on your operating system the Lecli config can be located at the following paths:
 
 If you're running on OSX, path to your configuration file should be:
     
@@ -24,6 +32,11 @@ If you're running on Debian, path to your configuration file should be:
     /home/<username>/.config/lecli/config.ini
 
 We are using `appdirs` library for this and you can always refer to its user_config_dir attribute for locating the configuration file.
+
+**Supported Platforms**
+
+Linux - Tested on `Debian 8`
+OSX   - Tested on `El Capitan`
 
 **Configuration File**
 ----------------
