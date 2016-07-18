@@ -1,3 +1,6 @@
+"""
+Team API module.
+"""
 import json
 
 import requests
