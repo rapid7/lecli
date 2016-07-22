@@ -6,11 +6,7 @@ The CLI is build on the Logentries REST APIs and provides a tool to interact dir
 **Installation**
 ----------------
 
-`pip install logentries-lecli`
-
-or
-
-`pip install <url to repository>`
+`pip install git+<url to git repository>`
 
 or 
 
