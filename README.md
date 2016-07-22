@@ -63,13 +63,13 @@ The event and query functionality of the CLI supports a number of different ways
 
 The 'recentevents' command allows you to retrieve the most recent log events that have been sent to Logentries.
 The logs to retrieve events from can be specified in a few ways. The Log IDs can be passed directly as a space separated list of log Ids, or you can take advantage of log groups and log nicknames. Log Ids can be obtained from the settings page or log set page of a log in the Logentries UI (https://logentries.com). Log nicknames can be passed using the '--lognick' '-n' arguments, log groups can be passed using the '--loggroup' '-g' arguments. For more information in setting up log nicknames and log groups, see the 'Log Nicknames and Groups' section below.
-By default the 'recentevents' command will return events for the last 20 minutes. The command also takes an optional time argument that allows you to specify how far back in time you wish to get events from; this is passed using '--timewindow' or '-t' argument.
+By default the 'recentevents' command will return events for the last 20 minutes. The command also takes an optional time argument that allows you to specify how far back in time you wish to get events from; this is passed using '--last' or '-l' argument.
 
 Example usage: 
 ```
-lecli recentevents 12345678-aaaa-bbbb-1234-1234cb123456 -t 200
-lecli recentevents -n mynicknamedlog -t 200
-lecli recentevents -g myloggroup -t 200
+lecli recentevents 12345678-aaaa-bbbb-1234-1234cb123456 -l 200
+lecli recentevents -n mynicknamedlog -l 200
+lecli recentevents -g myloggroup -l 200
 ```
 
 ####Events
