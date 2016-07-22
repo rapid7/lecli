@@ -27,6 +27,7 @@ def getteam(teamid):
     if teamid is not None:
         team_api.get_team(teamid)
 
+
 @cli.command()
 @click.argument('name', type=click.STRING, default=None)
 def createteam(name):
@@ -58,6 +59,7 @@ def addusertoteam(teamid, userid):
     """Update the team with the provided id with name and user.
     This will add the user to this team if it exists"""
     team_api.add_user_to_team(teamid, userid)\
+
 
 
 @cli.command()
@@ -162,10 +164,10 @@ def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
               help='Nickname of log in config file')
 @click.option('-g', '--loggroup', default=None,
               help='Name of log group defined in config file')
-@click.option('-t', '--timewindow', default=1200,
+@click.option('-l', '--last', default=1200,
               help='Time window from now to now-X in seconds over which events will be returned '
                    '(Defaults to 20 mins)')
-def recentevents(logkeys, lognick, loggroup, timewindow):
+def recentevents(logkeys, lognick, loggroup, last):
     """Get recent log events"""
 
     if lognick is not None:
@@ -173,18 +175,18 @@ def recentevents(logkeys, lognick, loggroup, timewindow):
     elif loggroup is not None:
         logkeys = apiutils.get_named_logkey_group(loggroup)
 
-    if all([logkeys, timewindow]):
-        query_api.get_recent_events(logkeys, timewindow)
+    if all([logkeys, last]):
+        query_api.get_recent_events(logkeys, last)
 
     else:
         click.echo(
-            'Example usage: lecli recentevents \'12345678-aaaa-bbbb-1234-1234cb123456\' -t 200')
-        click.echo('Example usage: lecli recentevents -n mynicknamedlog -t 200')
-        click.echo('Example usage: lecli recentevents -g myloggroup -t 200')
+            'Example usage: lecli recentevents \'12345678-aaaa-bbbb-1234-1234cb123456\' -l 200')
+        click.echo('Example usage: lecli recentevents -n mynicknamedlog -l 200')
+        click.echo('Example usage: lecli recentevents -g myloggroup -l 200')
 
 
 @cli.command()
-def userlist():
+def listusers():
     """Get list of users in account"""
 
     user_api.list_users()
@@ -201,7 +203,7 @@ def userlist():
               help='User ID of user to be added')
 @click.option('--force', is_flag=True,
               help='Force adding user with confirmation prompt')
-def useradd(first, last, email, userid, force):
+def adduser(first, last, email, userid, force):
     """Add a user to account"""
 
     if not any((first, last, email, userid)) or all((first, last, email, userid)):
@@ -227,7 +229,7 @@ def useradd(first, last, email, userid, force):
 @cli.command()
 @click.option('-u', '--userid', type=click.STRING,
               help='User ID of user to be deleted')
-def userdel(userid):
+def deleteuser(userid):
     """Delete a user from account"""
     if userid is None:
         click.echo('Example usage: lecli userdel -u 12345678-aaaa-bbbb-1234-1234cb123456')

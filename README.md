@@ -15,7 +15,7 @@ or
 **Note** 
 
 
-A dummy config file will be created in config directory during installation. You should edit this file with your API keys after the installation is complete.
+If there is no lecli configuration file, a dummy config file will be created in config directory at first use of any lecli command. You should edit the file in the provided path on your shell with your API keys and other configurations after this first use.
 
 Depending on your operating system the Lecli config can be located at the following paths:
 
@@ -37,7 +37,7 @@ OSX   - Tested on `El Capitan`
 **Configuration File**
 ----------------
 In order to use the CLI you must first setup the configuration file with your API keys. 
-Your account API keys are available at logentries.com. Under the account management section select the API Keys tab. 
+Your account API keys are available at logentries.com. Under the account management section select the API Keys tab. For more information: [https://docs.logentries.com/docs/api-keys](https://docs.logentries.com/docs/api-keys)
 Here you will get access to your account resource Id and be able to generate your Owner, Read/Write and Read-Only API keys. Note that only the account owner is allowed to generate an Owner API key. 
 
 In order to do User and account management via the CLI an owner API key and account resource Id is required. Querying of events and logs can be done using the Read/Write API key.

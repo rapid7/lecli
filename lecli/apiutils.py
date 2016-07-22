@@ -12,11 +12,42 @@ import lecli
 CONFIG = ConfigParser.ConfigParser()
 
 
+def init_config():
+    config_dir = user_config_dir(lecli.__name__)
+    config_file_path = os.path.join(config_dir, 'config.ini')
+
+    if not os.path.exists(config_file_path):
+        if not os.path.exists(config_dir):
+            os.makedirs(config_dir)
+
+        dummy_config = ConfigParser.ConfigParser()
+        config_file = open(config_file_path, 'w')
+        dummy_config.add_section('Auth')
+        dummy_config.set('Auth', 'account_resource_id', '')
+        dummy_config.set('Auth', 'owner_api_key_id', '')
+        dummy_config.set('Auth', 'owner_api_key', '')
+        dummy_config.set('Auth', 'rw_api_key', '')
+
+        dummy_config.add_section('LogNicknames')
+        dummy_config.add_section("LogGroups")
+        dummy_config.write(config_file)
+        config_file.close()
+        print "An empty config file created in path %s, please check and configure it. To learn " \
+              "how to get necessary api keys, go to this Logentries documentation page: " \
+              "https://docs.logentries.com/docs/api-keys" % \
+              config_file_path
+    else:
+        print "Config file exists in the path: " + config_file_path
+
+    exit(1)
+
+
 def load_config():
     config_file = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
     files_read = CONFIG.read(config_file)
     if len(files_read) != 1:
-        print "Error: Config file '%s' not found" % config_file
+        print "Error: Config file '%s' not found, generating one..." % config_file
+        init_config()
         exit(1)
     if not CONFIG.has_section('Auth'):
         print "Error: Config file '%s' is missing Auth section" % config_file
