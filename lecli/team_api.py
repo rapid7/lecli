@@ -9,8 +9,8 @@ def _url():
     """
     Get rest query url of account resource id.
     """
-    return 'https://rest.logentries.com/management/accounts/%s' + \
-           apiutils.get_account_resource_id() + '/teams'
+    return 'https://rest.logentries.com/management/accounts/%s/teams' % \
+           apiutils.get_account_resource_id()
 
 
 def response_error(response):
