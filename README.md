@@ -6,6 +6,10 @@ The CLI is build on the Logentries REST APIs and provides a tool to interact dir
 **Installation**
 ----------------
 
+`pip install logentries-lecli`
+
+or
+
 `pip install git+<url to git repository>`
 
 or 
@@ -15,7 +19,7 @@ or
 **Note** 
 
 
-A dummy config file will be created in config directory during installation. You should edit this file with your API keys after the installation is complete.
+If there is no lecli configuration file, a dummy config file will be created in config directory at first use of any lecli command. You should edit the file in the provided path on your shell with your API keys and other configurations after this first use.
 
 Depending on your operating system the Lecli config can be located at the following paths:
 
@@ -37,7 +41,7 @@ OSX   - Tested on `El Capitan`
 **Configuration File**
 ----------------
 In order to use the CLI you must first setup the configuration file with your API keys. 
-Your account API keys are available at logentries.com. Under the account management section select the API Keys tab. 
+Your account API keys are available at logentries.com. Under the account management section select the API Keys tab. For more information: [https://docs.logentries.com/docs/api-keys](https://docs.logentries.com/docs/api-keys)
 Here you will get access to your account resource Id and be able to generate your Owner, Read/Write and Read-Only API keys. Note that only the account owner is allowed to generate an Owner API key. 
 
 In order to do User and account management via the CLI an owner API key and account resource Id is required. Querying of events and logs can be done using the Read/Write API key.
@@ -59,13 +63,13 @@ The event and query functionality of the CLI supports a number of different ways
 
 The 'recentevents' command allows you to retrieve the most recent log events that have been sent to Logentries.
 The logs to retrieve events from can be specified in a few ways. The Log IDs can be passed directly as a space separated list of log Ids, or you can take advantage of log groups and log nicknames. Log Ids can be obtained from the settings page or log set page of a log in the Logentries UI (https://logentries.com). Log nicknames can be passed using the '--lognick' '-n' arguments, log groups can be passed using the '--loggroup' '-g' arguments. For more information in setting up log nicknames and log groups, see the 'Log Nicknames and Groups' section below.
-By default the 'recentevents' command will return events for the last 20 minutes. The command also takes an optional time argument that allows you to specify how far back in time you wish to get events from; this is passed using '--timewindow' or '-t' argument.
+By default the 'recentevents' command will return events for the last 20 minutes. The command also takes an optional time argument that allows you to specify how far back in time you wish to get events from; this is passed using '--last' or '-l' argument.
 
 Example usage: 
 ```
-lecli recentevents 12345678-aaaa-bbbb-1234-1234cb123456 -t 200
-lecli recentevents -n mynicknamedlog -t 200
-lecli recentevents -g myloggroup -t 200
+lecli recentevents 12345678-aaaa-bbbb-1234-1234cb123456 -l 200
+lecli recentevents -n mynicknamedlog -l 200
+lecli recentevents -g myloggroup -l 200
 ```
 
 ####Events

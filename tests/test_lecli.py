@@ -16,11 +16,11 @@ def test_get_owner(mocked_get_owner):
 @patch('lecli.cli.user_api.delete_user')
 def test_userdel(mocked_delete_user):
     runner = CliRunner()
-    result = runner.invoke(cli.userdel, input=None)
+    result = runner.invoke(cli.deleteuser, input=None)
 
     assert result.output == "Example usage: lecli userdel -u 12345678-aaaa-bbbb-1234-1234cb123456\n"
 
-    runner.invoke(cli.userdel, ['-u', misc_ex.TEST_USER_ID])
+    runner.invoke(cli.deleteuser, ['-u', misc_ex.TEST_USER_ID])
     mocked_delete_user.assert_called_once_with(misc_ex.TEST_USER_ID)
 
 
@@ -31,14 +31,14 @@ def test_useradd(mocked_add_new_user):
     email = "email"
 
     runner = CliRunner()
-    runner.invoke(cli.useradd, ['-f', first, '-l', last, '-e', email], input='y')
+    runner.invoke(cli.adduser, ['-f', first, '-l', last, '-e', email], input='y')
     mocked_add_new_user.assert_called_once_with(first, last, email)
 
 
 @patch('lecli.cli.user_api.list_users')
 def test_userlist(mocked_list_users):
     runner = CliRunner()
-    runner.invoke(cli.userlist)
+    runner.invoke(cli.listusers)
     mocked_list_users.assert_called_once_with()
 
 
