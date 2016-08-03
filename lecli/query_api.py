@@ -169,10 +169,11 @@ def prettyprint_events(response):
     for event in data['events']:
         time_value = datetime.datetime.fromtimestamp(event['timestamp'] / 1000)
         human_ts = time_value.strftime('%Y-%m-%d %H:%M:%S')
-        if isinstance(event, dict):
-            print colored(str(human_ts), 'red')
-            print json.dumps(event, indent=4, separators={':', ';'})
-        else:
+        try:
+            message = json.loads(event['message'])
+            print colored(str(human_ts), 'red') + '\t' + colored(json.dumps(message, indent=4, separators={':', ';'})
+                                                                 , 'white')
+        except ValueError:
             print colored(str(human_ts), 'red') + '\t' + colored(event['message'], 'white')
 
 
