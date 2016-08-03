@@ -161,6 +161,13 @@ def test_get_valid_named_logkey():
         assert logkey == (misc_ex.TEST_LOG_KEY,)
 
 
+def test_case_insensitivity_of_named_logkey():
+    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
+                                                                         misc_ex.TEST_LOG_KEY)]):
+        logkey = apiutils.get_named_logkey('TEST-logkey-nick')
+        assert logkey == (misc_ex.TEST_LOG_KEY,)
+
+
 def test_get_invalid_named_logkey(capsys):
     with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
                                                                          misc_ex.TEST_LOG_KEY)]):
@@ -175,6 +182,13 @@ def test_get_valid_named_group_key():
     with patch.object(ConfigParser.ConfigParser, 'items',
                       return_value=[('test-log-group-nick', misc_ex.TEST_LOG_GROUP)]):
         logkeys = apiutils.get_named_logkey_group('test-log-group-nick')
+        assert logkeys == filter(None, str(misc_ex.TEST_LOG_GROUP).splitlines())
+
+
+def test_case_insensitivity_of_named_group_skey():
+    with patch.object(ConfigParser.ConfigParser, 'items',
+                      return_value=[('test-log-group-nick', misc_ex.TEST_LOG_GROUP)]):
+        logkeys = apiutils.get_named_logkey_group('TEST-log-group-nick')
         assert logkeys == filter(None, str(misc_ex.TEST_LOG_GROUP).splitlines())
 
 
