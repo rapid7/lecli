@@ -166,11 +166,15 @@ def prettyprint_events(response):
     Print events in a human readable way.
     """
     data = response.json()
-
     for event in data['events']:
         time_value = datetime.datetime.fromtimestamp(event['timestamp'] / 1000)
         human_ts = time_value.strftime('%Y-%m-%d %H:%M:%S')
-        print colored(str(human_ts), 'red') + '\t' + colored(event['message'], 'white')
+        try:
+            message = json.loads(event['message'])
+            print colored(str(human_ts), 'red') + '\t' + colored(json.dumps(message, indent=4, separators={':', ';'})
+                                                                 , 'white')
+        except ValueError:
+            print colored(str(human_ts), 'red') + '\t' + colored(event['message'], 'white')
 
 
 def prettyprint_statistics(response):
