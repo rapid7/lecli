@@ -35,8 +35,8 @@ We are using `appdirs` library for this and you can always refer to its user_con
 
 **Supported Platforms**
 
-Linux - Tested on `Debian 8`
-OSX   - Tested on `El Capitan`
+ * Linux - Tested on `Debian 8`
+ * OSX   - Tested on `El Capitan`
 
 **Configuration File**
 ----------------
