@@ -185,7 +185,7 @@ def test_get_valid_named_group_key():
         assert logkeys == filter(None, str(misc_ex.TEST_LOG_GROUP).splitlines())
 
 
-def test_case_insensitivity_of_named_group_skey():
+def test_case_insensitivity_of_named_groups_key():
     with patch.object(ConfigParser.ConfigParser, 'items',
                       return_value=[('test-log-group-nick', misc_ex.TEST_LOG_GROUP)]):
         logkeys = apiutils.get_named_logkey_group('TEST-log-group-nick')
