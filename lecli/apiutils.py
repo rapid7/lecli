@@ -142,6 +142,7 @@ def get_named_logkey_group(name):
     """
 
     groups = dict(CONFIG.items('LogGroups'))
+    name = name.lower()
     if name in groups:
         logkeys = filter(None, str(groups[name]).splitlines())
         for logkey in logkeys:
@@ -162,7 +163,7 @@ def get_named_logkey(name):
     """
 
     nicknames = dict(CONFIG.items('LogNicknames'))
-
+    name = name.lower()
     if name in nicknames:
         logkey = (nicknames[name],)
         if len(logkey[0]) != 36:
@@ -182,6 +183,7 @@ def get_query_from_nickname(qnick):
     """
 
     qnicknames = dict(CONFIG.items('QueryNicknames'))
+    qnick = qnick.lower()
 
     if qnick in qnicknames:
         query = qnicknames[qnick]
