@@ -232,7 +232,7 @@ def adduser(first, last, email, userid, force):
 def deleteuser(userid):
     """Delete a user from account"""
     if userid is None:
-        click.echo('Example usage: lecli userdel -u 12345678-aaaa-bbbb-1234-1234cb123456')
+        click.echo('Example usage: lecli deleteuser -u 12345678-aaaa-bbbb-1234-1234cb123456')
 
     else:
         user_api.delete_user(userid)
