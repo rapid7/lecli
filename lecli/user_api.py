@@ -64,8 +64,8 @@ def handle_create_user_response(response):
         if response.status_code >= 400:
             print 'Failed to add user - User may have already been added this account or have a ' \
                   'Logentries account'
-            print 'To add a new user: lecli useradd -f John -l Smyth -e john@smyth.com'
-            print 'To add an existing user using their user ID: lecli useradd -u ' \
+            print 'To add a new user: lecli adduser -f John -l Smyth -e john@smyth.com'
+            print 'To add an existing user using their user ID: lecli adduser -u ' \
                   '12345678-aaaa-bbbb-1234-1234cb123456'
         exit(1)
 

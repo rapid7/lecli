@@ -208,8 +208,8 @@ def adduser(first, last, email, userid, force):
 
     if not any((first, last, email, userid)) or all((first, last, email, userid)):
         click.echo('Example usage\n' +
-                   'Add a new user: lecli useradd -f John -l Smith -e john.smith@email.com\n' +
-                   'Add an existing user: lecli useradd -u 1343423')
+                   'Add a new user: lecli adduser -f John -l Smith -e john.smith@email.com\n' +
+                   'Add an existing user: lecli adduser -u 1343423')
 
     elif first and last and email is not None:
         if force:
