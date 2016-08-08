@@ -208,8 +208,8 @@ def adduser(first, last, email, userid, force):
 
     if not any((first, last, email, userid)) or all((first, last, email, userid)):
         click.echo('Example usage\n' +
-                   'Add a new user: lecli useradd -f John -l Smith -e john.smith@email.com\n' +
-                   'Add an existing user: lecli useradd -u 1343423')
+                   'Add a new user: lecli adduser -f John -l Smith -e john.smith@email.com\n' +
+                   'Add an existing user: lecli adduser -u 1343423')
 
     elif first and last and email is not None:
         if force:
@@ -232,7 +232,7 @@ def adduser(first, last, email, userid, force):
 def deleteuser(userid):
     """Delete a user from account"""
     if userid is None:
-        click.echo('Example usage: lecli userdel -u 12345678-aaaa-bbbb-1234-1234cb123456')
+        click.echo('Example usage: lecli deleteuser -u 12345678-aaaa-bbbb-1234-1234cb123456')
 
     else:
         user_api.delete_user(userid)
