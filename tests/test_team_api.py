@@ -125,13 +125,13 @@ def test_add_user_to_team(mocked_url, mocked_rw_apikey, mocked_account_resource_
     team_api.add_user_to_team(test_team_id, user_id_to_add)
     out, err = capsys.readouterr()
 
-    assert "Added user with id: '%s' to team\n" % user_id_to_add == out
+    assert "Added user with key: '%s' to team\n" % user_id_to_add == out
 
 @httpretty.activate
 @patch('lecli.apiutils.get_account_resource_id')
 @patch('lecli.apiutils.get_rw_apikey')
 @patch('lecli.team_api._url')
-def test_add_user_to_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
+def test_delete_user_from_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     test_team_id = misc_ex.TEST_TEAM_ID
     mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
@@ -148,5 +148,5 @@ def test_add_user_to_team(mocked_url, mocked_rw_apikey, mocked_account_resource_
     team_api.delete_user_from_team(test_team_id, user_id_to_add)
     out, err = capsys.readouterr()
 
-    assert "Deleted user with id: '%s' from team" % user_id_to_add in out
+    assert "Deleted user with key: '%s' from team" % user_id_to_add in out
 

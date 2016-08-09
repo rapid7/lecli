@@ -54,21 +54,21 @@ def renameteam(teamid, name):
 
 @cli.command()
 @click.argument('teamid', type=click.STRING, default=None)
-@click.argument('userid', type=click.STRING, default=None)
-def addusertoteam(teamid, userid):
+@click.argument('userkey', type=click.STRING, default=None)
+def addusertoteam(teamid, userkey):
     """Update the team with the provided id with name and user.
     This will add the user to this team if it exists"""
-    team_api.add_user_to_team(teamid, userid)\
+    team_api.add_user_to_team(teamid, userkey)\
 
 
 
 @cli.command()
 @click.argument('teamid', type=click.STRING, default=None)
-@click.argument('userid', type=click.STRING, default=None)
-def deleteuserfromteam(teamid, userid):
+@click.argument('userkey', type=click.STRING, default=None)
+def deleteuserfromteam(teamid, userkey):
     """Update the team with the provided id with name and user.
     This will add the user to this team if it exists"""
-    team_api.delete_user_from_team(teamid, userid)
+    team_api.delete_user_from_team(teamid, userkey)
 
 
 @cli.command()
@@ -199,14 +199,14 @@ def listusers():
               help='Last name of user to be added')
 @click.option('-e', '--email', type=click.STRING,
               help='Email address of user to be added')
-@click.option('-u', '--userid', type=click.STRING,
-              help='User ID of user to be added')
+@click.option('-u', '--userkey', type=click.STRING,
+              help='User Key of user to be added')
 @click.option('--force', is_flag=True,
               help='Force adding user with confirmation prompt')
-def adduser(first, last, email, userid, force):
+def adduser(first, last, email, userkey, force):
     """Add a user to account"""
 
-    if not any((first, last, email, userid)) or all((first, last, email, userid)):
+    if not any((first, last, email, userkey)) or all((first, last, email, userkey)):
         click.echo('Example usage\n' +
                    'Add a new user: lecli adduser -f John -l Smith -e john.smith@email.com\n' +
                    'Add an existing user: lecli adduser -u 1343423')
@@ -218,24 +218,24 @@ def adduser(first, last, email, userid, force):
             if click.confirm('Please confirm you want to add user ' + first + ' ' + last):
                 user_api.add_new_user(first, last, email)
 
-    elif userid is not None:
+    elif userkey is not None:
         if force:
-            user_api.add_existing_user(userid)
+            user_api.add_existing_user(userkey)
         else:
-            if click.confirm('Please confirm you want to add user with user ID ' + userid):
-                user_api.add_existing_user(userid)
+            if click.confirm('Please confirm you want to add user with User Key ' + userkey):
+                user_api.add_existing_user(userkey)
 
 
 @cli.command()
-@click.option('-u', '--userid', type=click.STRING,
-              help='User ID of user to be deleted')
-def deleteuser(userid):
+@click.option('-u', '--userkey', type=click.STRING,
+              help='User Key of user to be deleted')
+def deleteuser(userkey):
     """Delete a user from account"""
-    if userid is None:
+    if userkey is None:
         click.echo('Example usage: lecli deleteuser -u 12345678-aaaa-bbbb-1234-1234cb123456')
 
     else:
-        user_api.delete_user(userid)
+        user_api.delete_user(userkey)
 
 
 @cli.command()

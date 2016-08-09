@@ -20,8 +20,8 @@ def test_userdel(mocked_delete_user):
 
     assert result.output == "Example usage: lecli deleteuser -u 12345678-aaaa-bbbb-1234-1234cb123456\n"
 
-    runner.invoke(cli.deleteuser, ['-u', misc_ex.TEST_USER_ID])
-    mocked_delete_user.assert_called_once_with(misc_ex.TEST_USER_ID)
+    runner.invoke(cli.deleteuser, ['-u', misc_ex.TEST_USER_KEY])
+    mocked_delete_user.assert_called_once_with(misc_ex.TEST_USER_KEY)
 
 
 @patch('lecli.cli.user_api.add_new_user')

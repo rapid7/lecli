@@ -65,18 +65,18 @@ def handle_create_user_response(response):
             print 'Failed to add user - User may have already been added this account or have a ' \
                   'Logentries account'
             print 'To add a new user: lecli adduser -f John -l Smyth -e john@smyth.com'
-            print 'To add an existing user using their user ID: lecli adduser -u ' \
+            print 'To add an existing user using their User Key: lecli adduser -u ' \
                   '12345678-aaaa-bbbb-1234-1234cb123456'
         exit(1)
 
     if response.status_code == 200:
         user = response.json()['user']
-        print 'Added user to account:\nName: %s %s \nLogin: %s \nEmail: %s \nUser ID: %s' % \
+        print 'Added user to account:\nName: %s %s \nLogin: %s \nEmail: %s \nUser Key: %s' % \
               (user['first_name'], user['last_name'], user['login_name'], user['email'], user['id'])
 
     if response.status_code == 201:
         user = response.json()['user']
-        print 'Added user to account:\nName: %s %s \nLogin: %s \nEmail: %s \nUser ID: %s' % \
+        print 'Added user to account:\nName: %s %s \nLogin: %s \nEmail: %s \nUser Key: %s' % \
               (user['first_name'], user['last_name'], user['login_name'], user['email'], user['id'])
 
     if response.status_code == 403:
@@ -119,11 +119,11 @@ def add_new_user(first_name, last_name, email):
         exit(1)
 
 
-def add_existing_user(user_id):
+def add_existing_user(user_key):
     """
     Add a user that already exist to the current account.
     """
-    url = _url('user') + '/' + str(user_id)
+    url = _url('user') + '/' + str(user_key)
     action = url.split("com/")[1]
     headers = apiutils.generate_headers('owner', method='POST', action=action, body='')
 
@@ -135,11 +135,11 @@ def add_existing_user(user_id):
         exit(1)
 
 
-def delete_user(user_id):
+def delete_user(user_key):
     """
     Delete a user from the current account.
     """
-    url = _url('user') + '/' + str(user_id)
+    url = _url('user') + '/' + str(user_key)
     action = url.split("com/")[1]
     headers = apiutils.generate_headers('owner', method='DELETE', action=action, body='')
 
