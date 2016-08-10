@@ -137,7 +137,7 @@ The user and account management functionality of the CLI can only be used with a
 It is worth noting that if your account does not have a specific owner set then some user management functions may fail with a 500 error; to check if an owner is set the 'getowner' command below can be used. If no owner is set then you must regenerate the owner API key, at which point you will be asked to set an account owner.
 
 ####List Users
-The 'userlist' command will return a list of all users that have access to the account for which the CLI has been configured. The command will return the users first and last name, email address, user ID and the last time they logged in. The 'userlist' command does not accept any arguments.
+The 'userlist' command will return a list of all users that have access to the account for which the CLI has been configured. The command will return the users first and last name, email address, user key and the last time they logged in. The 'userlist' command does not accept any arguments.
 
 Example usage:
 ```
@@ -148,14 +148,14 @@ lecli userlist
 The 'useradd' command allows you to add a user to your account. There are two ways to add users, depending on whether they are a new or existing user. 
 A new user is a user that has no Logentries account. 
 
-To add a new user you must provide their first and last name, and email address. If successfully added the CLI will print the users account information, including their newly generated user Id. A user added via the CLI must then go to https://logentries.com/user/password-reset/ and enter their email address. They will then be sent a link that they can use to setup the password for their new account.
+To add a new user you must provide their first and last name, and email address. If successfully added the CLI will print the users account information, including their newly generated user key. A user added via the CLI must then go to https://logentries.com/user/password-reset/ and enter their email address. They will then be sent a link that they can use to setup the password for their new account.
 
 A new user can be added using the following command
 ```
 lecli useradd -f John -l Smith -e john.smith@email.com
 ```
 
-To add an existing user (i.e. a user that already has a Logentries account, even if not associated with your account), you must first obtain their user Id. The user can obtain their user Id from the account management page of the Logentries application at https://logentries.com
+To add an existing user (i.e. a user that already has a Logentries account, even if not associated with your account), you must first obtain their user key. The user can obtain their user key from the account management page of the Logentries application at https://logentries.com
 
 An existing user can be added to your account use the following command
 ```
@@ -210,9 +210,9 @@ Rename a team with the given UUID to given name.
 ####Add User to a Team
 Add a new user to a team with the given UUID and user UUID respectively.
 
-    lecli addusertoteam <team id> <user id>
+    lecli addusertoteam <team id> <user key>
 
 ####Delete User from a Team
 Add a new user to a team with the given UUID and user UUID respectively.
 
-    lecli deleteuserfromteam <team id> <user id>
+    lecli deleteuserfromteam <team id> <user key>
