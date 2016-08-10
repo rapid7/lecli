@@ -161,9 +161,9 @@ def rename_team(team_id, team_name):
         exit(1)
 
 
-def add_user_to_team(team_id, user_id):
+def add_user_to_team(team_id, user_key):
     """
-    Add user with the provided user_id to team with provided team_id.
+    Add user with the provided user_key to team with provided team_id.
     """
     headers = apiutils.generate_headers('rw')
     params = {'teamid': team_id}
@@ -176,9 +176,9 @@ def add_user_to_team(team_id, user_id):
                 'team': {
                     'name': response.json()['team']['name'],
                     'users': [
-                        # we are doing a patch request here so it's safe to include the user_id
+                        # we are doing a patch request here so it's safe to include the user_key
                         # we want to add here
-                        {'id': user_id}
+                        {'id': user_key}
                     ]
                 }
             }
@@ -186,11 +186,11 @@ def add_user_to_team(team_id, user_id):
             try:
                 response = requests.patch(url, json=params, headers=headers)
                 if response_error(response):  # Check response has no errors
-                    print 'Adding user to team with id: %s failed, status code: %d' \
+                    print 'Adding user to team with key: %s failed, status code: %d' \
                           % (team_id, response.status_code)
                     exit(1)
                 elif response.status_code == 200:
-                    print "Added user with id: '%s' to team" % user_id
+                    print "Added user with key: '%s' to team" % user_key
             except requests.exceptions.RequestException as error:
                 print error
                 exit(1)
@@ -203,7 +203,7 @@ def add_user_to_team(team_id, user_id):
         exit(1)
 
 
-def delete_user_from_team(team_id, user_id):
+def delete_user_from_team(team_id, user_key):
     """
     Delete a user from a team.
     """
@@ -218,18 +218,18 @@ def delete_user_from_team(team_id, user_id):
                 'team': {
                     'name': response.json()['team']['name'],
                     'users': [user for user in response.json()['team']['users'] if user['id'] !=
-                              user_id]
+                              user_key]
                 }
             }
             headers = apiutils.generate_headers('rw')
             try:
                 response = requests.put(url, json=params, headers=headers)
                 if response_error(response):  # Check response has no errors
-                    print 'Deleting user from team with id: %s failed, status code: %d' \
+                    print 'Deleting user from team with key: %s failed, status code: %d' \
                           % (team_id, response.status_code)
                     exit(1)
                 elif response.status_code == 200:
-                    print "Deleted user with id: '%s' from team: %s" % (user_id, team_id)
+                    print "Deleted user with key: '%s' from team: %s" % (user_key, team_id)
             except requests.exceptions.RequestException as error:
                 print error
                 exit(1)

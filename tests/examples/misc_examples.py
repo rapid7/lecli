@@ -2,7 +2,7 @@ TEST_OWNER_APIKEY = 'test_owner_apikey'
 TEST_OWNER_APIKEY_ID = 'test_owner_apikey_id'
 TEST_ACCOUNT_RESOURCE_ID = 'test_account_resource_id'
 
-TEST_USER_ID = "test_user_id"
+TEST_USER_KEY = "test_user_key"
 DUMMY_USER_CONTENT = {"user": {"first_name": "",
                                "last_name": "",
                                "login_name": "",
