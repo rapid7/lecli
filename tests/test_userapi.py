@@ -5,8 +5,8 @@ import requests
 from mock import patch
 from tabulate import tabulate
 
-from lecli import user_api
 from examples import misc_examples as misc_ex
+from lecli import user_api
 
 
 @httpretty.activate
@@ -138,7 +138,8 @@ def test_handle_create_user_response_status_200_with_success(mocked_account_reso
 
 @httpretty.activate
 @patch('lecli.apiutils.get_account_resource_id')
-def test_handle_create_user_response_status_200_with_already_exists_error(mocked_account_resource_id, capsys):
+def test_handle_create_user_response_status_200_with_already_exists_error(
+        mocked_account_resource_id, capsys):
     httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USERAPI_URL,
                            content_type="application/json",
                            status=201,

@@ -1,4 +1,8 @@
+"""
+Query API module.
+"""
 from __future__ import division
+
 import json
 import time
 
@@ -13,7 +17,7 @@ def _url(path):
     """
     Get rest query url of a specific path.
     """
-    return 'https://rest.logentries.com/query/' + path + '/'
+    return 'https://rest.logentries.com/query/%s/' % path
 
 
 def response_error(response):
@@ -171,8 +175,8 @@ def prettyprint_events(response):
         human_ts = time_value.strftime('%Y-%m-%d %H:%M:%S')
         try:
             message = json.loads(event['message'])
-            print colored(str(human_ts), 'red') + '\t' + colored(json.dumps(message, indent=4, separators={':', ';'})
-                                                                 , 'white')
+            print colored(str(human_ts), 'red') + '\t' + \
+                  colored(json.dumps(message, indent=4, separators={':', ';'}), 'white')
         except ValueError:
             print colored(str(human_ts), 'red') + '\t' + colored(event['message'], 'white')
 

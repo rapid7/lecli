@@ -1,3 +1,6 @@
+"""
+User API module.
+"""
 import json
 
 import requests
@@ -11,11 +14,11 @@ def _url(endpoint):
     Get rest query url of account resource id.
     """
     if endpoint == 'owner':
-        return 'https://rest.logentries.com/management/accounts/' + str(
-            apiutils.get_account_resource_id()) + '/owners'
+        return 'https://rest.logentries.com/management/accounts/%s/owners' % \
+               apiutils.get_account_resource_id()
     elif endpoint == 'user':
-        return 'https://rest.logentries.com/management/accounts/' + str(
-            apiutils.get_account_resource_id()) + '/users'
+        return 'https://rest.logentries.com/management/accounts/%s/users' % \
+               apiutils.get_account_resource_id()
 
 
 def response_error(response):
@@ -103,10 +106,12 @@ def add_new_user(first_name, last_name, email):
     """
     action = 'management/accounts/' + str(apiutils.get_account_resource_id()) + '/users'
     json_content = {
-        "user": {"email": str(email),
-                 "first_name": str(first_name),
-                 "last_name": str(last_name)
-                 }
+        "user":
+            {
+                "email": str(email),
+                "first_name": str(first_name),
+                "last_name": str(last_name)
+            }
     }
     body = json.dumps(json_content)
     headers = apiutils.generate_headers('owner', method='POST', action=action, body=body)
