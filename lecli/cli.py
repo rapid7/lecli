@@ -1,5 +1,9 @@
+"""
+Main lecli module powered by click library.
+"""
 import click
 
+import lecli
 from lecli import apiutils
 from lecli import query_api
 from lecli import team_api
@@ -7,7 +11,7 @@ from lecli import user_api
 
 
 @click.group()
-@click.version_option(version=0.2)
+@click.version_option(version=lecli.__version__)
 def cli():
     """Logentries Command Line Interface"""
     # load configs from config.ini file in user_config_dir depending on running OS
@@ -101,7 +105,7 @@ def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefro
     if all([leql, querynick]):
         click.echo("Cannot define a LEQL query and query nickname in the same query request")
     elif querynick is not None:
-        leql = apiutils.get_query_from_nickname(querynick)
+        leql = apiutils.get_named_query(querynick)
 
     if all([logkeys, leql, timefrom, timeto]):
         query_api.post_query(logkeys, leql, time_from=timefrom, time_to=timeto)

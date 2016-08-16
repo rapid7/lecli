@@ -1,3 +1,6 @@
+"""
+Configuration and api keys util module.
+"""
 import ConfigParser
 import base64
 import hashlib
@@ -9,24 +12,47 @@ from appdirs import user_config_dir
 
 import lecli
 
+AUTH_SECTION = 'Auth'
 CONFIG = ConfigParser.ConfigParser()
+CONFIG_FILE_PATH = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
+
+
+def print_config_error_and_exit(section=None, config_key=None, value=None):
+    """
+    Print appropriate apiutils error message and exit.
+    """
+    if not section:
+        print "Error: Configuration file '%s' not found" % CONFIG_FILE_PATH
+    elif not config_key:
+        print "Error: Section '%s' was not found in configuration file(%s)" % (
+            section, CONFIG_FILE_PATH)
+    elif not value:
+        print "Error: Configuration key for %s was not found in configuration file(%s) in '%s' " \
+              "section" % (config_key, CONFIG_FILE_PATH, section)
+    else:
+        print "Error: %s = '%s' is not of correct length in section: '%s' of your configuration " \
+              "file: '%s'" % (config_key, value, section, CONFIG_FILE_PATH)
+
+    exit(1)
 
 
 def init_config():
+    """
+    Initialize config file in the OS specific config path if there is no config file exists.
+    """
     config_dir = user_config_dir(lecli.__name__)
-    config_file_path = os.path.join(config_dir, 'config.ini')
 
-    if not os.path.exists(config_file_path):
+    if not os.path.exists(CONFIG_FILE_PATH):
         if not os.path.exists(config_dir):
             os.makedirs(config_dir)
 
         dummy_config = ConfigParser.ConfigParser()
-        config_file = open(config_file_path, 'w')
-        dummy_config.add_section('Auth')
-        dummy_config.set('Auth', 'account_resource_id', '')
-        dummy_config.set('Auth', 'owner_api_key_id', '')
-        dummy_config.set('Auth', 'owner_api_key', '')
-        dummy_config.set('Auth', 'rw_api_key', '')
+        config_file = open(CONFIG_FILE_PATH, 'w')
+        dummy_config.add_section(AUTH_SECTION)
+        dummy_config.set(AUTH_SECTION, 'account_resource_id', '')
+        dummy_config.set(AUTH_SECTION, 'owner_api_key_id', '')
+        dummy_config.set(AUTH_SECTION, 'owner_api_key', '')
+        dummy_config.set(AUTH_SECTION, 'rw_api_key', '')
 
         dummy_config.add_section('LogNicknames')
         dummy_config.add_section("LogGroups")
@@ -35,23 +61,26 @@ def init_config():
         print "An empty config file created in path %s, please check and configure it. To learn " \
               "how to get necessary api keys, go to this Logentries documentation page: " \
               "https://docs.logentries.com/docs/api-keys" % \
-              config_file_path
+              CONFIG_FILE_PATH
     else:
-        print "Config file exists in the path: " + config_file_path
+        print "Config file exists in the path: " + CONFIG_FILE_PATH
 
     exit(1)
 
 
 def load_config():
-    config_file = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
-    files_read = CONFIG.read(config_file)
+    """
+    Load config from OS specific config path into ConfigParser object.
+    :return:
+    """
+    files_read = CONFIG.read(CONFIG_FILE_PATH)
     if len(files_read) != 1:
-        print "Error: Config file '%s' not found, generating one..." % config_file
+        print "Error: Config file '%s' not found, generating one..." % CONFIG_FILE_PATH
         init_config()
         exit(1)
-    if not CONFIG.has_section('Auth'):
-        print "Error: Config file '%s' is missing Auth section" % config_file
-        exit(1)
+        print_config_error_and_exit()
+    if not CONFIG.has_section(AUTH_SECTION):
+        print_config_error_and_exit(section=AUTH_SECTION)
 
 
 def get_ro_apikey():
@@ -59,15 +88,16 @@ def get_ro_apikey():
     Get read-only api key from the config file.
     """
 
-    ro_apikey = None
+    config_key = 'ro_api_key'
     try:
-        ro_apikey = CONFIG.get('Auth', 'ro_api_key')
-        if len(ro_apikey) != 36:
-            print 'Error: Read-only API Key not of correct length'
+        ro_api_key = CONFIG.get(AUTH_SECTION, config_key)
+        if len(ro_api_key) != 36:
+            print_config_error_and_exit(AUTH_SECTION, 'Read-only API key(%s)' % config_key,
+                                        ro_api_key)
+        else:
+            return ro_api_key
     except ConfigParser.NoOptionError:
-        print 'Error: Read-only API Key not configured in configuration file'
-        exit(1)
-    return ro_apikey
+        print_config_error_and_exit(AUTH_SECTION, 'Read-only API key(%s)' % config_key)
 
 
 def get_rw_apikey():
@@ -75,15 +105,16 @@ def get_rw_apikey():
     Get read-write api key from the config file.
     """
 
-    rw_apikey = None
+    config_key = 'rw_api_key'
     try:
-        rw_apikey = CONFIG.get('Auth', 'rw_api_key')
-        if len(rw_apikey) != 36:
-            print 'Error: Read/Write API Key not of correct length'
+        rw_api_key = CONFIG.get(AUTH_SECTION, config_key)
+        if len(rw_api_key) != 36:
+            print_config_error_and_exit(AUTH_SECTION, 'Read/Write API key(%s)' % config_key,
+                                        rw_api_key)
+        else:
+            return rw_api_key
     except ConfigParser.NoOptionError:
-        print 'Error: Read/Write API Key not configured in configuration file'
-        exit(1)
-    return rw_apikey
+        print_config_error_and_exit(AUTH_SECTION, 'Read/Write API key(%s)' % config_key)
 
 
 def get_owner_apikey():
@@ -91,15 +122,17 @@ def get_owner_apikey():
     Get owner api key from the config file.
     """
 
-    owner_apikey = None
+    config_key = 'owner_api_key'
     try:
-        owner_apikey = CONFIG.get('Auth', 'owner_api_key')
-        if len(owner_apikey) != 36:
-            print 'Error: Owner API Key not of correct length'
+        owner_api_key = CONFIG.get(AUTH_SECTION, config_key)
+        if len(owner_api_key) != 36:
+            print_config_error_and_exit(AUTH_SECTION, 'Owner API key(%s)' % config_key,
+                                        owner_api_key)
+            return
+        else:
+            return owner_api_key
     except ConfigParser.NoOptionError:
-        print 'Error: Owner API Key not configured in configuration file'
-        exit(1)
-    return owner_apikey
+        print_config_error_and_exit(AUTH_SECTION, 'Owner API key(%s)' % config_key)
 
 
 def get_owner_apikey_id():
@@ -107,15 +140,17 @@ def get_owner_apikey_id():
     Get owner api key id from the config file.
     """
 
-    owner_apikey_id = None
+    config_key = 'owner_api_key_id'
     try:
-        owner_apikey_id = CONFIG.get('Auth', 'owner_api_key_id')
+        owner_apikey_id = CONFIG.get(AUTH_SECTION, config_key)
         if len(owner_apikey_id) != 36:
-            print 'Error: Owner API Key ID not of correct length'
+            print_config_error_and_exit(AUTH_SECTION, 'Owner API key ID(%s)' % config_key,
+                                        owner_apikey_id)
+            return
+        else:
+            return owner_apikey_id
     except ConfigParser.NoOptionError:
-        print 'Error: Owner API Key ID not configured in configuration file'
-        exit(1)
-    return owner_apikey_id
+        print_config_error_and_exit(AUTH_SECTION, 'Owner API key ID(%s)' % config_key)
 
 
 def get_account_resource_id():
@@ -123,15 +158,17 @@ def get_account_resource_id():
     Get account resource id from the config file.
     """
 
-    account_resource_id = None
+    config_key = 'account_resource_id'
     try:
-        account_resource_id = CONFIG.get('Auth', 'account_resource_id')
+        account_resource_id = CONFIG.get(AUTH_SECTION, config_key)
         if len(account_resource_id) != 36:
-            print 'Error: Account Resource ID not of correct length'
+            print_config_error_and_exit(AUTH_SECTION, 'Account Resource ID(%s)' % config_key,
+                                        account_resource_id)
+            return
+        else:
+            return account_resource_id
     except ConfigParser.NoOptionError:
-        print 'Error: Account Resource ID not configured in configuration file'
-        exit(1)
-    return account_resource_id
+        print_config_error_and_exit(AUTH_SECTION, 'Account Resource ID(%s)' % config_key)
 
 
 def get_named_logkey_group(name):
@@ -141,18 +178,20 @@ def get_named_logkey_group(name):
     :param name: name of the group
     """
 
-    groups = dict(CONFIG.items('LogGroups'))
-    name = name.lower()
-    if name in groups:
-        logkeys = filter(None, str(groups[name]).splitlines())
-        for logkey in logkeys:
-            if len(logkey) != 36:
-                print 'Error: Logkey is not of correct length.'
-                return
-        return logkeys
-    else:
-        print "Error: No group with name '%s'" % name
-        return None
+    section = 'LogGroups'
+    try:
+        groups = dict(CONFIG.items(section))
+        name = name.lower()
+        if name in groups:
+            logkeys = [line for line in str(groups[name]).splitlines() if line is not None]
+            for logkey in logkeys:
+                if len(logkey) != 36:
+                    print_config_error_and_exit(section, 'Named Logkey Group(%s)' % name, logkey)
+            return logkeys
+        else:
+            print_config_error_and_exit(section, 'Named Logkey Group(%s)' % name)
+    except ConfigParser.NoSectionError:
+        print_config_error_and_exit(section)
 
 
 def get_named_logkey(name):
@@ -162,35 +201,42 @@ def get_named_logkey(name):
     :param name: name of the log key
     """
 
-    nicknames = dict(CONFIG.items('LogNicknames'))
-    name = name.lower()
-    if name in nicknames:
-        logkey = (nicknames[name],)
-        if len(logkey[0]) != 36:
-            print 'Error: Logkey is not of correct length. '
+    section = 'LogNicknames'
+
+    try:
+        named_logkeys = dict(CONFIG.items(section))
+        name = name.lower()
+        if name in named_logkeys:
+            logkey = (named_logkeys[name],)
+            if len(logkey[0]) != 36:
+                print_config_error_and_exit(section, 'Named Logkey(%s)' % name, logkey)
+            else:
+                return logkey
         else:
-            return logkey
-    else:
-        print "Error: No nickname with name '%s'" % name
-        return None
+            print_config_error_and_exit(section, 'Named Logkey(%s)' % name)
+    except ConfigParser.NoSectionError:
+        print_config_error_and_exit(section)
 
 
-def get_query_from_nickname(qnick):
+def get_named_query(name):
     """
     Get named query from config file.
 
-    :param qnick: query nick
+    :param name: query nick
     """
 
-    qnicknames = dict(CONFIG.items('QueryNicknames'))
-    qnick = qnick.lower()
+    section = 'QueryNicknames'
 
-    if qnick in qnicknames:
-        query = qnicknames[qnick]
-        return query
-    else:
-        print "Error: No query nickname with name '%s'" % qnick
-        return None
+    try:
+        named_queries = dict(CONFIG.items(section))
+        name = name.lower()
+        if name in named_queries:
+            query = named_queries[name]
+            return query
+        else:
+            print_config_error_and_exit(section, 'Named Query(%s)' % name)
+    except ConfigParser.NoSectionError:
+        print_config_error_and_exit(section)
 
 
 def generate_headers(api_key_type, method=None, action=None, body=None):
