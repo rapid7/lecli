@@ -10,7 +10,7 @@ The CLI is build on the Logentries REST APIs and provides a tool to interact dir
 
 or
 
-`pip install git+<url to git repository>`
+`pip install git+https://github.com/rapid7/lecli`
 
 or 
 
