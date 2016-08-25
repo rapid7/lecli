@@ -66,7 +66,7 @@ def handle_response(response, expand=False):
         return
 
 
-def continue_request(response, expand):
+def continue_request(response, expand=False):
     """
     Continue making request to the url in the response.
     """
