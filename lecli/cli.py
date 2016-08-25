@@ -93,9 +93,12 @@ def deleteuserfromteam(teamid, userkey):
               help='Date/Time to query from (ISO-8601 datetime)')
 @click.option('--dateto',
               help='Date/Time to query to (ISO-8601 datetime)')
-def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefrom, dateto):
+@click.option('-e', '--expand', is_flag=True,
+              help='Expand JSON')
+def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefrom, dateto, expand):
     """Query logs using LEQL"""
-
+    print "expand: ",
+    print expand
     if lognick is not None:
         logkeys = apiutils.get_named_logkey(lognick)
 
@@ -108,9 +111,9 @@ def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefro
         leql = apiutils.get_named_query(querynick)
 
     if all([logkeys, leql, timefrom, timeto]):
-        query_api.post_query(logkeys, leql, time_from=timefrom, time_to=timeto)
+        query_api.post_query(logkeys, leql, time_from=timefrom, time_to=timeto, expand=expand)
     elif all([logkeys, leql, datefrom, dateto]):
-        query_api.post_query(logkeys, leql, date_from=datefrom, date_to=dateto)
+        query_api.post_query(logkeys, leql, date_from=datefrom, date_to=dateto, expand=expand)
     else:
         click.echo("Example usage: lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q "
                    "'where(method=GET) calculate(count)' -f 1465370400 -t 1465370500")
@@ -139,7 +142,9 @@ def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefro
               help='Date/Time to get events from (ISO-8601 datetime)')
 @click.option('--dateto',
               help='Date/Time to get events to (ISO-8601 datetime)')
-def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
+@click.option('-e', '--expand', is_flag=True,
+              help='Expand JSON')
+def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto, expand):
     """Get log events"""
 
     if lognick is not None:
@@ -148,9 +153,9 @@ def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
         logkeys = apiutils.get_named_logkey_group(loggroup)
 
     if all([logkeys, timefrom, timeto]):
-        query_api.get_events(logkeys, time_from=timefrom, time_to=timeto)
+        query_api.get_events(logkeys, time_from=timefrom, time_to=timeto, expand=expand)
     elif all([logkeys, datefrom, dateto]):
-        query_api.get_events(logkeys, date_from=datefrom, date_to=dateto)
+        query_api.get_events(logkeys, date_from=datefrom, date_to=dateto, expand=expand)
     else:
         click.echo("Example usage: lecli events 12345678-aaaa-bbbb-1234-1234cb123456 "
                    "-f 1465370400 -t 1465370500")
@@ -171,7 +176,9 @@ def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
 @click.option('-l', '--last', default=1200,
               help='Time window from now to now-X in seconds over which events will be returned '
                    '(Defaults to 20 mins)')
-def recentevents(logkeys, lognick, loggroup, last):
+@click.option('-e', '--expand', is_flag=True,
+              help='Expand JSON')
+def recentevents(logkeys, lognick, loggroup, last, expand):
     """Get recent log events"""
 
     if lognick is not None:
@@ -180,7 +187,7 @@ def recentevents(logkeys, lognick, loggroup, last):
         logkeys = apiutils.get_named_logkey_group(loggroup)
 
     if all([logkeys, last]):
-        query_api.get_recent_events(logkeys, last)
+        query_api.get_recent_events(logkeys, last, expand=expand)
 
     else:
         click.echo(

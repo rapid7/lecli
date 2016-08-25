@@ -12,7 +12,6 @@ from termcolor import colored
 
 from lecli import apiutils
 
-
 def _url(path):
     """
     Get rest query url of a specific path.
@@ -47,7 +46,7 @@ def response_error(response):
     return False
 
 
-def handle_response(response):
+def handle_response(response, expand=False):
     """
     Handle response. Exit if it has any errors, continue if status code is 202, print response
     if status code is 200.
@@ -55,19 +54,19 @@ def handle_response(response):
     if response_error(response) is True:  # Check response has no errors
         exit(1)
     elif response.status_code == 200:
-        print_response(response)
+        print_response(response, expand)
         if 'links' in response.json():
             next_url = response.json()['links'][0]['href']
             next_response = fetch_results(next_url)
-            handle_response(next_response)
+            handle_response(next_response, expand)
             return
         return
     elif response.status_code == 202:
-        continue_request(response)
+        continue_request(response, expand)
         return
 
 
-def continue_request(response):
+def continue_request(response, expand):
     """
     Continue making request to the url in the response.
     """
@@ -75,7 +74,7 @@ def continue_request(response):
     if 'links' in response.json():
         continue_url = response.json()['links'][0]['href']
         new_response = fetch_results(continue_url)
-        handle_response(new_response)
+        handle_response(new_response, expand)
 
 
 def fetch_results(provided_url):
@@ -90,7 +89,7 @@ def fetch_results(provided_url):
         exit(1)
 
 
-def get_recent_events(log_keys, last_x_seconds=200):
+def get_recent_events(log_keys, last_x_seconds=200, expand=False):
     """
     Get recent events belonging to provided log_keys in the last_x_seconds.
     """
@@ -103,13 +102,13 @@ def get_recent_events(log_keys, last_x_seconds=200):
     try:
         response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
                                  json=payload)
-        handle_response(response)
+        handle_response(response, expand)
     except requests.exceptions.RequestException as error:
         print error
         exit(1)
 
 
-def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=None):
+def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=None, expand=False):
     """
     Get events belonging to log_keys and within the time range provided.
     """
@@ -126,13 +125,13 @@ def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=N
     try:
         response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
                                  json=payload)
-        handle_response(response)
+        handle_response(response, expand)
     except requests.exceptions.RequestException as error:
         print error
         exit(1)
 
 
-def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=None, date_to=None):
+def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=None, date_to=None, expand=False):
     """
     Post query to Logentries.
     """
@@ -149,23 +148,23 @@ def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=N
     try:
         response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
                                  json=payload)
-        handle_response(response)
+        handle_response(response, expand)
     except requests.exceptions.RequestException as error:
         print error
         exit(1)
 
 
-def print_response(response):
+def print_response(response, expand=False):
     """
     Print response in a human readable way.
     """
     if 'events' in response.json():
-        prettyprint_events(response)
+        prettyprint_events(response, expand)
     elif 'statistics' in response.json():
         prettyprint_statistics(response)
 
 
-def prettyprint_events(response):
+def prettyprint_events(response, expand=False):
     """
     Print events in a human readable way.
     """
@@ -173,11 +172,14 @@ def prettyprint_events(response):
     for event in data['events']:
         time_value = datetime.datetime.fromtimestamp(event['timestamp'] / 1000)
         human_ts = time_value.strftime('%Y-%m-%d %H:%M:%S')
-        try:
-            message = json.loads(event['message'])
-            print colored(str(human_ts), 'red') + '\t' + \
-                  colored(json.dumps(message, indent=4, separators={':', ';'}), 'white')
-        except ValueError:
+        if expand:
+            try:
+                message = json.loads(event['message'])
+                print colored(str(human_ts), 'red') + '\t' + \
+                      colored(json.dumps(message, indent=4, separators={':', ';'}), 'white')
+            except ValueError:
+                print colored(str(human_ts), 'red') + '\t' + colored(event['message'], 'white')
+        else:
             print colored(str(human_ts), 'red') + '\t' + colored(event['message'], 'white')
 
 
