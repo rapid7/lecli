@@ -131,7 +131,8 @@ def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=N
         exit(1)
 
 
-def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=None, date_to=None, expand=False):
+def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=None, date_to=None,
+               expand=False):
     """
     Post query to Logentries.
     """

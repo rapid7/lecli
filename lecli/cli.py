@@ -97,8 +97,6 @@ def deleteuserfromteam(teamid, userkey):
               help='Expand JSON')
 def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefrom, dateto, expand):
     """Query logs using LEQL"""
-    print "expand: ",
-    print expand
     if lognick is not None:
         logkeys = apiutils.get_named_logkey(lognick)
 
