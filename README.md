@@ -64,31 +64,38 @@ The event and query functionality of the CLI supports a number of different ways
 The 'recentevents' command allows you to retrieve the most recent log events that have been sent to Logentries.
 The logs to retrieve events from can be specified in a few ways. The Log IDs can be passed directly as a space separated list of log Ids, or you can take advantage of log groups and log nicknames. Log Ids can be obtained from the settings page or log set page of a log in the Logentries UI (https://logentries.com). Log nicknames can be passed using the '--lognick' '-n' arguments, log groups can be passed using the '--loggroup' '-g' arguments. For more information in setting up log nicknames and log groups, see the 'Log Nicknames and Groups' section below.
 By default the 'recentevents' command will return events for the last 20 minutes. The command also takes an optional time argument that allows you to specify how far back in time you wish to get events from; this is passed using '--last' or '-l' argument.
+It is also possible to provide '-r' (--relative_range) to use relative time range functionality of the Logentries REST API. Check [supported patterns](#supported-relative-time-patterns).
 
 Example usage: 
 ```
 lecli recentevents 12345678-aaaa-bbbb-1234-1234cb123456 -l 200
+lecli recentevents 12345678-aaaa-bbbb-1234-1234cb123456 -r 'last 2 hours'
 lecli recentevents -n mynicknamedlog -l 200
 lecli recentevents -g myloggroup -l 200
+lecli recentevents -g myloggroup -r 'last 1 week'
 ```
 
 ####Events
 The 'events' command allows for the retrieval of log events within defined time ranges. As with 'recentevents', logs can be passed to the 'events' command as a space separated list of log Ids, or you can take advantage of log groups and log nicknames.
 The 'events' command accepts time ranges in ISO-8601 human readable time format (YYYY-MM-DD HH:MM:SS); time ranges in this format can be passed using the '--datefrom' and '--dateto' arguments. Note, all time values are in UTC timezone. 
 The command also accepts epoch time with second granularity. Epoch format time parameters can be passed using the '--timefrom' '-f' and '--timeto' '-t' arguments. 
+It is also possible to provide '-r' (--relative_range) to use relative time range functionality of the Logentries REST API. Check [supported patterns](#supported-relative-time-patterns).
 
 Example usage: 
 ```
 lecli events 12345678-aaaa-bbbb-1234-1234cb123456 -f 1465370400 -t 1465370500
 lecli events 12345678-aaaa-bbbb-1234-1234cb123456 --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
+lecli events 12345678-aaaa-bbbb-1234-1234cb123456 -r 'yesterday'
 lecli events --loggroup myloggroup --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
 lecli events --lognick mynicknamedlog --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
+lecli events --lognick mynicknamedlog -r 'last 3 weeks'
 ```
 
 ####Query
 The 'query' command allows you to run LEQL queries on logs from the command line. Logs can be passed to the 'query' command using a space separated list of log Ids, log groups or log nicknames.
 As with the 'events' command, 'query' accepts time ranges in ISO-8601 human readable time format (YYYY-MM-DD HH:MM:SS); time ranges in this format can be passed using the '--datefrom' and '--dateto' arguments.
-It also accepts epoch time with second granularity. Epoch format time parameters can be passed using the '--timefrom' '-f' and '--timeto' '-t' arguments. 
+It also accepts epoch time with second granularity. Epoch format time parameters can be passed using the '--timefrom' '-f' and '--timeto' '-t' arguments.
+It is also possible to provide '-r' (--relative_range) to use relative time range functionality of the Logentries REST API. Check [supported patterns](#supported-relative-time-patterns).
 
 Any LEQL query type that can be used in the advanced mode in the Logentries UI can also be used with the 'query' command. The LEQL query is passed as a string using the '--leql' '-l' argument. For detailed information on using LEQL see https://logentries.com/doc/search/
 A query can return three types of results. For searches just using a where() and without any calculate or groupby functions then the CLI will print the list of matching log events. Other queries will return either statistical or timeseries data, the CLI willretty print both of these.
@@ -99,10 +106,26 @@ Example usage:
 ```
 lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q 'where(method=GET) calculate(count)' -f 1465370400 -t 1465370500
 lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q 'where(method=GET) calculate(count)'  --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
+lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q 'where(method=GET) calculate(count)'  -r 'last 2 days'
 lecli query --loggroup myloggroup --leql 'where(method=GET) calculate(count)' --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
 lecli query --lognick mynicknamedlog --leql 'where(method=GET) calculate(count)' --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
 lecli query --lognick mynicknamedlog -q testquery --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
+lecli query --lognick mynicknamedlog -q testquery -r 'last 15 mins'
 ```
+
+####Supported Relative Time Patterns
+Logentries REST API also supports relative time ranges instead of absolute `start` and `end` dates. All relative times are case insensitive and supported patterns are like these: 
+
+- `today`
+- `yesterday`
+- `last n timeunits` where timeunits can be:
+  - min, mins, minute, minutes
+  - hr, hrs, hour, hours
+  - day, days
+  - week, weeks
+  - month, months
+  - year, years
+    
 
 **Log Nicknames, Log Groups, and Query Nicknames**
 --------------------------------------------------

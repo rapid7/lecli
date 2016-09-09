@@ -24,6 +24,8 @@ TIME_TO = '1465370500'
 DATE_FROM = '2016-05-18 11:04:00'
 DATE_TO = '2016-05-18 11:09:59'
 
+RELATIVE_TIME = 'last 2 days'
+
 MOCK_QUERYAPI_URL = 'http://mydummylink.com/query/'
 
 MOCK_USERAPI_URL = 'http://mydummylink.com/user'

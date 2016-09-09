@@ -5,12 +5,15 @@ from __future__ import division
 
 import json
 import time
-
 import datetime
+
+import click
 import requests
 from termcolor import colored
 
 from lecli import apiutils
+
+ALL_EVENTS_QUERY = "where(/.*/)"
 
 
 def _url(path):
@@ -47,35 +50,44 @@ def response_error(response):
     return False
 
 
-def handle_response(response):
+def handle_response(response, progress_bar):
     """
     Handle response. Exit if it has any errors, continue if status code is 202, print response
     if status code is 200.
     """
+
     if response_error(response) is True:  # Check response has no errors
         exit(1)
     elif response.status_code == 200:
+        progress = response.json().get('progress')
+        if progress:
+            progress_bar.update(progress)
+        else:
+            progress_bar.update(100)
+            progress_bar.render_finish()
         print_response(response)
         if 'links' in response.json():
             next_url = response.json()['links'][0]['href']
             next_response = fetch_results(next_url)
-            handle_response(next_response)
+            handle_response(next_response, progress_bar)
             return
         return
     elif response.status_code == 202:
-        continue_request(response)
+        continue_request(response, progress_bar)
         return
 
 
-def continue_request(response):
+def continue_request(response, progress_bar):
     """
     Continue making request to the url in the response.
     """
-    time.sleep(1)  # Wait for 1 second before hitting continue endpoint to prevent hitting API limit
+    progress_bar.update(0)
+    time.sleep(1)  # Wait for 1 second before hitting continue endpoint to prevent hitting API
+    # limit
     if 'links' in response.json():
         continue_url = response.json()['links'][0]['href']
         new_response = fetch_results(continue_url)
-        handle_response(new_response)
+        handle_response(new_response, progress_bar)
 
 
 def fetch_results(provided_url):
@@ -90,66 +102,78 @@ def fetch_results(provided_url):
         exit(1)
 
 
-def get_recent_events(log_keys, last_x_seconds=200):
+def get_recent_events(log_keys, last_x_seconds=1200, time_range=None):
     """
     Get recent events belonging to provided log_keys in the last_x_seconds.
     """
-    to_ts = int(time.time()) * 1000
-    from_ts = (int(time.time()) - last_x_seconds) * 1000
-
-    leql = {"during": {"from": from_ts, "to": to_ts}, "statement": "where(/.*/)"}
+    if time_range:
+        leql = {"during": {"time_range": time_range}, "statement": ALL_EVENTS_QUERY}
+    else:
+        to_ts = int(time.time()) * 1000
+        from_ts = (int(time.time()) - last_x_seconds) * 1000
+        leql = {"during": {"from": from_ts, "to": to_ts}, "statement": ALL_EVENTS_QUERY}
     payload = {"logs": log_keys, "leql": leql}
 
     try:
         response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
                                  json=payload)
-        handle_response(response)
+        with click.progressbar(length=100, label='Progress') as progress_bar:
+            handle_response(response, progress_bar)
     except requests.exceptions.RequestException as error:
         print error
         exit(1)
 
 
-def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=None):
+def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=None,
+               time_range=None):
     """
     Get events belonging to log_keys and within the time range provided.
     """
-    if date_from is not None and date_to is not None:
+    if date_from and date_to:
         from_ts = int(time.mktime(time.strptime(date_from, "%Y-%m-%d %H:%M:%S"))) * 1000
         to_ts = int(time.mktime(time.strptime(date_to, "%Y-%m-%d %H:%M:%S"))) * 1000
-    else:
+        leql = {"during": {"from": from_ts, "to": to_ts}, "statement": ALL_EVENTS_QUERY}
+    elif time_to and time_from:
         from_ts = time_from * 1000
         to_ts = time_to * 1000
+        leql = {"during": {"from": from_ts, "to": to_ts}, "statement": ALL_EVENTS_QUERY}
+    else:
+        leql = {"during": {"time_range": time_range}, "statement": ALL_EVENTS_QUERY}
 
-    leql = {"during": {"from": from_ts, "to": to_ts}, "statement": "where(/.*/)"}
     payload = {"logs": log_keys, "leql": leql}
 
     try:
         response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
                                  json=payload)
-        handle_response(response)
+        with click.progressbar(length=100, label='Progress') as progress_bar:
+            handle_response(response, progress_bar)
     except requests.exceptions.RequestException as error:
         print error
         exit(1)
 
 
-def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=None, date_to=None):
+def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=None,
+               date_to=None, time_range=None):
     """
     Post query to Logentries.
     """
-    if date_from is not None and date_to is not None:
+    if date_from and date_to:
         from_ts = int(time.mktime(time.strptime(date_from, "%Y-%m-%d %H:%M:%S"))) * 1000
         to_ts = int(time.mktime(time.strptime(date_to, "%Y-%m-%d %H:%M:%S"))) * 1000
+        leql = {"during": {"from": from_ts, "to": to_ts}, "statement": query_string}
+    elif time_from and time_to:
+        leql = {"during": {"from": time_from * 1000, "to": time_to * 1000},
+                "statement": query_string}
     else:
-        from_ts = time_from * 1000
-        to_ts = time_to * 1000
+        leql = {"during": {"time_range": time_range}, "statement": query_string}
 
-    leql = {"during": {"from": from_ts, "to": to_ts}, "statement": query_string}
     payload = {"logs": log_keys, "leql": leql}
 
     try:
         response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
                                  json=payload)
-        handle_response(response)
+        with click.progressbar(length=100, label='Progress') as progress_bar:
+            handle_response(response, progress_bar)
     except requests.exceptions.RequestException as error:
         print error
         exit(1)
