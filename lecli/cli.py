@@ -62,8 +62,7 @@ def renameteam(teamid, name):
 def addusertoteam(teamid, userkey):
     """Update the team with the provided id with name and user.
     This will add the user to this team if it exists"""
-    team_api.add_user_to_team(teamid, userkey)\
-
+    team_api.add_user_to_team(teamid, userkey)
 
 
 @cli.command()
@@ -93,36 +92,44 @@ def deleteuserfromteam(teamid, userkey):
               help='Date/Time to query from (ISO-8601 datetime)')
 @click.option('--dateto',
               help='Date/Time to query to (ISO-8601 datetime)')
-def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefrom, dateto):
+@click.option('-r', '--relative_range',
+              help='Relative range to query until now (Examples: today, yesterday, last 10 min, '
+                   'last 6 weeks')
+def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefrom, dateto,
+          relative_range):
     """Query logs using LEQL"""
 
-    if lognick is not None:
+    if lognick:
         logkeys = apiutils.get_named_logkey(lognick)
-
-    if loggroup is not None:
+    elif loggroup:
         logkeys = apiutils.get_named_logkey_group(loggroup)
 
     if all([leql, querynick]):
         click.echo("Cannot define a LEQL query and query nickname in the same query request")
-    elif querynick is not None:
+    elif querynick:
         leql = apiutils.get_named_query(querynick)
 
     if all([logkeys, leql, timefrom, timeto]):
         query_api.post_query(logkeys, leql, time_from=timefrom, time_to=timeto)
     elif all([logkeys, leql, datefrom, dateto]):
         query_api.post_query(logkeys, leql, date_from=datefrom, date_to=dateto)
+    elif all([logkeys, relative_range]):
+        query_api.post_query(logkeys, leql, time_range=relative_range)
     else:
         click.echo("Example usage: lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q "
                    "'where(method=GET) calculate(count)' -f 1465370400 -t 1465370500")
         click.echo("Example usage: lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q "
                    "'where(method=GET) calculate(count)'  "
-                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'")
+                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59' ")
         click.echo("Example usage: lecli query --loggroup myloggroup --leql "
                    "'where(method=GET) calculate(count)' "
-                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'")
+                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59' ")
         click.echo("Example usage: lecli query --lognick mynicknamedlog --leql "
                    "'where(method=GET) calculate(count)' "
-                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'")
+                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59' ")
+        click.echo("Example usage: lecli query --lognick mynicknamedlog --leql "
+                   "'where(method=GET) calculate(count)' "
+                   "-r 'last 3 days'")
 
 
 @cli.command()
@@ -139,27 +146,34 @@ def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefro
               help='Date/Time to get events from (ISO-8601 datetime)')
 @click.option('--dateto',
               help='Date/Time to get events to (ISO-8601 datetime)')
-def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
+@click.option('-r', '--relative_range',
+              help='Relative range to query until now (Examples: today, yesterday, '
+                   'last x timeunit: last 2 hours, last 6 weeks etc.')
+def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto, relative_range):
     """Get log events"""
 
-    if lognick is not None:
+    if lognick:
         logkeys = apiutils.get_named_logkey(lognick)
-    elif loggroup is not None:
+    elif loggroup:
         logkeys = apiutils.get_named_logkey_group(loggroup)
 
     if all([logkeys, timefrom, timeto]):
         query_api.get_events(logkeys, time_from=timefrom, time_to=timeto)
     elif all([logkeys, datefrom, dateto]):
         query_api.get_events(logkeys, date_from=datefrom, date_to=dateto)
+    elif all([logkeys, relative_range]):
+        query_api.get_events(logkeys, time_range=relative_range)
     else:
         click.echo("Example usage: lecli events 12345678-aaaa-bbbb-1234-1234cb123456 "
                    "-f 1465370400 -t 1465370500")
-        click.echo("Example usage: lecli events 12345678-aaaa-bbbb-1234-1234cb123456"
-                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'")
-        click.echo("Example usage: lecli events --loggroup myloggroup"
-                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'")
-        click.echo("Example usage: lecli events --lognick mynicknamedlog"
-                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'")
+        click.echo("Example usage: lecli events 12345678-aaaa-bbbb-1234-1234cb123456 "
+                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59' ")
+        click.echo("Example usage: lecli events --loggroup myloggroup "
+                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59' ")
+        click.echo("Example usage: lecli events --lognick mynicknamedlog "
+                   "--datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59' ")
+        click.echo("Example usage: lecli events --lognick mynicknamedlog "
+                   "-r 'last 3 hours'")
 
 
 @cli.command()
@@ -171,22 +185,27 @@ def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
 @click.option('-l', '--last', default=1200,
               help='Time window from now to now-X in seconds over which events will be returned '
                    '(Defaults to 20 mins)')
-def recentevents(logkeys, lognick, loggroup, last):
+@click.option('-r', '--relative_range',
+              help='Relative range to query until now (Examples: today, yesterday, '
+                   'last x timeunit: last 2 hours, last 6 weeks etc.')
+def recentevents(logkeys, lognick, loggroup, last, relative_range):
     """Get recent log events"""
 
-    if lognick is not None:
+    if lognick:
         logkeys = apiutils.get_named_logkey(lognick)
-    elif loggroup is not None:
+    elif loggroup:
         logkeys = apiutils.get_named_logkey_group(loggroup)
 
-    if all([logkeys, last]):
-        query_api.get_recent_events(logkeys, last)
-
+    if all([logkeys, relative_range]):
+        query_api.get_recent_events(logkeys, time_range=relative_range)
+    elif all([logkeys, last]):
+        query_api.get_recent_events(logkeys, last_x_seconds=last)
     else:
         click.echo(
             'Example usage: lecli recentevents \'12345678-aaaa-bbbb-1234-1234cb123456\' -l 200')
         click.echo('Example usage: lecli recentevents -n mynicknamedlog -l 200')
         click.echo('Example usage: lecli recentevents -g myloggroup -l 200')
+        click.echo("Example usage: lecli recentevents -g myloggroup -r 'last 50 mins'")
 
 
 @cli.command()
