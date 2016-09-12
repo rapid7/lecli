@@ -50,11 +50,27 @@ def test_recentevents(mocked_recent_events):
     assert mocked_recent_events.called
 
 
+@patch('lecli.cli.query_api.get_recent_events')
+def test_recentevents_with_relative_range(mocked_recent_events):
+    runner = CliRunner()
+    runner.invoke(cli.recentevents, [str(misc_ex.TEST_LOG_GROUP), '-r', misc_ex.RELATIVE_TIME])
+
+    assert mocked_recent_events.called
+
+
 @patch('lecli.cli.query_api.get_events')
 def test_events(mocked_get_events):
     runner = CliRunner()
     runner.invoke(cli.events, [str(misc_ex.TEST_LOG_GROUP), '-f', misc_ex.TIME_FROM, '-t',
                                misc_ex.TIME_TO])
+
+    assert mocked_get_events.called
+
+
+@patch('lecli.cli.query_api.get_events')
+def test_events_with_relative_range(mocked_get_events):
+    runner = CliRunner()
+    runner.invoke(cli.events, [str(misc_ex.TEST_LOG_GROUP), '-r', misc_ex.RELATIVE_TIME])
 
     assert mocked_get_events.called
 
@@ -68,6 +84,14 @@ def test_query(mocked_post_query):
 
     assert mocked_post_query.called
 
+
+@patch('lecli.cli.query_api.post_query')
+def test_query_with_relative_range(mocked_post_query):
+    runner = CliRunner()
+    runner.invoke(cli.query, [str(misc_ex.TEST_LOG_GROUP), '-l', misc_ex.TEST_QUERY, '-r',
+                              misc_ex.RELATIVE_TIME])
+
+    assert mocked_post_query.called
 
 @patch('lecli.cli.team_api.get_teams')
 def test_get_teams(mocked_get_teams):
