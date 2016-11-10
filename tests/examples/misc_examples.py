@@ -32,4 +32,10 @@ MOCK_USERAPI_URL = 'http://mydummylink.com/user'
 
 MOCK_TEAMSAPI_URL = 'http://mydummyurl.com/teams'
 
+MOCK_USAGE_URL = 'https://mydummyurl.com/usage'
+
 TEST_TEAM_ID = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+
+USAGE_DATE_FROM = '2016-03-01'
+
+USAGE_DATE_TO = '2016-10-01'

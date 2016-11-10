@@ -11,7 +11,8 @@ import click
 import requests
 from termcolor import colored
 
-from lecli import apiutils
+from lecli import api_utils
+from lecli import response_utils
 
 ALL_EVENTS_QUERY = "where(/.*/)"
 
@@ -23,40 +24,13 @@ def _url(path):
     return 'https://rest.logentries.com/query/%s/' % path
 
 
-def response_error(response):
-    """
-    Check response if it has any errors.
-    """
-    if response.headers.get('X-RateLimit-Remaining') is not None:
-        if int(response.headers['X-RateLimit-Remaining']) == 0:
-            print 'Error: Rate Limit Reached, will reset in ' + response.headers.get(
-                'X-RateLimit-Reset') + ' seconds'
-            return True
-
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as error:
-        print "Request Error:", error.message
-        return True
-
-    if response.status_code == 200:
-        if response.headers['Content-Type'] != 'application/json':
-            print 'Unexpected Content Type Received in Response: ' + response.headers[
-                'Content-Type']
-            return True
-        else:
-            return False
-
-    return False
-
-
 def handle_response(response, progress_bar):
     """
     Handle response. Exit if it has any errors, continue if status code is 202, print response
     if status code is 200.
     """
 
-    if response_error(response) is True:  # Check response has no errors
+    if response_utils.response_error(response) is True:  # Check response has no errors
         exit(1)
     elif response.status_code == 200:
         progress = response.json().get('progress')
@@ -95,7 +69,7 @@ def fetch_results(provided_url):
     Make the get request to the url and return the response.
     """
     try:
-        response = requests.get(provided_url, headers=apiutils.generate_headers('rw'))
+        response = requests.get(provided_url, headers=api_utils.generate_headers('rw'))
         return response
     except requests.exceptions.RequestException as error:
         print error
@@ -115,7 +89,7 @@ def get_recent_events(log_keys, last_x_seconds=1200, time_range=None):
     payload = {"logs": log_keys, "leql": leql}
 
     try:
-        response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
+        response = requests.post(_url('logs'), headers=api_utils.generate_headers('rw'),
                                  json=payload)
         with click.progressbar(length=100, label='Progress') as progress_bar:
             handle_response(response, progress_bar)
@@ -143,7 +117,7 @@ def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=N
     payload = {"logs": log_keys, "leql": leql}
 
     try:
-        response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
+        response = requests.post(_url('logs'), headers=api_utils.generate_headers('rw'),
                                  json=payload)
         with click.progressbar(length=100, label='Progress') as progress_bar:
             handle_response(response, progress_bar)
@@ -170,7 +144,7 @@ def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=N
     payload = {"logs": log_keys, "leql": leql}
 
     try:
-        response = requests.post(_url('logs'), headers=apiutils.generate_headers('rw'),
+        response = requests.post(_url('logs'), headers=api_utils.generate_headers('rw'),
                                  json=payload)
         with click.progressbar(length=100, label='Progress') as progress_bar:
             handle_response(response, progress_bar)

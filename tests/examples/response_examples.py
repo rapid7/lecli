@@ -112,3 +112,31 @@ team_response = {
         }
     ]
 }
+
+usage_response = {
+  "id": "362e8659-e866-42dd-b2bf-f1b80166dd71",
+  "name": "Testing Account Part II",
+  "period": {
+    "to": "2016-06-01",
+    "from": "2016-01-01"
+  },
+  "period_usage": 170129010,
+  "daily_usage": [
+    {
+      "usage": 30618,
+      "day": "2016-06-01"
+    },
+    {
+      "usage": 6397,
+      "day": "2016-05-31"
+    },
+    {
+      "usage": 1606,
+      "day": "2016-05-30"
+    },
+    {
+      "usage": 2406,
+      "day": "2016-05-29"
+    }
+  ]
+}

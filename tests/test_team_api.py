@@ -9,8 +9,8 @@ from examples import response_examples as resp_ex
 
 
 @httpretty.activate
-@patch('lecli.apiutils.get_account_resource_id')
-@patch('lecli.apiutils.get_rw_apikey')
+@patch('lecli.api_utils.get_account_resource_id')
+@patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team_api._url')
 def test_get_teams(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
@@ -19,7 +19,7 @@ def test_get_teams(mocked_url, mocked_rw_apikey, mocked_account_resource_id, cap
     httpretty.register_uri(httpretty.GET, misc_ex.MOCK_TEAMSAPI_URL,
                            status=200,
                            content_type='application/json',
-                           body=json.dumps({'teams': resp_ex.team_response}))
+                           body=json.dumps({'teams': [resp_ex.team_response]}))
 
     team_api.get_teams()
     out, err = capsys.readouterr()
@@ -28,8 +28,8 @@ def test_get_teams(mocked_url, mocked_rw_apikey, mocked_account_resource_id, cap
 
 
 @httpretty.activate
-@patch('lecli.apiutils.get_account_resource_id')
-@patch('lecli.apiutils.get_rw_apikey')
+@patch('lecli.api_utils.get_account_resource_id')
+@patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team_api._url')
 def test_get_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     team_id = misc_ex.TEST_TEAM_ID
@@ -48,8 +48,8 @@ def test_get_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, caps
 
 
 @httpretty.activate
-@patch('lecli.apiutils.get_account_resource_id')
-@patch('lecli.apiutils.get_rw_apikey')
+@patch('lecli.api_utils.get_account_resource_id')
+@patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team_api._url')
 def test_create_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
@@ -66,8 +66,8 @@ def test_create_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, c
 
 
 @httpretty.activate
-@patch('lecli.apiutils.get_account_resource_id')
-@patch('lecli.apiutils.get_rw_apikey')
+@patch('lecli.api_utils.get_account_resource_id')
+@patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team_api._url')
 def test_delete_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     test_team_id = misc_ex.TEST_TEAM_ID
@@ -84,8 +84,8 @@ def test_delete_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, c
 
 
 @httpretty.activate
-@patch('lecli.apiutils.get_account_resource_id')
-@patch('lecli.apiutils.get_rw_apikey')
+@patch('lecli.api_utils.get_account_resource_id')
+@patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team_api._url')
 def test_rename_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     test_team_id = misc_ex.TEST_TEAM_ID
@@ -105,8 +105,8 @@ def test_rename_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, c
 
 
 @httpretty.activate
-@patch('lecli.apiutils.get_account_resource_id')
-@patch('lecli.apiutils.get_rw_apikey')
+@patch('lecli.api_utils.get_account_resource_id')
+@patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team_api._url')
 def test_add_user_to_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     test_team_id = misc_ex.TEST_TEAM_ID
@@ -127,9 +127,10 @@ def test_add_user_to_team(mocked_url, mocked_rw_apikey, mocked_account_resource_
 
     assert "Added user with key: '%s' to team\n" % user_id_to_add == out
 
+
 @httpretty.activate
-@patch('lecli.apiutils.get_account_resource_id')
-@patch('lecli.apiutils.get_rw_apikey')
+@patch('lecli.api_utils.get_account_resource_id')
+@patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team_api._url')
 def test_delete_user_from_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     test_team_id = misc_ex.TEST_TEAM_ID

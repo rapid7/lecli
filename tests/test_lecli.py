@@ -93,6 +93,7 @@ def test_query_with_relative_range(mocked_post_query):
 
     assert mocked_post_query.called
 
+
 @patch('lecli.cli.team_api.get_teams')
 def test_get_teams(mocked_get_teams):
     runner = CliRunner()
@@ -141,3 +142,9 @@ def test_add_user_to_team(mocked_add_user):
     assert mocked_add_user.called
 
 
+@patch('lecli.cli.usage_api.get_usage')
+def test_add_user_to_team(mocked_get_usage):
+    runner = CliRunner()
+    runner.invoke(cli.usage, ['-s', misc_ex.USAGE_DATE_FROM, '-e', misc_ex.USAGE_DATE_TO])
+
+    assert mocked_get_usage.called
