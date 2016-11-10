@@ -69,7 +69,7 @@ def test_prettyprint_events(capsys):
     teardown_httpretty()
 
 
-@patch('lecli.apiutils.generate_headers')
+@patch('lecli.api_utils.generate_headers')
 @patch('lecli.query_api._url')
 def test_post_query_with_time(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
@@ -91,7 +91,7 @@ def test_post_query_with_time(mocked_url, mocked_generate_headers, capsys):
     teardown_httpretty()
 
 
-@patch('lecli.apiutils.generate_headers')
+@patch('lecli.api_utils.generate_headers')
 @patch('lecli.query_api._url')
 def test_post_query_with_date(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
@@ -112,7 +112,7 @@ def test_post_query_with_date(mocked_url, mocked_generate_headers, capsys):
     teardown_httpretty()
 
 
-@patch('lecli.apiutils.generate_headers')
+@patch('lecli.api_utils.generate_headers')
 @patch('lecli.query_api._url')
 def test_post_query_with_relative_range(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
@@ -133,7 +133,7 @@ def test_post_query_with_relative_range(mocked_url, mocked_generate_headers, cap
     teardown_httpretty()
 
 
-@patch('lecli.apiutils.generate_headers')
+@patch('lecli.api_utils.generate_headers')
 @patch('lecli.query_api._url')
 def test_get_events(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
@@ -155,7 +155,7 @@ def test_get_events(mocked_url, mocked_generate_headers, capsys):
     teardown_httpretty()
 
 
-@patch('lecli.apiutils.generate_headers')
+@patch('lecli.api_utils.generate_headers')
 @patch('lecli.query_api._url')
 def test_get_recent_events(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
@@ -176,7 +176,7 @@ def test_get_recent_events(mocked_url, mocked_generate_headers, capsys):
     teardown_httpretty()
 
 
-@patch('lecli.apiutils.generate_headers')
+@patch('lecli.api_utils.generate_headers')
 def test_fetch_results(mocked_generate_headers):
     setup_httpretty()
     dest_url = misc_ex.MOCK_QUERYAPI_URL + "_some_arbitrary_url_suffix"
@@ -194,7 +194,7 @@ def test_fetch_results(mocked_generate_headers):
     teardown_httpretty()
 
 
-@patch('lecli.apiutils.generate_headers')
+@patch('lecli.api_utils.generate_headers')
 @patch('lecli.query_api.handle_response')
 def test_continue_request(mocked_headers, mocked_response_handle):
     setup_httpretty()
@@ -234,37 +234,5 @@ def test_handle_response(capsys):
     assert "Message contents1" in out
     assert "Message contents2" in out
     assert "Message contents3" in out
-
-    teardown_httpretty()
-
-
-def test_response_error_status(capsys):
-    setup_httpretty()
-
-    httpretty.register_uri(httpretty.GET,
-                           misc_ex.MOCK_QUERYAPI_URL,
-                           content_type='application/json',
-                           status=405)
-    resp = requests.get(misc_ex.MOCK_QUERYAPI_URL)
-    query_api.response_error(resp)
-
-    out, err = capsys.readouterr()
-    assert "Request Error: " in out
-
-    teardown_httpretty()
-
-
-def test_response_error_content_type(capsys):
-    setup_httpretty()
-
-    httpretty.register_uri(httpretty.GET,
-                           misc_ex.MOCK_QUERYAPI_URL,
-                           content_type='text/html',
-                           status=200)
-    resp = requests.get(misc_ex.MOCK_QUERYAPI_URL)
-    query_api.response_error(resp)
-
-    out, err = capsys.readouterr()
-    assert "Unexpected Content Type Received in Response: " in out
 
     teardown_httpretty()

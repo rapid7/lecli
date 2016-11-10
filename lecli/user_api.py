@@ -6,7 +6,8 @@ import json
 import requests
 from tabulate import tabulate
 
-from lecli import apiutils
+from lecli import api_utils
+from lecli import response_utils
 
 
 def _url(endpoint):
@@ -15,45 +16,17 @@ def _url(endpoint):
     """
     if endpoint == 'owner':
         return 'https://rest.logentries.com/management/accounts/%s/owners' % \
-               apiutils.get_account_resource_id()
+               api_utils.get_account_resource_id()
     elif endpoint == 'user':
         return 'https://rest.logentries.com/management/accounts/%s/users' % \
-               apiutils.get_account_resource_id()
-
-
-def response_error(response):
-    """
-    Check response if it has any errors.
-    """
-    if response.headers.get('X-RateLimit-Remaining') is not None:
-        if int(response.headers['X-RateLimit-Remaining']) == 0:
-            print 'Error: Rate Limit Reached, will reset in ' + response.headers.get(
-                'X-RateLimit-Reset') + ' seconds'
-            return True
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as error:
-        print "Request Error:", error.message
-        if response.status_code == 500:
-            print 'Your account may have no owner assigned. ' \
-                  'Please visit www.logentries.com for information on assigning an account owner.'
-        return True
-
-    if response.status_code == 200:
-        if response.headers['Content-Type'] != 'application/json':
-            print 'Unexpected Content Type Received in Response: ' + response.headers[
-                'Content-Type']
-            return True
-        else:
-            return False
-    return False
+               api_utils.get_account_resource_id()
 
 
 def handle_userlist_response(response):
     """
     Handle userlist response. Exit if it has any errors, print if status code is 200.
     """
-    if response_error(response) is True:  # Check response has no errors
+    if response_utils.response_error(response) is True:  # Check response has no errors
         exit(1)
     elif response.status_code == 200:
         print_users(response)
@@ -63,7 +36,7 @@ def handle_create_user_response(response):
     """
     Handle create user response. If it has any errors, print help.
     """
-    if response_error(response) is True:  # Check response has no errors
+    if response_utils.response_error(response) is True:  # Check response has no errors
         if response.status_code >= 400:
             print 'Failed to add user - User may have already been added this account or have a ' \
                   'Logentries account'
@@ -90,9 +63,9 @@ def list_users():
     """
     List users that is in the current account.
     """
-    action = 'management/accounts/' + str(apiutils.get_account_resource_id()) + '/users'
+    action = 'management/accounts/%s/users' % api_utils.get_account_resource_id()
     try:
-        response = requests.request('GET', _url('user'), headers=apiutils.generate_headers(
+        response = requests.request('GET', _url('user'), headers=api_utils.generate_headers(
             'owner', 'GET', action, ''))
         handle_userlist_response(response)
     except requests.exceptions.RequestException as error:
@@ -104,7 +77,7 @@ def add_new_user(first_name, last_name, email):
     """
     Add a new user to the current account.
     """
-    action = 'management/accounts/' + str(apiutils.get_account_resource_id()) + '/users'
+    action = 'management/accounts/%s/users' % api_utils.get_account_resource_id()
     json_content = {
         "user":
             {
@@ -114,7 +87,7 @@ def add_new_user(first_name, last_name, email):
             }
     }
     body = json.dumps(json_content)
-    headers = apiutils.generate_headers('owner', method='POST', action=action, body=body)
+    headers = api_utils.generate_headers('owner', method='POST', action=action, body=body)
 
     try:
         response = requests.request('POST', _url('user'), json=json_content, headers=headers)
@@ -130,7 +103,7 @@ def add_existing_user(user_key):
     """
     url = _url('user') + '/' + str(user_key)
     action = url.split("com/")[1]
-    headers = apiutils.generate_headers('owner', method='POST', action=action, body='')
+    headers = api_utils.generate_headers('owner', method='POST', action=action, body='')
 
     try:
         response = requests.request('POST', url, data='', headers=headers)
@@ -146,12 +119,12 @@ def delete_user(user_key):
     """
     url = _url('user') + '/' + str(user_key)
     action = url.split("com/")[1]
-    headers = apiutils.generate_headers('owner', method='DELETE', action=action, body='')
+    headers = api_utils.generate_headers('owner', method='DELETE', action=action, body='')
 
     try:
         response = requests.request('DELETE', url, data='', headers=headers)
-        if response_error(response) is True:  # Check response has no errors
-            print 'Delete user failed, status code: ' + str(response.status_code)
+        if response_utils.response_error(response) is True:  # Check response has no errors
+            print 'Delete user failed, status code: %s' % response.status_code
             exit(1)
         elif response.status_code == 204:
             print 'Deleted user'
@@ -164,9 +137,9 @@ def get_owner():
     """
     Get owner information of the current account.
     """
-    action = 'management/accounts/' + str(apiutils.get_account_resource_id()) + '/owners'
+    action = 'management/accounts/%s/owners' % api_utils.get_account_resource_id()
     try:
-        response = requests.request('GET', _url('owner'), headers=apiutils.generate_headers(
+        response = requests.request('GET', _url('owner'), headers=api_utils.generate_headers(
             'owner', 'GET', action, ''))
         handle_userlist_response(response)
     except requests.exceptions.RequestException as error:
