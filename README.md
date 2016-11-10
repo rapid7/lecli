@@ -156,47 +156,47 @@ testquery = where(logID) groupby(logID) calculate(count) sort(desc) limit(3)
 
 **User and Account Management**
 -------------------------------
-The user and account management functionality of the CLI can only be used with a valid owner API key. The configuration file must contain the account_resource_id, owner_api_key_id and owner_api_key in the Auth section. These are all available from the account managemnet and API keys section at https://logentries.com.
+The user and account management functionality of the CLI can only be used with a valid owner API key. The configuration file must contain the account_resource_id, owner_api_key_id and owner_api_key in the Auth section. These are all available from the account management and API keys section at https://logentries.com.
 It is worth noting that if your account does not have a specific owner set then some user management functions may fail with a 500 error; to check if an owner is set the 'getowner' command below can be used. If no owner is set then you must regenerate the owner API key, at which point you will be asked to set an account owner.
 
 ####List Users
-The 'userlist' command will return a list of all users that have access to the account for which the CLI has been configured. The command will return the users first and last name, email address, user key and the last time they logged in. The 'userlist' command does not accept any arguments.
+The 'listusers' command will return a list of all users that have access to the account for which the CLI has been configured. The command will return the users first and last name, email address, user key and the last time they logged in. The 'listusers' command does not accept any arguments.
 
 Example usage:
 ```
-lecli userlist
+lecli listusers
 ```
 
 ####Add User
-The 'useradd' command allows you to add a user to your account. There are two ways to add users, depending on whether they are a new or existing user. 
+The 'adduser' command allows you to add a user to your account. There are two ways to add users, depending on whether they are a new or existing user. 
 A new user is a user that has no Logentries account. 
 
 To add a new user you must provide their first and last name, and email address. If successfully added the CLI will print the users account information, including their newly generated user key. A user added via the CLI must then go to https://logentries.com/user/password-reset/ and enter their email address. They will then be sent a link that they can use to setup the password for their new account.
 
 A new user can be added using the following command
 ```
-lecli useradd -f John -l Smith -e john.smith@email.com
+lecli adduser -f John -l Smith -e john.smith@email.com
 ```
 
 To add an existing user (i.e. a user that already has a Logentries account, even if not associated with your account), you must first obtain their user key. The user can obtain their user key from the account management page of the Logentries application at https://logentries.com
 
 An existing user can be added to your account use the following command
 ```
-lecli useradd -u 12345678-aaaa-bbbb-1234-1234cb123456
+lecli adduser -u 12345678-aaaa-bbbb-1234-1234cb123456
 ```
 
 ####Delete User
-To userdel command allow for the removal of a user from your account and deletion of the users account from Logentries. 
+The 'deleteuser' command allows for the removal of a user from your account and deletion of the users account from Logentries.
 If the user is associated with only your account then the users access to your account will be removed and the users account deleted. 
-However, if the user is associated to any other account then access to your account will be removed but the users Logentries account and any assoication to other accounts will remain.
+However, if the user is associated to any other account then access to your account will be removed but the users Logentries account and any association to other accounts will remain.
 
 To delete a user use the following command
 ```
-lecli userdel -u 12345678-aaaa-bbbb-1234-1234cb123456
+lecli deleteuser -u 12345678-aaaa-bbbb-1234-1234cb123456
 ```
 
 ####Get Account Owner
-The getowner command allows you to retrieve the details of the account owner, this  is done using the following command
+The 'getowner' command allows you to retrieve the details of the account owner, this  is done using the following command
 ```
 lecli getowner
 ```
@@ -239,3 +239,12 @@ Add a new user to a team with the given UUID and user UUID respectively.
 Add a new user to a team with the given UUID and user UUID respectively.
 
     lecli deleteuserfromteam <team id> <user key>
+
+
+**Account Usage**
+-----------------
+Account usage can be retrieved using lecli 'usage' command along with 'start' and 'end' date ranges to be queried. 
+A valid read-write api key in configuration file is required for this operation.
+*Note:* 'start' and 'end' dates should be in ISO-8601 format: 'YYYY-MM-DD', example: '2016-01-01'
+
+    lecli usage -s <start date> -e <end date>

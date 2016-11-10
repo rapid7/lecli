@@ -4,10 +4,11 @@ Main lecli module powered by click library.
 import click
 
 import lecli
-from lecli import apiutils
+from lecli import api_utils
 from lecli import query_api
 from lecli import team_api
 from lecli import user_api
+from lecli import usage_api
 
 
 @click.group()
@@ -15,7 +16,19 @@ from lecli import user_api
 def cli():
     """Logentries Command Line Interface"""
     # load configs from config.ini file in user_config_dir depending on running OS
-    apiutils.load_config()
+    api_utils.load_config()
+
+
+@cli.command()
+@click.option('-s', '--start', type=click.STRING, default=None)
+@click.option('-e', '--end', type=click.STRING, default=None)
+def usage(start, end):
+    """Get account's usage information"""
+    if all([start, end]):
+        usage_api.get_usage(start, end)
+    else:
+        click.echo("Example usage: lecli usage -s '2016-01-01' -e '2016-06-01'")
+        click.echo("Note: Start and end dates should be in ISO-8601 format: YYYY-MM-DD")
 
 
 @cli.command()
@@ -100,14 +113,14 @@ def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefro
     """Query logs using LEQL"""
 
     if lognick:
-        logkeys = apiutils.get_named_logkey(lognick)
+        logkeys = api_utils.get_named_logkey(lognick)
     elif loggroup:
-        logkeys = apiutils.get_named_logkey_group(loggroup)
+        logkeys = api_utils.get_named_logkey_group(loggroup)
 
     if all([leql, querynick]):
         click.echo("Cannot define a LEQL query and query nickname in the same query request")
     elif querynick:
-        leql = apiutils.get_named_query(querynick)
+        leql = api_utils.get_named_query(querynick)
 
     if all([logkeys, leql, timefrom, timeto]):
         query_api.post_query(logkeys, leql, time_from=timefrom, time_to=timeto)
@@ -153,9 +166,9 @@ def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto, relat
     """Get log events"""
 
     if lognick:
-        logkeys = apiutils.get_named_logkey(lognick)
+        logkeys = api_utils.get_named_logkey(lognick)
     elif loggroup:
-        logkeys = apiutils.get_named_logkey_group(loggroup)
+        logkeys = api_utils.get_named_logkey_group(loggroup)
 
     if all([logkeys, timefrom, timeto]):
         query_api.get_events(logkeys, time_from=timefrom, time_to=timeto)
@@ -192,9 +205,9 @@ def recentevents(logkeys, lognick, loggroup, last, relative_range):
     """Get recent log events"""
 
     if lognick:
-        logkeys = apiutils.get_named_logkey(lognick)
+        logkeys = api_utils.get_named_logkey(lognick)
     elif loggroup:
-        logkeys = apiutils.get_named_logkey_group(loggroup)
+        logkeys = api_utils.get_named_logkey_group(loggroup)
 
     if all([logkeys, relative_range]):
         query_api.get_recent_events(logkeys, time_range=relative_range)
