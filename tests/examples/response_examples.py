@@ -114,8 +114,8 @@ team_response = {
 }
 
 usage_response = {
-  "id": "362e8659-e866-42dd-b2bf-f1b80166dd71",
-  "name": "Testing Account Part II",
+  "id": "123456789012345678901234567890123456",
+  "name": "Test",
   "period": {
     "to": "2016-06-01",
     "from": "2016-01-01"
