@@ -21,8 +21,8 @@ def test_get_usage(mocked_url, mocked_rw_apikey, mocked_account_resource_id, cap
                            content_type='application/json',
                            body=json.dumps(resp_ex.usage_response))
     expected_total = 170129010
-    expected_name = 'Testing Account Part II'
-    expected_id = '362e8659-e866-42dd-b2bf-f1b80166dd71'
+    expected_name = 'Test'
+    expected_id = '123456789012345678901234567890123456'
 
     usage_api.get_usage(misc_ex.USAGE_DATE_FROM, misc_ex.USAGE_DATE_TO)
 
