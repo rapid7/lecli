@@ -148,3 +148,76 @@ def test_add_user_to_team(mocked_get_usage):
     runner.invoke(cli.usage, ['-s', misc_ex.USAGE_DATE_FROM, '-e', misc_ex.USAGE_DATE_TO])
 
     assert mocked_get_usage.called
+
+
+@patch('lecli.cli.saved_query_api.create_saved_query')
+def test_create_saved_query(mocked_create_saved_query):
+    runner = CliRunner()
+    runner.invoke(cli.createsavedquery, ['new_saved_query', 'where(/*/)', '-f', 10, '-t', 1000])
+
+    assert mocked_create_saved_query.called
+
+
+@patch('lecli.cli.saved_query_api.create_saved_query')
+def test_create_query_with_missing_statement(mocked_create_saved_query):
+    runner = CliRunner()
+    runner.invoke(cli.createsavedquery, ['new_saved_query', '-f', 10, '-t', 1000])
+
+    assert not mocked_create_saved_query.called
+
+
+@patch('lecli.cli.saved_query_api.update_saved_query')
+def test_update_saved_query(mocked_update_saved_query):
+    runner = CliRunner()
+    runner.invoke(cli.updatesavedquery, ['123456789012345678901234567890123456', '-f', 10, '-t',
+                                         1000])
+
+    assert mocked_update_saved_query.called
+
+
+@patch('lecli.cli.saved_query_api.update_saved_query')
+def test_failing_update_saved_query(mocked_create_saved_query):
+    runner = CliRunner()
+    runner.invoke(cli.createsavedquery, ['-f', 10, '-t', 1000])
+
+    assert not mocked_create_saved_query.called
+
+
+@patch('lecli.cli.saved_query_api.get_saved_query')
+def test_get_saved_query(mocked_get_saved_query):
+    runner = CliRunner()
+    runner.invoke(cli.getsavedquery, ['123456789012345678901234567890123456'])
+
+    assert mocked_get_saved_query.called
+
+
+@patch('lecli.cli.saved_query_api.get_saved_queries')
+def test_get_saved_queries(mocked_get_saved_queries):
+    runner = CliRunner()
+    runner.invoke(cli.getsavedqueries)
+
+    assert mocked_get_saved_queries.called
+
+
+@patch('lecli.cli.saved_query_api.get_saved_query')
+def test_get_saved_queries(mocked_get_saved_queries):
+    runner = CliRunner()
+    runner.invoke(cli.getsavedqueries)
+
+    assert mocked_get_saved_queries.called
+
+
+@patch('lecli.cli.saved_query_api.delete_saved_query')
+def test_delete_saved_query(mocked_delete_saved_query):
+    runner = CliRunner()
+    runner.invoke(cli.deletesavedquery, ['123456789012345678901234567890123456'])
+
+    assert mocked_delete_saved_query.called
+
+
+@patch('lecli.cli.saved_query_api.delete_saved_query')
+def test_delete_saved_query_without_id(mocked_delete_saved_query):
+    runner = CliRunner()
+    runner.invoke(cli.deletesavedquery)
+
+    assert not mocked_delete_saved_query.called
