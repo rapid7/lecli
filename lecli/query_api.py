@@ -69,7 +69,7 @@ def fetch_results(provided_url):
         response = requests.get(provided_url, headers=api_utils.generate_headers('rw'))
         return response
     except requests.exceptions.RequestException as error:
-        print error
+        click.echo(error)
         exit(1)
 
 
@@ -91,7 +91,7 @@ def get_recent_events(log_keys, last_x_seconds=1200, time_range=None):
         with click.progressbar(length=100, label='Progress') as progress_bar:
             handle_response(response, progress_bar)
     except requests.exceptions.RequestException as error:
-        print error
+        click.echo(error)
         exit(1)
 
 
@@ -119,7 +119,7 @@ def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=N
         with click.progressbar(length=100, label='Progress') as progress_bar:
             handle_response(response, progress_bar)
     except requests.exceptions.RequestException as error:
-        print error
+        click.echo(error)
         exit(1)
 
 
@@ -146,7 +146,7 @@ def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=N
         with click.progressbar(length=100, label='Progress') as progress_bar:
             handle_response(response, progress_bar)
     except requests.exceptions.RequestException as error:
-        print error
+        click.echo(error)
         exit(1)
 
 
@@ -170,10 +170,11 @@ def prettyprint_events(response):
         human_ts = time_value.strftime('%Y-%m-%d %H:%M:%S')
         try:
             message = json.loads(event['message'])
-            print colored(str(human_ts), 'red') + '\t' + \
-                  colored(json.dumps(message, indent=4, separators={':', ';'}), 'white')
+            click.echo(
+                colored(str(human_ts), 'red') + '\t' +
+                colored(json.dumps(message, indent=4, separators={':', ';'}), 'white'))
         except ValueError:
-            print colored(str(human_ts), 'red') + '\t' + colored(event['message'], 'white')
+            click.echo(colored(str(human_ts), 'red') + '\t' + colored(event['message'], 'white'))
 
 
 def prettyprint_statistics(response):
@@ -192,9 +193,9 @@ def prettyprint_statistics(response):
         stats_key = data['statistics']['stats'].keys()[0]
         stats_calc_value = data['statistics']['stats'].get(stats_key).values()
         total = stats_calc_value[0] if len(stats_calc_value) != 0 else 0
-        print 'Total: %s' % total
+        click.echo('Total: %s' % total)
 
-        print 'Timeseries: '
+        click.echo('Timeseries: ')
         timeseries_key = data['statistics']['timeseries'].keys()[0]
         time_range = time_to - time_from
         num_timeseries_values = len(data['statistics']['timeseries'].get(timeseries_key))
@@ -202,15 +203,15 @@ def prettyprint_statistics(response):
             timestamp = (time_from + (time_range / num_timeseries_values) * (index + 1)) / 1000
             time_value = datetime.datetime.fromtimestamp(timestamp)
             human_ts = time_value.strftime('%Y-%m-%d %H:%M:%S')
-            print human_ts + ': ' + str(value.values()[0])
+            click.echo(human_ts + ': ' + str(value.values()[0]))
 
     # Handle Groups
     elif len(data['statistics']['groups']) != 0:
         for group in data['statistics']['groups']:
             for key, value in group.iteritems():
-                print str(key) + ':'
+                click.echo(str(key) + ':')
                 for innerkey, innervalue in value.iteritems():
-                    print '\t' + str(innerkey) + ': ' + str(innervalue)
+                    click.echo('\t' + str(innerkey) + ': ' + str(innervalue))
 
     else:
-        print json.dumps(response.json(), indent=4, separators={':', ';'})
+        click.echo(json.dumps(response.json(), indent=4, separators={':', ';'}))
