@@ -91,6 +91,33 @@ ts_response = {
     }
 }
 
+empty_ts_response = {
+    'statistics': {
+        'from': 123123,
+        'to': 123123,
+        'count': 0.0,
+        'stats': {
+            'global_timeseries':
+                {}  # empty global timeseries object
+        },
+        'granularity': 120000,
+        'timeseries': {
+            'global_timeseries': [
+                {'count': 0.0},
+                {'count': 0.0},
+                {'count': 0.0},
+                {'count': 0.0},
+                {'count': 0.0},
+                {'count': 0.0},
+                {'count': 0.0},
+                {'count': 0.0},
+                {'count': 0.0},
+                {'count': 0.0}
+            ]
+        }
+    }
+}
+
 events_response = {
     'events': [
         {'timestamp': 1432080000011, 'message': 'Message contents1'},
@@ -114,31 +141,31 @@ team_response = {
 }
 
 usage_response = {
-  "id": "123456789012345678901234567890123456",
-  "name": "Test",
-  "period": {
-    "to": "2016-06-01",
-    "from": "2016-01-01"
-  },
-  "period_usage": 170129010,
-  "daily_usage": [
-    {
-      "usage": 30618,
-      "day": "2016-06-01"
+    "id": "123456789012345678901234567890123456",
+    "name": "Test",
+    "period": {
+        "to": "2016-06-01",
+        "from": "2016-01-01"
     },
-    {
-      "usage": 6397,
-      "day": "2016-05-31"
-    },
-    {
-      "usage": 1606,
-      "day": "2016-05-30"
-    },
-    {
-      "usage": 2406,
-      "day": "2016-05-29"
-    }
-  ]
+    "period_usage": 170129010,
+    "daily_usage": [
+        {
+            "usage": 30618,
+            "day": "2016-06-01"
+        },
+        {
+            "usage": 6397,
+            "day": "2016-05-31"
+        },
+        {
+            "usage": 1606,
+            "day": "2016-05-30"
+        },
+        {
+            "usage": 2406,
+            "day": "2016-05-29"
+        }
+    ]
 }
 
 saved_query_response = {

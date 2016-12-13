@@ -39,16 +39,13 @@ def handle_response(response, progress_bar):
         else:
             progress_bar.update(100)
             progress_bar.render_finish()
-        print_response(response)
+            print_response(response)
         if 'links' in response.json():
             next_url = response.json()['links'][0]['href']
             next_response = fetch_results(next_url)
             handle_response(next_response, progress_bar)
-            return
-        return
     elif response.status_code == 202:
         continue_request(response, progress_bar)
-        return
 
 
 def continue_request(response, progress_bar):
@@ -192,16 +189,15 @@ def prettyprint_statistics(response):
     # Handle timeseries
     if len(data['statistics']['timeseries']) != 0:
         # Extract keys
-        timeseries_key = data['statistics']['timeseries'].keys()[0]
         stats_key = data['statistics']['stats'].keys()[0]
-        num_timeseries_values = len(data['statistics']['timeseries'].get(timeseries_key))
-        stats_calc_key = data['statistics']['stats'].get(stats_key).keys()[0]
-        total = data['statistics']['stats'].get(stats_key).get(stats_calc_key)
-        time_range = time_to - time_from
-
-        print 'Total' + ': ' + str(total)
+        stats_calc_value = data['statistics']['stats'].get(stats_key).values()
+        total = stats_calc_value[0] if len(stats_calc_value) != 0 else 0
+        print 'Total: %s' % total
 
         print 'Timeseries: '
+        timeseries_key = data['statistics']['timeseries'].keys()[0]
+        time_range = time_to - time_from
+        num_timeseries_values = len(data['statistics']['timeseries'].get(timeseries_key))
         for index, value in enumerate(data['statistics']['timeseries'].get(timeseries_key)):
             timestamp = (time_from + (time_range / num_timeseries_values) * (index + 1)) / 1000
             time_value = datetime.datetime.fromtimestamp(timestamp)

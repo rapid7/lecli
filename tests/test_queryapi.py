@@ -51,6 +51,22 @@ def test_prettyprint_statistics_timeseries(capsys):
     teardown_httpretty()
 
 
+def test_prettyprint_statistics_timeseries_with_empty_result(capsys):
+    setup_httpretty()
+
+    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_QUERYAPI_URL,
+                           content_type='application/json',
+                           body=json.dumps(resp_ex.empty_ts_response))
+    response = requests.get(misc_ex.MOCK_QUERYAPI_URL)
+    query_api.prettyprint_statistics(response)
+
+    out, err = capsys.readouterr()
+    assert "Total" in out
+    assert "Timeseries" in out
+
+    teardown_httpretty()
+
+
 def test_prettyprint_events(capsys):
     setup_httpretty()
 
