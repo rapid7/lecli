@@ -51,7 +51,6 @@ def _handle_saved_query_response(response):
     """
     if response.json().get('saved_queries'):
         queries = response.json()['saved_queries']
-        # print tabulate(queries, headers={})
         for query in queries:
             _pretty_print_saved_query(query)
     elif response.json().get('saved_query'):
@@ -61,8 +60,8 @@ def _handle_saved_query_response(response):
 
 def get_saved_query(query_id=None):
     """
-    Get a specific saved query
-    :param query_id: uuid of saved query to be retrieved
+    If query id is provided, get this specific saved query or get them all
+    :param query_id: uuid of saved query to be retrieved(optional)
     """
     endpoint_url = _url()
     if query_id:

@@ -258,12 +258,16 @@ This operation required read-write api key to be in lecli config file.
 ####List saved queries
 Get a list of saved queries belongs to the used account.
 
+Example:
+
     lecli getsavedqueries
 
 ####Get a saved query
 Get a specific saved query
 Mandatory positional argument:
 - UUID of the saved query to be retrieved.
+
+Example:
 
     lecli getsavedquery <uuid of the saved query>
 
@@ -311,5 +315,7 @@ Examples:
 Delete a saved query.
 Mandatory positional argument:
 - UUID of the saved query to be deleted.
+
+Example:
 
     lecli deletesavedquery <uuid of the saved query>
