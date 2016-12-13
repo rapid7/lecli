@@ -5,3 +5,6 @@ v0.3, 14/07/2016  -- Teams API support with create/delete/rename teams and addin
                      from teams.
                      Configuration file loading during installation.
                      Travis-tox-pylint support.
+v0.4, 9/9/2016    -- Relative time range and progress bar support.
+v0.5, 10/11/2016  -- Account usage management support.
+v0.6, 13/12/2016  -- Saved query management support.
