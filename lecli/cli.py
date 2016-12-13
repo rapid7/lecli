@@ -9,6 +9,7 @@ from lecli import query_api
 from lecli import team_api
 from lecli import user_api
 from lecli import usage_api
+from lecli import saved_query_api
 
 
 @click.group()
@@ -17,6 +18,54 @@ def cli():
     """Logentries Command Line Interface"""
     # load configs from config.ini file in user_config_dir depending on running OS
     api_utils.load_config()
+
+
+@cli.command()
+def getsavedqueries():
+    """Get a list of saved queries"""
+    saved_query_api.get_saved_query()
+
+
+@cli.command()
+@click.argument('query_id', type=click.STRING)
+def getsavedquery(query_id):
+    """Get the saved query with the given ID"""
+    saved_query_api.get_saved_query(query_id)
+
+
+@cli.command()
+@click.argument('name', type=click.STRING)
+@click.argument('statement', type=click.STRING)
+@click.option('-f', '--timefrom', help='Time to query from (unix epoch)', type=int)
+@click.option('-t', '--timeto', help='Time to query to (unix epoch)', type=int)
+@click.option('-r', '--relative_range', help='Relative time range (ex: last x :timeunit)',
+              type=click.STRING)
+@click.option('-l', '--logs', help='Logs(colon delimited if multiple)', type=click.STRING)
+def createsavedquery(name, statement, timefrom, timeto, relative_range, logs):
+    """Create a saved query with the given arguments"""
+    saved_query_api.create_saved_query(name, statement, timefrom, timeto, relative_range, logs)
+
+
+@cli.command()
+@click.argument('query_id', type=click.STRING)
+@click.option('-n', '--name', help='Name of the saved query', type=click.STRING)
+@click.option('-s', '--statement', help='LEQL statement', type=click.STRING)
+@click.option('-f', '--timefrom', help='Time to query from (unix epoch)', type=int)
+@click.option('-t', '--timeto', help='Time to query to (unix epoch)', type=int)
+@click.option('-r', '--relative_range', help='Relative time range (ex: last x :timeunit)',
+              type=click.STRING)
+@click.option('-l', '--logs', help='Logs(colon delimited if multiple)', type=click.STRING)
+def updatesavedquery(query_id, name, statement, timefrom, timeto, relative_range, logs):
+    """Update the saved query with the given arguments"""
+    saved_query_api.update_saved_query(query_id, name, statement, timefrom, timeto, relative_range,
+                                       logs)
+
+
+@cli.command()
+@click.argument('query_id', type=click.STRING)
+def deletesavedquery(query_id):
+    """Delete the saved query with given ID"""
+    saved_query_api.delete_saved_query(query_id)
 
 
 @cli.command()
