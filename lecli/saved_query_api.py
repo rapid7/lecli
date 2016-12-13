@@ -157,16 +157,16 @@ def update_saved_query(query_id, name=None, statement=None, from_ts=None, to_ts=
     }
 
     if name:
-        params['saved_query'].update({'name': name})
+        params['saved_query']['name'] = name
 
     if logs:
-        params['saved_query'].update({'logs': logs.split(':')})
+        params['saved_query']['logs'] = logs.split(':')
 
-    if statement or from_ts or to_ts or time_range:
+    if any([statement, from_ts, to_ts, time_range]):
         leql = {}
         if statement:
-            leql.update({'statement': statement})
-        if from_ts or to_ts or time_range:
+            leql['statement'] = statement
+        if any([from_ts, to_ts, time_range]):
             during = {}
             if from_ts:
                 during.update({'from': from_ts, 'to': None, 'time_range': None})
@@ -174,8 +174,8 @@ def update_saved_query(query_id, name=None, statement=None, from_ts=None, to_ts=
                 during.update({'to': to_ts, 'time_range': None})
             if time_range:
                 during.update({'time_range': time_range, 'from': None, 'to': None})
-            leql.update({'during': during})
-        params['saved_query'].update({'leql': leql})
+            leql['during'] = during
+        params['saved_query']['leql'] = leql
 
     try:
         response = requests.patch(_url() + "/" + query_id, json=params, headers=headers)

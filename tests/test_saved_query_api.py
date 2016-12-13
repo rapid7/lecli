@@ -122,6 +122,31 @@ def test_patch_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resource
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.saved_query_api._url')
+def test_patch_saved_query_none_fields(mocked_url, mocked_rw_apikey, mocked_account_resource_id,
+                                       capsys):
+    test_saved_query_id = str(uuid.uuid4())
+    mocked_url.return_value = misc_ex.MOCK_SAVED_QUERY_URL
+    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
+    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
+    httpretty.register_uri(
+        httpretty.PATCH, misc_ex.MOCK_SAVED_QUERY_URL + "/" + test_saved_query_id, status=200,
+        content_type='application/json', body=json.dumps({"saved_query":
+                                                              resp_ex.saved_query_response}))
+
+    saved_query_api.update_saved_query(test_saved_query_id, name=None,
+                                       statement="new_statement")
+    out, err = capsys.readouterr()
+
+    assert "Saved query with id %s updated" % test_saved_query_id in out
+    body = json.loads(httpretty.last_request().body)['saved_query']
+    assert "name" not in body
+    assert "statement" in body['leql']
+
+
+@httpretty.activate
+@patch('lecli.api_utils.get_account_resource_id')
+@patch('lecli.api_utils.get_rw_apikey')
+@patch('lecli.saved_query_api._url')
 def test_failing_patch_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resource_id,
                                    capsys):
     test_saved_query_id = str(uuid.uuid4())
