@@ -248,3 +248,74 @@ A valid read-write api key in configuration file is required for this operation.
 *Note:* 'start' and 'end' dates should be in ISO-8601 format: 'YYYY-MM-DD', example: '2016-01-01'
 
     lecli usage -s <start date> -e <end date>
+
+
+**Saved Query Management**
+--------------------------
+Saved queries that belong to an account can be managed via lecli. Lecli supports creating(POST), listing(GET ALL), retrieving(GET), deleting(DELETE) and updating(PATCH) saved queries via command line. 
+This operation required read-write api key to be in lecli config file.
+
+####List saved queries
+Get a list of saved queries belongs to the used account.
+
+Example:
+
+    lecli getsavedqueries
+
+####Get a saved query
+Get a specific saved query
+Mandatory positional argument:
+- UUID of the saved query to be retrieved.
+
+Example:
+
+    lecli getsavedquery <uuid of the saved query>
+
+####Create a new saved query
+Create a new saved query with the given arguments:
+
+Mandatory positional arguments:
+- Name: Name of the saved query
+- Statement: LEQL statement of the saved query
+Optional named arguments:
+- '-f': From timestamp - epoch in milliseconds
+- '-t': To timestamp - epoch in milliseconds
+- '-r': Relative time range(cannot be defined with from and/or to fields)
+- '-l': Logs of the saved query. Multiple logs can be provided with a colon(:) separated logs string.
+
+Examples:
+
+    lecli createsavedquery 'new_saved_query' 'where(event)'
+    lecli createsavedquery 'new_saved_query' 'where(event)' -l '123456789012345678901234567890123456'
+    lecli createsavedquery 'new_saved_query' 'where(event)' -r 'last 5 min' -l '123456789012345678901234567890123456:123456789012345678901234567890123457'
+    lecli createsavedquery 'new_saved_query' 'where(event)' -f 1481558514334 -t 1481562814000 -l '123456789012345678901234567890123456:123456789012345678901234567890123457'
+
+####Update a saved query
+Update a saved query with the given arguments.
+
+Mandatory positional argument:
+- UUID of the saved query to be updated.
+
+Optional named arguments:
+- '-n': Name of the saved query
+- '-s': LEQL statement of the saved query
+- '-f': From timestamp - epoch in milliseconds
+- '-t': To timestamp - epoch in milliseconds
+- '-r': Relative time range(cannot be defined with from and/or to fields) 
+- '-l': Logs of the saved query. To provide multiple logs, colon(:) separated logs can be used.
+    
+Examples:
+
+    lecli updatesavedquery -n 'new_name_for_query' -s 'where(/*/)'
+    lecli updatesavedquery -n 'new_name_for_query' -s 'where(/*/)' -r 'last 10 days'
+    lecli updatesavedquery -n 'new_name_for_query' -f 1481558514334 -t 1481562814000
+    lecli updatesavedquery -n 'new_name_for_query' -l '123456789012345678901234567890123456'
+
+####Delete a saved query
+Delete a saved query.
+Mandatory positional argument:
+- UUID of the saved query to be deleted.
+
+Example:
+
+    lecli deletesavedquery <uuid of the saved query>

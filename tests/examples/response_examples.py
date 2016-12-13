@@ -140,3 +140,22 @@ usage_response = {
     }
   ]
 }
+
+saved_query_response = {
+    "id": "123456789012345678901234567890123456",
+    "name": "test",
+    "leql": {
+        "statement": "where(/*/)",
+        "during": {
+            "time_range": None,
+            "to": 123123,
+            "from": 123
+        }
+    },
+    "logs": ['123456789012345678901234567890123456']
+}
+
+saved_query_error_response = {
+    "fields": ["time_range"],
+    "messages": ["Invalid query: time_range cannot be specified with from and/or to fields"]
+}

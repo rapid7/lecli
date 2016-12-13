@@ -34,6 +34,8 @@ MOCK_TEAMSAPI_URL = 'http://mydummyurl.com/teams'
 
 MOCK_USAGE_URL = 'https://mydummyurl.com/usage'
 
+MOCK_SAVED_QUERY_URL = 'https://mydummyurl.com/saved_queries'
+
 TEST_TEAM_ID = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 
 USAGE_DATE_FROM = '2016-03-01'
