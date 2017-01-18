@@ -1,6 +1,7 @@
 """
 Configuration and api keys util module.
 """
+import sys
 import ConfigParser
 import base64
 import hashlib
@@ -33,7 +34,7 @@ def print_config_error_and_exit(section=None, config_key=None, value=None):
         print "Error: %s = '%s' is not of correct length in section: '%s' of your configuration " \
               "file: '%s'" % (config_key, value, section, CONFIG_FILE_PATH)
 
-    exit(1)
+    sys.exit(1)
 
 
 def init_config():
@@ -65,7 +66,7 @@ def init_config():
     else:
         print "Config file exists in the path: " + CONFIG_FILE_PATH
 
-    exit(1)
+    sys.exit(1)
 
 
 def load_config():
@@ -77,7 +78,7 @@ def load_config():
     if len(files_read) != 1:
         print "Error: Config file '%s' not found, generating one..." % CONFIG_FILE_PATH
         init_config()
-        exit(1)
+        sys.exit(1)
         print_config_error_and_exit()
     if not CONFIG.has_section(AUTH_SECTION):
         print_config_error_and_exit(section=AUTH_SECTION)

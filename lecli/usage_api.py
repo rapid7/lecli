@@ -1,6 +1,7 @@
 """
 Account usage API module.
 """
+import sys
 import requests
 from tabulate import tabulate
 
@@ -44,9 +45,9 @@ def get_usage(start, end):
         response = requests.get(_url(), params=params, headers=headers)
         if response_utils.response_error(response):
             print "Getting account usage failed. Status code %s" % response.status_code
-            exit(1)
+            sys.exit(1)
         else:
             _handle_get_usage_response(response)
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)

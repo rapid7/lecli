@@ -1,6 +1,7 @@
 """
 Saved Query API module.
 """
+import sys
 import click
 import requests
 
@@ -41,7 +42,7 @@ def _pretty_print_saved_query_error(response):
         if 'messages' in error_body:
             click.echo('Message: %s' % ",".join(response.json()['messages']))
     except ValueError:
-        exit(1)
+        sys.exit(1)
 
 
 def _handle_saved_query_response(response):
@@ -78,7 +79,7 @@ def get_saved_query(query_id=None):
             _handle_saved_query_response(response)
     except requests.exceptions.RequestException as error:
         click.echo(error)
-        exit(1)
+        sys.exit(1)
 
 
 def delete_saved_query(query_id):
@@ -95,7 +96,7 @@ def delete_saved_query(query_id):
             click.echo('Deleted saved query with id: %s' % query_id)
     except requests.exceptions.RequestException as error:
         click.echo(error)
-        exit(1)
+        sys.exit(1)
 
 
 def create_saved_query(name, statement, from_ts=None, to_ts=None, time_range=None, logs=None):
@@ -135,7 +136,7 @@ def create_saved_query(name, statement, from_ts=None, to_ts=None, time_range=Non
             _pretty_print_saved_query(response.json()['saved_query'])
     except requests.exceptions.RequestException as error:
         click.echo(error)
-        exit(1)
+        sys.exit(1)
 
 
 def update_saved_query(query_id, name=None, statement=None, from_ts=None, to_ts=None,
@@ -187,4 +188,4 @@ def update_saved_query(query_id, name=None, statement=None, from_ts=None, to_ts=
             _pretty_print_saved_query(response.json()['saved_query'])
     except requests.exceptions.RequestException as error:
         click.echo(error)
-        exit(1)
+        sys.exit(1)
