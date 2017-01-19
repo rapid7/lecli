@@ -71,7 +71,7 @@ def init_config():
     else:
         print "Config file exists in the path: " + CONFIG_FILE_PATH
 
-    exit(1)
+    sys.exit(1)
 
 
 def load_config():

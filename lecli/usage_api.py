@@ -44,7 +44,8 @@ def get_usage(start, end):
     try:
         response = requests.get(_url(), params=params, headers=headers)
         if response_utils.response_error(response):
-            print "Getting account usage failed. Status code %s" % response.status_code
+            sys.stderr.write("Getting account usage failed. Status code %s"
+                             % response.status_code)
             sys.exit(1)
         else:
             _handle_get_usage_response(response)
