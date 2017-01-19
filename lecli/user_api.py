@@ -28,6 +28,7 @@ def handle_userlist_response(response):
     Handle userlist response. Exit if it has any errors, print if status code is 200.
     """
     if response_utils.response_error(response) is True:  # Check response has no errors
+        sys.stderr.write(response.text)
         sys.exit(1)
     elif response.status_code == 200:
         print_users(response)
@@ -39,11 +40,11 @@ def handle_create_user_response(response):
     """
     if response_utils.response_error(response) is True:  # Check response has no errors
         if response.status_code >= 400:
-            print 'Failed to add user - User may have already been added this account or have a ' \
-                  'Logentries account'
-            print 'To add a new user: lecli adduser -f John -l Smyth -e john@smyth.com'
-            print 'To add an existing user using their User Key: lecli adduser -u ' \
-                  '12345678-aaaa-bbbb-1234-1234cb123456'
+            sys.stderr.write('Failed to add user - User may have already been '
+                             'added this account or have a Logentries account')
+            sys.stderr.write('To add a new user: lecli adduser -f John -l Smyth -e john@smyth.com')
+            sys.stderr.write('To add an existing user using their User Key: '
+                             'lecli adduser -u 12345678-aaaa-bbbb-1234-1234cb123456')
         sys.exit(1)
 
     if response.status_code == 200:
@@ -57,7 +58,7 @@ def handle_create_user_response(response):
               (user['first_name'], user['last_name'], user['login_name'], user['email'], user['id'])
 
     if response.status_code == 403:
-        print "User you attempted to add is the account owner"
+        sys.stderr.write("User you attempted to add is the account owner")
 
 
 def list_users():
@@ -125,7 +126,7 @@ def delete_user(user_key):
     try:
         response = requests.request('DELETE', url, data='', headers=headers)
         if response_utils.response_error(response) is True:  # Check response has no errors
-            print 'Delete user failed, status code: %s' % response.status_code
+            sys.stderr.write('Delete user failed, status code: %s' % response.status_code)
             sys.exit(1)
         elif response.status_code == 204:
             print 'Deleted user'

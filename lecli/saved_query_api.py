@@ -72,9 +72,9 @@ def get_saved_query(query_id=None):
         response = requests.get(endpoint_url, headers=headers)
         if response_utils.response_error(response):
             if query_id:
-                click.echo("Unable to retrieve saved query with id %s" % query_id)
+                sys.stderr.write("Unable to retrieve saved query with id %s" % query_id)
             else:
-                click.echo("Unable to retrieve saved queries.")
+                sys.stderr.write("Unable to retrieve saved queries.")
         elif response.status_code == 200:
             _handle_saved_query_response(response)
     except requests.exceptions.RequestException as error:
@@ -91,7 +91,7 @@ def delete_saved_query(query_id):
     try:
         response = requests.delete(_url() + "/" + query_id, headers=headers)
         if response_utils.response_error(response):
-            click.echo('Delete saved query failed, status code: %d' % response.status_code)
+            sys.stderr.write('Delete saved query failed, status code: %d' % response.status_code)
         elif response.status_code == 204:
             click.echo('Deleted saved query with id: %s' % query_id)
     except requests.exceptions.RequestException as error:
@@ -129,7 +129,7 @@ def create_saved_query(name, statement, from_ts=None, to_ts=None, time_range=Non
     try:
         response = requests.post(_url(), json=params, headers=headers)
         if response_utils.response_error(response):
-            click.echo('Creating saved query failed, status code: %d' % response.status_code)
+            sys.stderr.write('Creating saved query failed, status code: %d' % response.status_code)
             _pretty_print_saved_query_error(response)
         elif response.status_code == 201:
             click.echo('Saved query created with name: %s' % name)
@@ -181,7 +181,7 @@ def update_saved_query(query_id, name=None, statement=None, from_ts=None, to_ts=
     try:
         response = requests.patch(_url() + "/" + query_id, json=params, headers=headers)
         if response_utils.response_error(response):
-            click.echo('Updating saved query failed, status code: %d' % response.status_code)
+            sys.stderr.write('Updating saved query failed, status code: %d' % response.status_code)
             _pretty_print_saved_query_error(response)
         elif response.status_code == 200:
             click.echo('Saved query with id %s updated.' % query_id)
