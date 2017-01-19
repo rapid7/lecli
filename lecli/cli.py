@@ -23,6 +23,7 @@ def cli():
     # load configs from config.ini file in user_config_dir depending on running OS
     api_utils.load_config()
 
+
 @cli.command()
 def getsavedqueries():
     """Get a list of saved queries"""
@@ -356,8 +357,8 @@ def createlog(name, filename):
             click.echo('Example usage: lecli createlog -n new_log_name')
             click.echo('Example usage: lecli createlog -f path_to_file.json')
     else:
-        print "File was not found. " \
-              "Please ensure you have provided the correct path to the file."
+        sys.stderr.write("File was not found. "
+                         "Please ensure you have provided the correct path to the file.")
 
 
 @cli.command()
@@ -402,8 +403,8 @@ def updatelog(log_id, filename):
                 sys.stderr.write(error)
                 sys.exit(1)
     else:
-        print "File was not found. " \
-              "Please ensure you have provided the correct path to the file."
+        sys.stderr.write("File was not found. "
+                         "Please ensure you have provided the correct path to the file.")
 
 
 @cli.command()
@@ -423,8 +424,8 @@ def replacelog(log_id, filename):
                 sys.stderr.write(error)
                 sys.exit(1)
     else:
-        print "File was not found. " \
-              "Please ensure you have provided the correct path to the file."
+        sys.stderr.write("File was not found. "
+                         "Please ensure you have provided the correct path to the file.")
 
 
 if __name__ == '__main__':
