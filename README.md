@@ -55,6 +55,16 @@ owner_api_key = 12345678-aaaa-bbbb-1234-1234cb12345c
 rw_api_key = 12345678-aaaa-bbbb-1234-1234cb12345d
 ```
 
+You will also need to set your log management URL. This defaults to:
+    
+    https://rest.logentries.com/management/logs
+    
+This value can be updated in the URL section of the CLI configuration file:
+
+    [Url]
+    log_management_url=https://<some_url>/management/logs
+
+
 **Query and Events**
 --------------------
 The event and query functionality of the CLI supports a number of different ways to query events and statistics.
@@ -319,3 +329,94 @@ Mandatory positional argument:
 Example:
 
     lecli deletesavedquery <uuid of the saved query>
+    
+    
+ **Log Management**
+--------------------
+
+The CLI allows you to retrieve and manage logs. You can retrieve all or single logs as well as create, delete and rename logs. You can also assign a log to a logset. These actions all require a valid read-write API key in your configuration file.
+
+
+####Retrieve all logs
+Retrieve all logs.
+
+Example:
+    
+    lecli getlogs
+
+####Retrieve a specific log
+Retrieve a log with a given ID.
+
+Mandatory positional argument:
+- UUID of the log to be retrieved.
+
+Example:
+    
+    lecli getlog <log id>
+
+####Create a new log
+Create a new log with a given name or from a provided json file.
+
+Logs can be created with a given name and default values by providing the name. 
+If you wish to supply additional information, the (relative or full) path to a JSON file can be provided.
+
+Example JSON:
+
+    {
+        "name": "log name",
+        "logsets_info": [
+            {
+                "id": "logset id",,
+                "name": "logset name"
+            }
+        ]
+    }
+
+Example:
+
+    lecli createlog -n <name>
+    lecli createlog -f <path_to_json_file>
+
+####Rename a log
+Rename a log with the provided ID.
+
+Mandatory positional arguments:
+- UUID of the log to be renamed
+- New name of the log
+
+Example:
+
+    lecli renamelog <log_id> <new_name>
+    
+####Update a log
+Add logset information to a given log.
+
+Mandatory positional arguments:
+- UUID of the log to be updated
+- Full or relative path to a JSON file containing the updated log information
+
+Examples:
+    
+    lecli setlogset <log_id> <path_to_json_file>
+    
+ 
+####Delete a log
+Deletes a log with the provided ID.
+
+Mandatory positional argument:
+- UUID of the log to be deleted
+
+Example:
+
+    lecli deletelog <log id>
+    
+####Replace a log
+Replaces a log with the provided log.
+
+Mandatory positional argument:
+- UUID of the log to be replaced
+- Full or relative path to JSON file containing a valid log object
+
+Example:
+    
+    lecli replacelog <log_id> <path_to_json_file>

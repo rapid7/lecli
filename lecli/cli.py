@@ -1,6 +1,9 @@
 """
 Main lecli module powered by click library.
 """
+import sys
+import os
+import json
 import click
 
 import lecli
@@ -10,6 +13,7 @@ from lecli import team_api
 from lecli import user_api
 from lecli import usage_api
 from lecli import saved_query_api
+from lecli import log_api
 
 
 @click.group()
@@ -18,7 +22,6 @@ def cli():
     """Logentries Command Line Interface"""
     # load configs from config.ini file in user_config_dir depending on running OS
     api_utils.load_config()
-
 
 @cli.command()
 def getsavedqueries():
@@ -326,8 +329,102 @@ def deleteuser(userkey):
 @cli.command()
 def getowner():
     """Get account owner details"""
-
     user_api.get_owner()
+
+
+@cli.command()
+@click.option('-n', '--name', type=click.STRING, default=None,
+              help='Name of new log')
+@click.option('-f', '--filename', type=click.STRING, default=None,
+              help='Full or relative path to file containing JSON log object')
+def createlog(name, filename):
+    """Create a log with the provided name and details.
+    Will use JSON file first if both name and file are provided"""
+    if os.path.exists(filename) and os.path.isfile(filename):
+        if filename is not None:
+            with open(filename) as json_data:
+                # Open file and load as JSON
+                try:
+                    params = json.load(json_data)
+                    log_api.create_log(None, params)
+                except ValueError as error:
+                    sys.stderr.write(error)
+                    sys.exit(1)
+        elif name is not None:
+            log_api.create_log(name, None)
+        else:
+            click.echo('Example usage: lecli createlog -n new_log_name')
+            click.echo('Example usage: lecli createlog -f path_to_file.json')
+    else:
+        print "File was not found. " \
+              "Please ensure you have provided the correct path to the file."
+
+
+@cli.command()
+@click.argument('logid', type=click.STRING, default=None)
+def deletelog(logid):
+    """Delete a log with the provided id"""
+    log_api.delete_log(logid)
+
+
+@cli.command()
+def getlogs():
+    """Get all logs"""
+    log_api.get_logs()
+
+
+@cli.command()
+@click.argument('log_id', type=click.STRING, default=None)
+def getlog(log_id):
+    """Get a log with the provided id"""
+    log_api.get_log(log_id)
+
+@cli.command()
+@click.argument('log_id', type=click.STRING)
+@click.argument('name', type=click.STRING)
+def renamelog(log_id, name):
+    """Update a log with the provided details"""
+    log_api.rename_log(log_id, name)
+
+
+@cli.command()
+@click.argument('log_id', type=click.STRING)
+@click.argument('filename', type=click.STRING)
+def updatelog(log_id, filename):
+    """Update a log with the details provided"""
+    if os.path.exists(filename) and os.path.isfile(filename):
+        with open(filename) as json_data:
+            # Open file and load as JSON
+            try:
+                params = json.load(json_data)
+                log_api.update_log(log_id, params)
+            except ValueError as error:
+                sys.stderr.write(error)
+                sys.exit(1)
+    else:
+        print "File was not found. " \
+              "Please ensure you have provided the correct path to the file."
+
+
+@cli.command()
+@click.argument('log_id', type=click.STRING)
+@click.argument('filename', type=click.STRING)
+def replacelog(log_id, filename):
+    """
+    Replace a log of a given log_id with new details
+    """
+    if os.path.exists(filename) and os.path.isfile(filename):
+        with open(filename) as json_data:
+            # Open file and load as JSON
+            try:
+                params = json.load(json_data)
+                log_api.replace_log(log_id, params)
+            except ValueError as error:
+                sys.stderr.write(error)
+                sys.exit(1)
+    else:
+        print "File was not found. " \
+              "Please ensure you have provided the correct path to the file."
 
 
 if __name__ == '__main__':

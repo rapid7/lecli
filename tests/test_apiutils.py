@@ -218,3 +218,12 @@ def test_get_invalid_named_group_key(capsys):
             assert result is None
             assert nick_to_query in out
             assert 'was not found' in out
+
+
+@patch('lecli.api_utils.get_management_url')
+def test_generate_headers_ro(mocked_management_url):
+    mocked_management_url.return_value = misc_ex.TEST_MANAGEMENT_URL
+
+    result = api_utils.get_management_url()
+
+    assert "https://rest.logentries.com/management/logs" in result

@@ -140,6 +140,43 @@ team_response = {
     ]
 }
 
+log_response = {
+    "log" : {
+        "id" : "12345",
+        "name" : "Test Log",
+        "logsets_info" : [
+            {
+                "id" : "67890",
+                "name" : "Test Logset 1",
+                "links" :
+                    {
+                        "rel" : "Self",
+                        "href" : "http://mydummyurl.com/management/logsets/67890"
+                    }
+            },
+            {
+                "id": "2468",
+                "name": "Test Logset 2",
+                "links":
+                    {
+                        "rel" : "Self",
+                        "href" : "http://mydummyurl.com/management/logsets/2468"
+                    }
+            }
+        ],
+        "source_type" : "token",
+        "token_seed" : "12345678-1234-1234-1234-123456789abcdef",
+        "tokens" : [{}],
+        "structures" : [{}],
+        "user_data" : {
+            "LocationDescription" : "All logs for DC1",
+            "le_hostname" : "testhost"
+        }
+
+    }
+
+}
+
 usage_response = {
     "id": "123456789012345678901234567890123456",
     "name": "Test",

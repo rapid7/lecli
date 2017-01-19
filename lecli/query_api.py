@@ -3,6 +3,7 @@ Query API module.
 """
 from __future__ import division
 
+import sys
 import json
 import time
 import datetime
@@ -31,7 +32,7 @@ def handle_response(response, progress_bar):
     """
 
     if response_utils.response_error(response) is True:  # Check response has no errors
-        exit(1)
+        sys.exit(1)
     elif response.status_code == 200:
         progress = response.json().get('progress')
         if progress:
@@ -70,7 +71,7 @@ def fetch_results(provided_url):
         return response
     except requests.exceptions.RequestException as error:
         click.echo(error)
-        exit(1)
+        sys.exit(1)
 
 
 def get_recent_events(log_keys, last_x_seconds=1200, time_range=None):
@@ -92,7 +93,7 @@ def get_recent_events(log_keys, last_x_seconds=1200, time_range=None):
             handle_response(response, progress_bar)
     except requests.exceptions.RequestException as error:
         click.echo(error)
-        exit(1)
+        sys.exit(1)
 
 
 def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=None,
@@ -120,7 +121,7 @@ def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=N
             handle_response(response, progress_bar)
     except requests.exceptions.RequestException as error:
         click.echo(error)
-        exit(1)
+        sys.exit(1)
 
 
 def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=None,
@@ -147,7 +148,7 @@ def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=N
             handle_response(response, progress_bar)
     except requests.exceptions.RequestException as error:
         click.echo(error)
-        exit(1)
+        sys.exit(1)
 
 
 def print_response(response):

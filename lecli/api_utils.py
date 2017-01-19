@@ -1,6 +1,7 @@
 """
 Configuration and api keys util module.
 """
+import sys
 import ConfigParser
 import base64
 import hashlib
@@ -8,11 +9,13 @@ import hmac
 import os
 
 import datetime
+import validators
 from appdirs import user_config_dir
 
 import lecli
 
 AUTH_SECTION = 'Auth'
+URL_SECTION = 'Url'
 CONFIG = ConfigParser.ConfigParser()
 CONFIG_FILE_PATH = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
 
@@ -33,7 +36,7 @@ def print_config_error_and_exit(section=None, config_key=None, value=None):
         print "Error: %s = '%s' is not of correct length in section: '%s' of your configuration " \
               "file: '%s'" % (config_key, value, section, CONFIG_FILE_PATH)
 
-    exit(1)
+    sys.exit(1)
 
 
 def init_config():
@@ -56,6 +59,9 @@ def init_config():
 
         dummy_config.add_section('LogNicknames')
         dummy_config.add_section("LogGroups")
+        dummy_config.add_section("Url")
+        dummy_config.set(URL_SECTION, 'log_management_url',
+                         'https://rest.logentries.com/management/logs')
         dummy_config.write(config_file)
         config_file.close()
         print "An empty config file created in path %s, please check and configure it. To learn " \
@@ -77,7 +83,7 @@ def load_config():
     if len(files_read) != 1:
         print "Error: Config file '%s' not found, generating one..." % CONFIG_FILE_PATH
         init_config()
-        exit(1)
+        sys.exit(1)
         print_config_error_and_exit()
     if not CONFIG.has_section(AUTH_SECTION):
         print_config_error_and_exit(section=AUTH_SECTION)
@@ -284,3 +290,18 @@ def gensignature(api_key, date, content_type, request_method, query_path, reques
     digest.update(canonical_string)
 
     return digest.digest()
+
+def get_management_url():
+    """
+    Get management url from the config file.
+    """
+
+    config_key = 'management_url'
+    try:
+        url = CONFIG.get(URL_SECTION, config_key)
+        if validators.url(str(url)):
+            return url
+        else:
+            print_config_error_and_exit(URL_SECTION, 'Log Management URL(%s)' % config_key)
+    except ConfigParser.NoOptionError:
+        print_config_error_and_exit(URL_SECTION, 'Log Management URL(%s)' % config_key)
