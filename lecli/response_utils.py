@@ -12,7 +12,7 @@ def response_error(response):
     if response.headers.get('X-RateLimit-Remaining') is not None:
         if int(response.headers['X-RateLimit-Remaining']) == 0:
             sys.stderr.write('Error: Rate Limit Reached, will reset in ' + response.headers.get(
-                'X-RateLimit-Reset') + ' seconds')
+                'X-RateLimit-Reset') + ' seconds \n')
             return True
     try:
         response.raise_for_status()
@@ -20,7 +20,7 @@ def response_error(response):
         print "Request Error:", error.message
         if response.status_code == 500:
             sys.stderr.write('Your account may have no owner assigned. ' \
-                  'Please visit www.logentries.com for information on assigning an account owner.')
+                  'Please visit www.logentries.com for information on assigning an account owner. \n')
         return True
 
     if response.status_code == 200:
