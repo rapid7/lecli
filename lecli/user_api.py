@@ -1,6 +1,7 @@
 """
 User API module.
 """
+import sys
 import json
 
 import requests
@@ -27,7 +28,8 @@ def handle_userlist_response(response):
     Handle userlist response. Exit if it has any errors, print if status code is 200.
     """
     if response_utils.response_error(response) is True:  # Check response has no errors
-        exit(1)
+        sys.stderr.write(response.text)
+        sys.exit(1)
     elif response.status_code == 200:
         print_users(response)
 
@@ -38,12 +40,12 @@ def handle_create_user_response(response):
     """
     if response_utils.response_error(response) is True:  # Check response has no errors
         if response.status_code >= 400:
-            print 'Failed to add user - User may have already been added this account or have a ' \
-                  'Logentries account'
-            print 'To add a new user: lecli adduser -f John -l Smyth -e john@smyth.com'
-            print 'To add an existing user using their User Key: lecli adduser -u ' \
-                  '12345678-aaaa-bbbb-1234-1234cb123456'
-        exit(1)
+            sys.stderr.write('Failed to add user - User may have already been '
+                             'added this account or have a Logentries account')
+            sys.stderr.write('To add a new user: lecli adduser -f John -l Smyth -e john@smyth.com')
+            sys.stderr.write('To add an existing user using their User Key: '
+                             'lecli adduser -u 12345678-aaaa-bbbb-1234-1234cb123456')
+        sys.exit(1)
 
     if response.status_code == 200:
         user = response.json()['user']
@@ -56,7 +58,7 @@ def handle_create_user_response(response):
               (user['first_name'], user['last_name'], user['login_name'], user['email'], user['id'])
 
     if response.status_code == 403:
-        print "User you attempted to add is the account owner"
+        sys.stderr.write("User you attempted to add is the account owner")
 
 
 def list_users():
@@ -69,8 +71,8 @@ def list_users():
             'owner', 'GET', action, ''))
         handle_userlist_response(response)
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
 def add_new_user(first_name, last_name, email):
@@ -93,8 +95,8 @@ def add_new_user(first_name, last_name, email):
         response = requests.request('POST', _url('user'), json=json_content, headers=headers)
         handle_create_user_response(response)
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
 def add_existing_user(user_key):
@@ -109,8 +111,8 @@ def add_existing_user(user_key):
         response = requests.request('POST', url, data='', headers=headers)
         handle_create_user_response(response)
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
 def delete_user(user_key):
@@ -124,13 +126,13 @@ def delete_user(user_key):
     try:
         response = requests.request('DELETE', url, data='', headers=headers)
         if response_utils.response_error(response) is True:  # Check response has no errors
-            print 'Delete user failed, status code: %s' % response.status_code
-            exit(1)
+            sys.stderr.write('Delete user failed, status code: %s' % response.status_code)
+            sys.exit(1)
         elif response.status_code == 204:
             print 'Deleted user'
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
 def get_owner():
@@ -143,8 +145,8 @@ def get_owner():
             'owner', 'GET', action, ''))
         handle_userlist_response(response)
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
 def print_users(response):
