@@ -23,7 +23,7 @@ def handle_get_log_response(response):
         sys.exit(1)
     elif response.status_code == 200:
         key_name = 'logs' if 'logs' in response.json() else 'log'
-        print json.dumps(response.json()[key_name], indent=4, sort_keys=True)
+        sys.stdout.write(json.dumps(response.json()[key_name], indent=4, sort_keys=True))
 
 
 def get_logs():
@@ -75,7 +75,7 @@ def create_log(logname, params):
     try:
         response = requests.post(_url(), json=request_params, headers=headers)
         if response_utils.response_error(response):
-            print 'Creating log failed, status code: %d' % response.status_code
+            sys.stderr.write('Creating log failed, status code: %d' % response.status_code)
             sys.exit(1)
         elif response.status_code == 201:
             api_utils.pretty_print_string_as_json(response.text)
@@ -95,10 +95,10 @@ def delete_log(log_id):
     try:
         response = requests.delete(url, headers=headers)
         if response_utils.response_error(response):
-            print 'Delete log failed, status code: %d' % response.status_code
+            sys.stderr.write('Delete log failed, status code: %d' % response.status_code)
             sys.exit(1)
         elif response.status_code == 204:
-            print 'Deleted log with id: %s' % log_id
+            sys.stdout.write('Deleted log with id: %s' % log_id)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
@@ -113,11 +113,11 @@ def replace_log(log_id, params):
     try:
         response = requests.put(url, json=params, headers=headers)
         if response_utils.response_error(response):
-            print 'Updating log with details: %s failed, status code: %d' \
-                  % (params, response.status_code)
+            sys.stderr.write('Updating log with details: %s failed, status code: %d' \
+                  % (params, response.status_code))
             sys.exit(1)
         elif response.status_code == 200:
-            print "Log: '%s' updated to: \n" % (log_id)
+            sys.stdout.write("Log: '%s' updated to: \n" % (log_id))
             api_utils.pretty_print_string_as_json(response.text)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
