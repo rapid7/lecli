@@ -60,6 +60,7 @@ def test_create_log_with_default_source_type(mocked_url, mocked_rw_apikey, capsy
     assert 'Test Log' in out
     assert 'token' in out
 
+
 @httpretty.activate
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.log_api._url')
@@ -97,26 +98,39 @@ def test_delete_log(mocked_url, mocked_rw_apikey, capsys):
 
 @httpretty.activate
 @patch('lecli.api_utils.get_rw_apikey')
+@patch('lecli.api_utils.get_ro_apikey')
 @patch('lecli.log_api._url')
-def test_rename_log(mocked_url, mocked_rw_apikey, capsys):
+def test_rename_log(mocked_url, mocked_rw_apikey, mocked_ro_apikey, capsys):
     test_log_id = misc_ex.TEST_LOG_RESOURCE_ID
     mocked_url.return_value = misc_ex.MOCK_LOGAPI_URL
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    httpretty.register_uri(httpretty.PATCH,
+    mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
+
+    request_body = '{"log": { "name": "test.log","logsets_info": [],"source_type": "token"}}'
+    expected_result = '{"log": { "name": "new_test_log_name","logsets_info": [],"source_type": "token"}}'
+
+    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_LOGAPI_URL + '/' + test_log_id,
+                           status=200,
+                           content_type='application/json',
+                           body=request_body)
+
+    httpretty.register_uri(httpretty.PUT,
                            misc_ex.MOCK_LOGAPI_URL + "/" + test_log_id,
                            status=200,
+                           body = expected_result,
                            content_type='application/json')
 
-    new_name_for_log = "{'name': 'new_test_log_name'}"
-    log_api.update_log(test_log_id, new_name_for_log)
+    new_name_for_log = "new_test_log_name"
+    log_api.rename_log(test_log_id, new_name_for_log)
     out, err = capsys.readouterr()
 
     assert new_name_for_log in out
 
+
 @httpretty.activate
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.log_api._url')
-def test_update_logset(mocked_url, mocked_rw_apikey, capsys):
+def test_replace_log(mocked_url, mocked_rw_apikey, capsys):
     log_id = misc_ex.TEST_LOG_RESOURCE_ID
 
     request_body = '{"log": { "name": "test.log","logsets_info": [],"source_type": "token"}}'
@@ -125,33 +139,12 @@ def test_update_logset(mocked_url, mocked_rw_apikey, capsys):
 
     dest_url = misc_ex.MOCK_LOGAPI_URL + '/' + str(misc_ex.TEST_LOG_RESOURCE_ID)
 
-    httpretty.register_uri(httpretty.PUT, dest_url, status=200, content_type='application/json')
+    httpretty.register_uri(httpretty.PUT, dest_url, status=200, body = request_body, content_type='application/json')
 
     log_api.replace_log(log_id, params=request_body)
 
     out, err = capsys.readouterr()
     assert "test.log" in out
-
-@httpretty.activate
-@patch('lecli.api_utils.get_rw_apikey')
-@patch('lecli.log_api._url')
-def test_set_logset(mocked_url, mocked_rw_apikey, capsys):
-    log_id = misc_ex.TEST_LOG_RESOURCE_ID
-
-
-    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    mocked_url.return_value = misc_ex.MOCK_LOGAPI_URL
-
-    dest_url = misc_ex.MOCK_LOGAPI_URL + '/' + str(misc_ex.TEST_LOG_RESOURCE_ID)
-    httpretty.register_uri(httpretty.PATCH, dest_url,
-                           status=200,
-                           body=json.dumps({'logs': resp_ex.log_response}),
-                           content_type='application/json')
-
-    log_api.update_log(log_id, resp_ex.log_response)
-
-    out, err = capsys.readouterr()
-    assert str("Test Log") in out
 
 
 @httpretty.activate

@@ -334,7 +334,7 @@ Example:
  **Log Management**
 --------------------
 
-The CLI allows you to retrieve and manage logs. You can retrieve all or single logs as well as create, delete and rename logs. You can also assign a log to a logset. These actions all require a valid read-write API key in your configuration file.
+The CLI allows you to retrieve and manage logs. You can retrieve a specific or all logs as well as create, delete, replace and rename logs. These actions all require a valid read-write API key in your configuration file.
 
 
 ####Retrieve all logs
@@ -388,18 +388,6 @@ Example:
 
     lecli renamelog <log_id> <new_name>
     
-####Update a log
-Add logset information to a given log.
-
-Mandatory positional arguments:
-- UUID of the log to be updated
-- Full or relative path to a JSON file containing the updated log information
-
-Examples:
-    
-    lecli setlogset <log_id> <path_to_json_file>
-    
- 
 ####Delete a log
 Deletes a log with the provided ID.
 

@@ -341,8 +341,8 @@ def getowner():
 def createlog(name, filename):
     """Create a log with the provided name and details.
     Will use JSON file first if both name and file are provided"""
-    if os.path.exists(filename) and os.path.isfile(filename):
-        if filename is not None:
+    if filename is not None:
+        if os.path.exists(filename) and os.path.isfile(filename):
             with open(filename) as json_data:
                 # Open file and load as JSON
                 try:
@@ -351,14 +351,15 @@ def createlog(name, filename):
                 except ValueError as error:
                     sys.stderr.write(error)
                     sys.exit(1)
-        elif name is not None:
-            log_api.create_log(name, None)
         else:
-            click.echo('Example usage: lecli createlog -n new_log_name')
-            click.echo('Example usage: lecli createlog -f path_to_file.json')
+            sys.stderr.write("File was not found. "
+                             "Please ensure you have provided the correct path to the file.")
+    elif name is not None:
+        log_api.create_log(name, None)
     else:
-        sys.stderr.write("File was not found. "
-                         "Please ensure you have provided the correct path to the file.")
+        click.echo('Example usage: lecli createlog -n new_log_name')
+        click.echo('Example usage: lecli createlog -f path_to_file.json')
+
 
 
 @cli.command()
@@ -380,6 +381,7 @@ def getlog(log_id):
     """Get a log with the provided id"""
     log_api.get_log(log_id)
 
+
 @cli.command()
 @click.argument('log_id', type=click.STRING)
 @click.argument('name', type=click.STRING)
@@ -391,38 +393,20 @@ def renamelog(log_id, name):
 @cli.command()
 @click.argument('log_id', type=click.STRING)
 @click.argument('filename', type=click.STRING)
-def updatelog(log_id, filename):
-    """Update a log with the details provided"""
-    if os.path.exists(filename) and os.path.isfile(filename):
-        with open(filename) as json_data:
-            # Open file and load as JSON
-            try:
-                params = json.load(json_data)
-                log_api.update_log(log_id, params)
-            except ValueError as error:
-                sys.stderr.write(error)
-                sys.exit(1)
-    else:
-        sys.stderr.write("File was not found. "
-                         "Please ensure you have provided the correct path to the file.")
-
-
-@cli.command()
-@click.argument('log_id', type=click.STRING)
-@click.argument('filename', type=click.STRING)
 def replacelog(log_id, filename):
     """
     Replace a log of a given log_id with new details
     """
-    if os.path.exists(filename) and os.path.isfile(filename):
-        with open(filename) as json_data:
-            # Open file and load as JSON
-            try:
-                params = json.load(json_data)
-                log_api.replace_log(log_id, params)
-            except ValueError as error:
-                sys.stderr.write(error)
-                sys.exit(1)
+    if filename is not None:
+        if os.path.exists(filename) and os.path.isfile(filename):
+            with open(filename) as json_data:
+                # Open file and load as JSON
+                try:
+                    params = json.load(json_data)
+                    log_api.replace_log(log_id, params)
+                except ValueError as error:
+                    sys.stderr.write(error)
+                    sys.exit(1)
     else:
         sys.stderr.write("File was not found. "
                          "Please ensure you have provided the correct path to the file.")

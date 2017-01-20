@@ -12,7 +12,7 @@ def _url():
     """
     Get rest query url of log resource id.
     """
-    return api_utils.get_management_url()
+    return api_utils.get_management_url() + '/logs'
 
 
 def handle_get_log_response(response):
@@ -45,7 +45,7 @@ def get_log(log_id):
     """
     headers = api_utils.generate_headers('ro')
     try:
-        response = requests.get(_url() + "/" + str(log_id),
+        response = requests.get(_url() + "/" + log_id,
                                 headers=headers)
         handle_get_log_response(response)
     except requests.exceptions.RequestException as error:
@@ -78,7 +78,7 @@ def create_log(logname, params):
             print 'Creating log failed, status code: %d' % response.status_code
             sys.exit(1)
         elif response.status_code == 201:
-            pretty_print_string_as_json(response.text)
+            api_utils.pretty_print_string_as_json(response.text)
 
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
@@ -104,16 +104,21 @@ def delete_log(log_id):
         sys.exit(1)
 
 
-def patch_log(log_id, url, headers, params):
-    """Makes a HTTP PATCH call with the given details"""
+def replace_log(log_id, params):
+    """
+    Replace the given log with the given details
+    """
+    url = "/".join([_url(), log_id])
+    headers = api_utils.generate_headers('rw')
     try:
-        response = requests.patch(url, json=params, headers=headers)
+        response = requests.put(url, json=params, headers=headers)
         if response_utils.response_error(response):
             print 'Updating log with details: %s failed, status code: %d' \
                   % (params, response.status_code)
             sys.exit(1)
         elif response.status_code == 200:
-            print "Log: '%s' updated to: %s"  % (log_id, params)
+            print "Log: '%s' updated to: \n" % (log_id)
+            api_utils.pretty_print_string_as_json(response.text)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
@@ -121,53 +126,16 @@ def patch_log(log_id, url, headers, params):
 
 def rename_log(log_id, log_name):
     """
-    Update the given log with the name provided
+    Rename the given log with the name provided
     """
     url = "/".join([_url(), log_id])
-
-    params = {
-        'log': {
-            'name': log_name
-        }
-    }
-
-    headers = api_utils.generate_headers('rw')
-
-    patch_log(log_id, url, headers, params)
-
-
-def update_log(log_id, params):
-    """
-    Update the given log with the given details
-    """
-    url = _url() + '/' + str(log_id)
-
-    headers = api_utils.generate_headers('rw')
-
-    patch_log(log_id, url, headers, params)
-
-def replace_log(log_id, params):
-    """
-       Replace a log with a new log as provided
-    """
-    url = _url() + '/' + str(log_id)
-
-    headers = api_utils.generate_headers('rw')
+    headers = api_utils.generate_headers('ro')
 
     try:
-        response = requests.put(url, json=params, headers=headers)
-        if response_utils.response_error(response):  # Check response has no errors
-            print 'Replacing log with details: %s failed, status code: %d' \
-                  % (params, response.status_code)
-            sys.exit(1)
-        elif response.status_code == 200:
-            print "Log: '%s' replaced with: %s" % (log_id, params)
+        response = requests.get(url, headers=headers)
+        params = response.json()
+        params['log']['name'] = log_name
+        replace_log(log_id, params)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
-
-def pretty_print_string_as_json(text):
-    """
-    Pretty prints a json string
-    """
-    print json.dumps(json.loads(text), indent=4, sort_keys=True)
