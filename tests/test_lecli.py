@@ -276,6 +276,19 @@ def test_replace_log(mocked_replace_log):
         mocked_replace_log.assert_called_once()
 
 
+@patch('lecli.cli.log_api.update_log')
+@patch('os.path.exists', MagicMock(return_value=True))
+@patch('os.path.isfile', MagicMock(return_value=True))
+@patch("json.load", MagicMock('{"log": {"id": "ba2b371a-87fa-40ee-97fd-e9b0d2424b2f","name": "new_log"}}'))
+def test_replace_log(mocked_update_log):
+    with patch('__builtin__.open', mock_open(read_data='data'), create=True):
+
+        runner = CliRunner()
+        runner.invoke(cli.updatelog, ['1234', 'file.json'])
+
+        mocked_update_log.assert_called_once()
+
+
 @patch('lecli.cli.log_api.create_log')
 @patch('os.path.exists', MagicMock(return_value=False))
 @patch('os.path.isfile', MagicMock(return_value=False))
@@ -284,6 +297,7 @@ def test_non_existant_file(mocked_create_log):
     runner.invoke(cli.createlog, ['123', 'non_existant_file.json'])
 
     assert not mocked_create_log.called
+
 
 @patch('lecli.cli.log_api.create_log')
 @patch('os.path.exists', MagicMock(return_value=True))

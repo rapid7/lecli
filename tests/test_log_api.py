@@ -149,6 +149,45 @@ def test_replace_log(mocked_url, mocked_rw_apikey, capsys):
 
 @httpretty.activate
 @patch('lecli.api_utils.get_rw_apikey')
+@patch('lecli.api_utils.get_ro_apikey')
+@patch('lecli.log_api._url')
+def test_update_log(mocked_url, mocked_rw_apikey, mocked_ro_apikey, capsys):
+    test_log_id = misc_ex.TEST_LOG_RESOURCE_ID
+    mocked_url.return_value = misc_ex.MOCK_LOGAPI_URL
+    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
+    mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
+
+    request_body = '{"log": { "name": "test.log","logsets_info": [],"source_type": "token"}}'
+    expected_result = '{"log": { "name": "test.log",' \
+                      '"logsets_info": [{"id": "e227f890-7742-47b4-86b2-5ff1d345397e","name": "test_logset"}],' \
+                      '"source_type": "token"}}'
+
+    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_LOGAPI_URL + '/' + test_log_id,
+                           status=200,
+                           content_type='application/json',
+                           body=request_body)
+
+    httpretty.register_uri(httpretty.PUT,
+                           misc_ex.MOCK_LOGAPI_URL + "/" + test_log_id,
+                           status=200,
+                           body = expected_result,
+                           content_type='application/json')
+
+    logset_info = {
+        "logsets_info": [
+            {
+                "id": "e227f890-7742-47b4-86b2-5ff1d345397e",
+                  "name": "test_logset"
+            }]
+        }
+    log_api.update_log(test_log_id, logset_info)
+    out, err = capsys.readouterr()
+
+    assert "test_logset" in out
+
+
+@httpretty.activate
+@patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.log_api._url')
 def test_duplicate_log_id(mocked_url, mocked_rw_apikey):
     with pytest.raises(Exception) as exception:

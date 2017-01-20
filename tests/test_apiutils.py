@@ -227,3 +227,49 @@ def test_generate_headers_ro(mocked_management_url):
     result = api_utils.get_management_url()
 
     assert "https://rest.logentries.com/management/logs" in result
+
+
+def test_combine_objects():
+    obj_1 = {
+    "log": {
+        "id": "21dd21e7-708a-4bc4-bf45-ffbc78190ecd",
+        "logsets_info": [],
+        "name": "test_log_old",
+        "structures": [],
+        "tokens": [],
+        "user_data": {}
+        }
+    }
+
+    obj_2 = {
+    "log": {
+        "name": "test_log_new",
+        "structures": [],
+        "tokens": [],
+        "user_data": {},
+        "logsets_info": [
+            {
+                "id": "e227f890-7742-47b4-86b2-5ff1d345397e",
+                  "name": "test_logset"
+            }]
+        }
+    }
+
+    expected_result = {
+    "log": {
+        "id": "21dd21e7-708a-4bc4-bf45-ffbc78190ecd",
+        "logsets_info": [
+            {
+                "id": "e227f890-7742-47b4-86b2-5ff1d345397e",
+                  "name": "test_logset"
+            }],
+        "name": "test_log_new",
+        "structures": [],
+        "tokens": [],
+        "user_data": {}
+        }
+    }
+
+    result = api_utils.combine_objects(obj_1, obj_2)
+
+    assert result == expected_result

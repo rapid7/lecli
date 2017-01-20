@@ -312,3 +312,23 @@ def pretty_print_string_as_json(text):
     Pretty prints a json string
     """
     print json.dumps(json.loads(text), indent=4, sort_keys=True)
+
+
+def combine_objects(left, right):
+    """
+    Merge two objects
+    """
+    if isinstance(left, dict) and isinstance(right, dict):
+        result = {}
+        for key, value in left.iteritems():
+            if key not in right:
+                result[key] = value
+            else:
+                result[key] = combine_objects(value, right[key])
+        for key, value in right.iteritems():
+            if key not in left:
+                result[key] = value
+        return result
+    if isinstance(left, list) and isinstance(right, list):
+        return left + right
+    return right

@@ -139,3 +139,19 @@ def rename_log(log_id, log_name):
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
+
+
+def update_log(log_id, params):
+    """
+    Update a log with the details provided
+    """
+    url = "/".join([_url(), log_id])
+    headers = api_utils.generate_headers('ro')
+
+    try:
+        response = requests.get(url, headers=headers)
+        existing_log = response.json()
+        replace_log(log_id, api_utils.combine_objects(existing_log, params))
+    except requests.exceptions.RequestException as error:
+        sys.stderr.write(error)
+        sys.exit(1)

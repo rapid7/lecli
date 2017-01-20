@@ -388,6 +388,18 @@ Example:
 
     lecli renamelog <log_id> <new_name>
     
+####Update a log
+Add information to a given log.
+
+Mandatory positional arguments:
+- UUID of the log to be updated
+- Full or relative path to a JSON file containing the updated log information
+
+Examples:
+    
+    lecli setlogset <log_id> <path_to_json_file>
+    
+ 
 ####Delete a log
 Deletes a log with the provided ID.
 

@@ -412,5 +412,27 @@ def replacelog(log_id, filename):
                          "Please ensure you have provided the correct path to the file.")
 
 
+@cli.command()
+@click.argument('log_id', type=click.STRING)
+@click.argument('filename', type=click.STRING)
+def updatelog(log_id, filename):
+    """
+    Update a log of a given log_id with new details
+    """
+    if filename is not None:
+        if os.path.exists(filename) and os.path.isfile(filename):
+            with open(filename) as json_data:
+                # Open file and load as JSON
+                try:
+                    params = json.load(json_data)
+                    log_api.update_log(log_id, params)
+                except ValueError as error:
+                    sys.stderr.write(error)
+                    sys.exit(1)
+    else:
+        sys.stderr.write("File was not found. "
+                         "Please ensure you have provided the correct path to the file.")
+
+
 if __name__ == '__main__':
     cli()
