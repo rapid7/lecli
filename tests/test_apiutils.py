@@ -221,7 +221,7 @@ def test_get_invalid_named_group_key(capsys):
 
 
 @patch('lecli.api_utils.get_management_url')
-def test_generate_headers_ro(mocked_management_url):
+def test_generate_management_url(mocked_management_url):
     mocked_management_url.return_value = misc_ex.TEST_MANAGEMENT_URL
 
     result = api_utils.get_management_url()
