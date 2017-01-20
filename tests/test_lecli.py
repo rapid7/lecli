@@ -1,5 +1,7 @@
 from click.testing import CliRunner
 from mock import patch
+from mock import mock_open
+from mock import MagicMock
 
 from examples import misc_examples as misc_ex
 from lecli import cli
@@ -11,7 +13,6 @@ def test_get_owner(mocked_get_owner):
     runner.invoke(cli.getowner)
 
     mocked_get_owner.assert_called_once_with()
-
 
 @patch('lecli.cli.user_api.delete_user')
 def test_userdel(mocked_delete_user):
@@ -198,7 +199,6 @@ def test_get_saved_queries(mocked_get_saved_queries):
 
     assert mocked_get_saved_queries.called
 
-
 @patch('lecli.cli.saved_query_api.get_saved_query')
 def test_get_saved_queries(mocked_get_saved_queries):
     runner = CliRunner()
@@ -221,3 +221,89 @@ def test_delete_saved_query_without_id(mocked_delete_saved_query):
     runner.invoke(cli.deletesavedquery)
 
     assert not mocked_delete_saved_query.called
+
+@patch('lecli.cli.log_api.get_logs')
+def test_get_logs(mocked_get_logs):
+    runner = CliRunner()
+    runner.invoke(cli.getlogs)
+
+    mocked_get_logs.assert_called_once_with()
+
+
+@patch('lecli.cli.log_api.get_log')
+def test_get_log(mocked_get_log):
+    runner = CliRunner()
+    runner.invoke(cli.getlog, ['123'])
+
+    mocked_get_log.assert_called_once_with('123')
+
+
+@patch('lecli.cli.log_api.create_log')
+@patch('os.path.exists', MagicMock(return_value=True))
+@patch('os.path.isfile', MagicMock(return_value=True))
+def test_create_log(mocked_create_log):
+    runner = CliRunner()
+    runner.invoke(cli.createlog, ['-n', 'new log'])
+
+    mocked_create_log.assert_called_once_with('new log', None)
+
+@patch('lecli.cli.log_api.delete_log')
+def test_delete_log(mocked_delete_log):
+    runner = CliRunner()
+    runner.invoke(cli.deletelog, ['123'])
+
+    mocked_delete_log.assert_called_once_with('123')
+
+
+@patch('lecli.cli.log_api.rename_log')
+def test_rename_log(mocked_rename_log):
+    runner = CliRunner()
+    runner.invoke(cli.renamelog, ['123', 'new name'])
+
+    mocked_rename_log.assert_called_once_with('123', 'new name')
+
+
+@patch('lecli.cli.log_api.replace_log')
+@patch('os.path.exists', MagicMock(return_value=True))
+@patch('os.path.isfile', MagicMock(return_value=True))
+@patch("json.load", MagicMock('{"log": {"id": "ba2b371a-87fa-40ee-97fd-e9b0d2424b2f","name": "new_log"}}'))
+def test_replace_log(mocked_replace_log):
+    with patch('__builtin__.open', mock_open(read_data='data'), create=True):
+
+        runner = CliRunner()
+        runner.invoke(cli.replacelog, ['1234', 'file.json'])
+
+        mocked_replace_log.assert_called_once()
+
+
+@patch('lecli.cli.log_api.update_log')
+@patch('os.path.exists', MagicMock(return_value=True))
+@patch('os.path.isfile', MagicMock(return_value=True))
+@patch("json.load", MagicMock('{"log": {"id": "ba2b371a-87fa-40ee-97fd-e9b0d2424b2f","name": "new_log"}}'))
+def test_replace_log(mocked_update_log):
+    with patch('__builtin__.open', mock_open(read_data='data'), create=True):
+
+        runner = CliRunner()
+        runner.invoke(cli.updatelog, ['1234', 'file.json'])
+
+        mocked_update_log.assert_called_once()
+
+
+@patch('lecli.cli.log_api.create_log')
+@patch('os.path.exists', MagicMock(return_value=False))
+@patch('os.path.isfile', MagicMock(return_value=False))
+def test_non_existant_file(mocked_create_log):
+    runner = CliRunner()
+    runner.invoke(cli.createlog, ['123', 'non_existant_file.json'])
+
+    assert not mocked_create_log.called
+
+
+@patch('lecli.cli.log_api.create_log')
+@patch('os.path.exists', MagicMock(return_value=True))
+@patch('os.path.isfile', MagicMock(return_value=False))
+def test_not_a_file(mocked_create_log):
+    runner = CliRunner()
+    runner.invoke(cli.createlog, ['123', 'directory'])
+
+    assert not mocked_create_log.called
