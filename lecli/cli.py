@@ -1,5 +1,9 @@
+"""
+Main lecli module powered by click library.
+"""
 import click
 
+import lecli
 from lecli import apiutils
 from lecli import query_api
 from lecli import team_api
@@ -7,7 +11,7 @@ from lecli import user_api
 
 
 @click.group()
-@click.version_option(version=0.2)
+@click.version_option(version=lecli.__version__)
 def cli():
     """Logentries Command Line Interface"""
     # load configs from config.ini file in user_config_dir depending on running OS
@@ -54,21 +58,21 @@ def renameteam(teamid, name):
 
 @cli.command()
 @click.argument('teamid', type=click.STRING, default=None)
-@click.argument('userid', type=click.STRING, default=None)
-def addusertoteam(teamid, userid):
+@click.argument('userkey', type=click.STRING, default=None)
+def addusertoteam(teamid, userkey):
     """Update the team with the provided id with name and user.
     This will add the user to this team if it exists"""
-    team_api.add_user_to_team(teamid, userid)\
+    team_api.add_user_to_team(teamid, userkey)\
 
 
 
 @cli.command()
 @click.argument('teamid', type=click.STRING, default=None)
-@click.argument('userid', type=click.STRING, default=None)
-def deleteuserfromteam(teamid, userid):
+@click.argument('userkey', type=click.STRING, default=None)
+def deleteuserfromteam(teamid, userkey):
     """Update the team with the provided id with name and user.
     This will add the user to this team if it exists"""
-    team_api.delete_user_from_team(teamid, userid)
+    team_api.delete_user_from_team(teamid, userkey)
 
 
 @cli.command()
@@ -89,9 +93,10 @@ def deleteuserfromteam(teamid, userid):
               help='Date/Time to query from (ISO-8601 datetime)')
 @click.option('--dateto',
               help='Date/Time to query to (ISO-8601 datetime)')
-def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefrom, dateto):
+@click.option('-e', '--expand', is_flag=True,
+              help='Expand JSON')
+def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefrom, dateto, expand):
     """Query logs using LEQL"""
-
     if lognick is not None:
         logkeys = apiutils.get_named_logkey(lognick)
 
@@ -101,12 +106,12 @@ def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefro
     if all([leql, querynick]):
         click.echo("Cannot define a LEQL query and query nickname in the same query request")
     elif querynick is not None:
-        leql = apiutils.get_query_from_nickname(querynick)
+        leql = apiutils.get_named_query(querynick)
 
     if all([logkeys, leql, timefrom, timeto]):
-        query_api.post_query(logkeys, leql, time_from=timefrom, time_to=timeto)
+        query_api.post_query(logkeys, leql, time_from=timefrom, time_to=timeto, expand=expand)
     elif all([logkeys, leql, datefrom, dateto]):
-        query_api.post_query(logkeys, leql, date_from=datefrom, date_to=dateto)
+        query_api.post_query(logkeys, leql, date_from=datefrom, date_to=dateto, expand=expand)
     else:
         click.echo("Example usage: lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q "
                    "'where(method=GET) calculate(count)' -f 1465370400 -t 1465370500")
@@ -135,7 +140,9 @@ def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefro
               help='Date/Time to get events from (ISO-8601 datetime)')
 @click.option('--dateto',
               help='Date/Time to get events to (ISO-8601 datetime)')
-def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
+@click.option('-e', '--expand', is_flag=True,
+              help='Expand JSON')
+def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto, expand):
     """Get log events"""
 
     if lognick is not None:
@@ -144,9 +151,9 @@ def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
         logkeys = apiutils.get_named_logkey_group(loggroup)
 
     if all([logkeys, timefrom, timeto]):
-        query_api.get_events(logkeys, time_from=timefrom, time_to=timeto)
+        query_api.get_events(logkeys, time_from=timefrom, time_to=timeto, expand=expand)
     elif all([logkeys, datefrom, dateto]):
-        query_api.get_events(logkeys, date_from=datefrom, date_to=dateto)
+        query_api.get_events(logkeys, date_from=datefrom, date_to=dateto, expand=expand)
     else:
         click.echo("Example usage: lecli events 12345678-aaaa-bbbb-1234-1234cb123456 "
                    "-f 1465370400 -t 1465370500")
@@ -167,7 +174,9 @@ def events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto):
 @click.option('-l', '--last', default=1200,
               help='Time window from now to now-X in seconds over which events will be returned '
                    '(Defaults to 20 mins)')
-def recentevents(logkeys, lognick, loggroup, last):
+@click.option('-e', '--expand', is_flag=True,
+              help='Expand JSON')
+def recentevents(logkeys, lognick, loggroup, last, expand):
     """Get recent log events"""
 
     if lognick is not None:
@@ -176,7 +185,7 @@ def recentevents(logkeys, lognick, loggroup, last):
         logkeys = apiutils.get_named_logkey_group(loggroup)
 
     if all([logkeys, last]):
-        query_api.get_recent_events(logkeys, last)
+        query_api.get_recent_events(logkeys, last, expand=expand)
 
     else:
         click.echo(
@@ -199,14 +208,14 @@ def listusers():
               help='Last name of user to be added')
 @click.option('-e', '--email', type=click.STRING,
               help='Email address of user to be added')
-@click.option('-u', '--userid', type=click.STRING,
-              help='User ID of user to be added')
+@click.option('-u', '--userkey', type=click.STRING,
+              help='User Key of user to be added')
 @click.option('--force', is_flag=True,
               help='Force adding user with confirmation prompt')
-def adduser(first, last, email, userid, force):
+def adduser(first, last, email, userkey, force):
     """Add a user to account"""
 
-    if not any((first, last, email, userid)) or all((first, last, email, userid)):
+    if not any((first, last, email, userkey)) or all((first, last, email, userkey)):
         click.echo('Example usage\n' +
                    'Add a new user: lecli adduser -f John -l Smith -e john.smith@email.com\n' +
                    'Add an existing user: lecli adduser -u 1343423')
@@ -218,24 +227,24 @@ def adduser(first, last, email, userid, force):
             if click.confirm('Please confirm you want to add user ' + first + ' ' + last):
                 user_api.add_new_user(first, last, email)
 
-    elif userid is not None:
+    elif userkey is not None:
         if force:
-            user_api.add_existing_user(userid)
+            user_api.add_existing_user(userkey)
         else:
-            if click.confirm('Please confirm you want to add user with user ID ' + userid):
-                user_api.add_existing_user(userid)
+            if click.confirm('Please confirm you want to add user with User Key ' + userkey):
+                user_api.add_existing_user(userkey)
 
 
 @cli.command()
-@click.option('-u', '--userid', type=click.STRING,
-              help='User ID of user to be deleted')
-def deleteuser(userid):
+@click.option('-u', '--userkey', type=click.STRING,
+              help='User Key of user to be deleted')
+def deleteuser(userkey):
     """Delete a user from account"""
-    if userid is None:
+    if userkey is None:
         click.echo('Example usage: lecli deleteuser -u 12345678-aaaa-bbbb-1234-1234cb123456')
 
     else:
-        user_api.delete_user(userid)
+        user_api.delete_user(userkey)
 
 
 @cli.command()

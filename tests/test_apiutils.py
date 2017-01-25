@@ -1,6 +1,7 @@
 import ConfigParser
 import hmac
 
+import pytest
 from mock import patch, Mock
 
 from lecli import apiutils
@@ -72,11 +73,13 @@ def test_get_valid_ro_apikey():
 def test_get_invalid_ro_apikey(capsys):
     with patch.object(ConfigParser.ConfigParser, 'get',
                       return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
-        ro_api_key = apiutils.get_ro_apikey()
-        out, err = capsys.readouterr()
+        with pytest.raises(SystemExit):
+            ro_api_key = apiutils.get_ro_apikey()
+            out, err = capsys.readouterr()
 
-        assert ro_api_key == misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH
-        assert 'Error: Read-only API Key not of correct length\n' == out
+            assert ro_api_key is None
+            assert misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH in out
+            assert 'is not of correct length' in out
 
 
 def test_get_valid_rw_apikey():
@@ -90,12 +93,14 @@ def test_get_valid_rw_apikey():
 def test_get_invalid_rw_apikey(capsys):
     with patch.object(ConfigParser.ConfigParser, 'get',
                       return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
-        apiutils.load_config = Mock()
-        rw_api_key = apiutils.get_rw_apikey()
-        out, err = capsys.readouterr()
+        with pytest.raises(SystemExit):
+            apiutils.load_config = Mock()
+            result = apiutils.get_rw_apikey()
+            out, err = capsys.readouterr()
 
-        assert rw_api_key == misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH
-        assert 'Error: Read/Write API Key not of correct length\n' == out
+            assert result is None
+            assert misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH in out
+            assert 'is not of correct length' in out
 
 
 def test_get_valid_owner_apikey():
@@ -109,12 +114,14 @@ def test_get_valid_owner_apikey():
 def test_get_invalid_owner_apikey(capsys):
     with patch.object(ConfigParser.ConfigParser, 'get',
                       return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
-        apiutils.load_config = Mock()
-        owner_api_key = apiutils.get_owner_apikey()
-        out, err = capsys.readouterr()
+        with pytest.raises(SystemExit):
+            apiutils.load_config = Mock()
+            result = apiutils.get_owner_apikey()
+            out, err = capsys.readouterr()
 
-        assert owner_api_key == misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH
-        assert 'Error: Owner API Key not of correct length\n' == out
+            assert result is None
+            assert misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH in out
+            assert 'is not of correct length' in out
 
 
 def test_get_valid_owner_apikey_id():
@@ -128,12 +135,14 @@ def test_get_valid_owner_apikey_id():
 def test_get_invalid_owner_apikey_id(capsys):
     with patch.object(ConfigParser.ConfigParser, 'get',
                       return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
-        apiutils.load_config = Mock()
-        owner_api_key_id = apiutils.get_owner_apikey_id()
-        out, err = capsys.readouterr()
+        with pytest.raises(SystemExit):
+            apiutils.load_config = Mock()
+            result = apiutils.get_owner_apikey_id()
+            out, err = capsys.readouterr()
 
-        assert owner_api_key_id == misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH
-        assert 'Error: Owner API Key ID not of correct length\n' == out
+            assert result is None
+            assert misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH in out
+            assert 'is not of correct length' in out
 
 
 def test_get_valid_account_resource_id():
@@ -147,11 +156,13 @@ def test_get_valid_account_resource_id():
 def test_get_invalid_account_resource_id(capsys):
     with patch.object(ConfigParser.ConfigParser, 'get',
                       return_value=misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH):
-        account_resource_id = apiutils.get_account_resource_id()
-        out, err = capsys.readouterr()
+        with pytest.raises(SystemExit):
+            result = apiutils.get_account_resource_id()
+            out, err = capsys.readouterr()
 
-        assert account_resource_id == misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH
-        assert 'Error: Account Resource ID not of correct length\n' == out
+            assert result is None
+            assert misc_ex.TEST_APIKEY_WITH_INVALID_LENGTH in out
+            assert 'is not of correct length' in out
 
 
 def test_get_valid_named_logkey():
@@ -171,11 +182,14 @@ def test_case_insensitivity_of_named_logkey():
 def test_get_invalid_named_logkey(capsys):
     with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
                                                                          misc_ex.TEST_LOG_KEY)]):
-        nick_to_query = 'test-logkey-nick_invalid'
-        logkey = apiutils.get_named_logkey(nick_to_query)
-        out, err = capsys.readouterr()
-        assert logkey is None
-        assert 'Error: No nickname with name ' + '\'' + nick_to_query + '\'\n' == out
+        with pytest.raises(SystemExit):
+            nick_to_query = 'test-logkey-nick_invalid'
+            logkey = apiutils.get_named_logkey(nick_to_query)
+            out, err = capsys.readouterr()
+
+            assert logkey is None
+            assert nick_to_query in out
+            assert 'was not found' in out
 
 
 def test_get_valid_named_group_key():
@@ -195,8 +209,11 @@ def test_case_insensitivity_of_named_groups_key():
 def test_get_invalid_named_group_key(capsys):
     with patch.object(ConfigParser.ConfigParser, 'items',
                       return_value=[('test-log-group-nick', ["test-log-key1", "test-log-key2"])]):
-        nick_to_query = 'test-log-group-nick-invalid'
-        logkeys = apiutils.get_named_logkey_group(nick_to_query)
-        out, err = capsys.readouterr()
-        assert logkeys is None
-        assert 'Error: No group with name ' + '\'' + nick_to_query + '\'\n' == out
+        with pytest.raises(SystemExit):
+            nick_to_query = 'test-log-group-nick-invalid'
+            result = apiutils.get_named_logkey_group(nick_to_query)
+            out, err = capsys.readouterr()
+
+            assert result is None
+            assert nick_to_query in out
+            assert 'was not found' in out

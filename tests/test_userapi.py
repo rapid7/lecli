@@ -5,8 +5,8 @@ import requests
 from mock import patch
 from tabulate import tabulate
 
-from lecli import user_api
 from examples import misc_examples as misc_ex
+from lecli import user_api
 
 
 @httpretty.activate
@@ -43,10 +43,10 @@ def test_delete_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
     mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
     mocked_url.return_value = misc_ex.MOCK_USERAPI_URL
 
-    dest_url = misc_ex.MOCK_USERAPI_URL + '/' + str(misc_ex.TEST_USER_ID)
+    dest_url = misc_ex.MOCK_USERAPI_URL + '/' + str(misc_ex.TEST_USER_KEY)
     httpretty.register_uri(httpretty.DELETE, dest_url, status=204)
 
-    user_api.delete_user(misc_ex.TEST_USER_ID)
+    user_api.delete_user(misc_ex.TEST_USER_KEY)
 
     out, err = capsys.readouterr()
     assert 'Deleted user' in out
@@ -64,13 +64,13 @@ def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_
     mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
     mocked_url.return_value = misc_ex.MOCK_USERAPI_URL
 
-    dest_url = misc_ex.MOCK_USERAPI_URL + '/' + str(misc_ex.TEST_USER_ID)
+    dest_url = misc_ex.MOCK_USERAPI_URL + '/' + str(misc_ex.TEST_USER_KEY)
     httpretty.register_uri(httpretty.POST, dest_url,
                            body=json.dumps(misc_ex.DUMMY_USER_CONTENT),
                            status=200,
                            content_type='application/json')
 
-    user_api.add_existing_user(misc_ex.TEST_USER_ID)
+    user_api.add_existing_user(misc_ex.TEST_USER_KEY)
 
     out, err = capsys.readouterr()
     assert "Added user to account" in out
@@ -138,7 +138,8 @@ def test_handle_create_user_response_status_200_with_success(mocked_account_reso
 
 @httpretty.activate
 @patch('lecli.apiutils.get_account_resource_id')
-def test_handle_create_user_response_status_200_with_already_exists_error(mocked_account_resource_id, capsys):
+def test_handle_create_user_response_status_200_with_already_exists_error(
+        mocked_account_resource_id, capsys):
     httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USERAPI_URL,
                            content_type="application/json",
                            status=201,
