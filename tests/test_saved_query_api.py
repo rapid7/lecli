@@ -3,15 +3,16 @@ import uuid
 
 import httpretty
 from mock import patch
+
 from examples import misc_examples as misc_ex
 from examples import response_examples as resp_ex
-from lecli import saved_query_api
+from lecli.saved_query import saved_query_api
 
 
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_rw_apikey')
-@patch('lecli.saved_query_api._url')
+@patch('lecli.saved_query.saved_query_api._url')
 def test_get_saved_queries(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     mocked_url.return_value = misc_ex.MOCK_SAVED_QUERY_URL
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
@@ -36,7 +37,7 @@ def test_get_saved_queries(mocked_url, mocked_rw_apikey, mocked_account_resource
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_rw_apikey')
-@patch('lecli.saved_query_api._url')
+@patch('lecli.saved_query.saved_query_api._url')
 def test_get_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     saved_query_id = str(uuid.uuid4())
     mocked_url.return_value = misc_ex.MOCK_SAVED_QUERY_URL + "/" + saved_query_id
@@ -62,7 +63,7 @@ def test_get_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resource_i
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_rw_apikey')
-@patch('lecli.saved_query_api._url')
+@patch('lecli.saved_query.saved_query_api._url')
 def test_create_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     saved_query_name = "my_saved_query"
     mocked_url.return_value = misc_ex.MOCK_SAVED_QUERY_URL
@@ -82,7 +83,7 @@ def test_create_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resourc
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_rw_apikey')
-@patch('lecli.saved_query_api._url')
+@patch('lecli.saved_query.saved_query_api._url')
 def test_delete_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     test_saved_query_id = str(uuid.uuid4())
     mocked_url.return_value = misc_ex.MOCK_SAVED_QUERY_URL
@@ -100,7 +101,7 @@ def test_delete_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resourc
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_rw_apikey')
-@patch('lecli.saved_query_api._url')
+@patch('lecli.saved_query.saved_query_api._url')
 def test_patch_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     test_saved_query_id = str(uuid.uuid4())
     mocked_url.return_value = misc_ex.MOCK_SAVED_QUERY_URL
@@ -121,7 +122,7 @@ def test_patch_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resource
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_rw_apikey')
-@patch('lecli.saved_query_api._url')
+@patch('lecli.saved_query.saved_query_api._url')
 def test_patch_saved_query_none_fields(mocked_url, mocked_rw_apikey, mocked_account_resource_id,
                                        capsys):
     test_saved_query_id = str(uuid.uuid4())
@@ -146,7 +147,7 @@ def test_patch_saved_query_none_fields(mocked_url, mocked_rw_apikey, mocked_acco
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_rw_apikey')
-@patch('lecli.saved_query_api._url')
+@patch('lecli.saved_query.saved_query_api._url')
 def test_failing_patch_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resource_id,
                                    capsys):
     test_saved_query_id = str(uuid.uuid4())
@@ -169,7 +170,7 @@ def test_failing_patch_saved_query(mocked_url, mocked_rw_apikey, mocked_account_
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_rw_apikey')
-@patch('lecli.saved_query_api._url')
+@patch('lecli.saved_query.saved_query_api._url')
 def test_failing_create_saved_query(mocked_url, mocked_rw_apikey, mocked_account_resource_id,
                                    capsys):
     mocked_url.return_value = misc_ex.MOCK_SAVED_QUERY_URL

@@ -4,9 +4,9 @@ import httpretty
 import requests
 from mock import patch, Mock
 
-from lecli import query_api
-from examples import response_examples as resp_ex
 from examples import misc_examples as misc_ex
+from examples import response_examples as resp_ex
+from lecli.query import query_api
 
 
 def setup_httpretty():
@@ -86,7 +86,7 @@ def test_prettyprint_events(capsys):
 
 
 @patch('lecli.api_utils.generate_headers')
-@patch('lecli.query_api._url')
+@patch('lecli.query.query_api._url')
 def test_post_query_with_time(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
     mocked_url.return_value = misc_ex.MOCK_QUERYAPI_URL
@@ -108,7 +108,7 @@ def test_post_query_with_time(mocked_url, mocked_generate_headers, capsys):
 
 
 @patch('lecli.api_utils.generate_headers')
-@patch('lecli.query_api._url')
+@patch('lecli.query.query_api._url')
 def test_post_query_with_date(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
     mocked_url.return_value = misc_ex.MOCK_QUERYAPI_URL
@@ -129,7 +129,7 @@ def test_post_query_with_date(mocked_url, mocked_generate_headers, capsys):
 
 
 @patch('lecli.api_utils.generate_headers')
-@patch('lecli.query_api._url')
+@patch('lecli.query.query_api._url')
 def test_post_query_with_relative_range(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
     mocked_url.return_value = misc_ex.MOCK_QUERYAPI_URL
@@ -150,7 +150,7 @@ def test_post_query_with_relative_range(mocked_url, mocked_generate_headers, cap
 
 
 @patch('lecli.api_utils.generate_headers')
-@patch('lecli.query_api._url')
+@patch('lecli.query.query_api._url')
 def test_get_events(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
     mocked_url.return_value = misc_ex.MOCK_QUERYAPI_URL
@@ -172,7 +172,7 @@ def test_get_events(mocked_url, mocked_generate_headers, capsys):
 
 
 @patch('lecli.api_utils.generate_headers')
-@patch('lecli.query_api._url')
+@patch('lecli.query.query_api._url')
 def test_get_recent_events(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
     mocked_url.return_value = misc_ex.MOCK_QUERYAPI_URL
@@ -211,7 +211,7 @@ def test_fetch_results(mocked_generate_headers):
 
 
 @patch('lecli.api_utils.generate_headers')
-@patch('lecli.query_api.handle_response')
+@patch('lecli.query.query_api.handle_response')
 def test_continue_request(mocked_headers, mocked_response_handle):
     setup_httpretty()
 

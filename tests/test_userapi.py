@@ -6,14 +6,14 @@ from mock import patch
 from tabulate import tabulate
 
 from examples import misc_examples as misc_ex
-from lecli import user_api
+from lecli.user import user_api
 
 
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_owner_apikey_id')
 @patch('lecli.api_utils.get_owner_apikey')
-@patch('lecli.user_api._url')
+@patch('lecli.user.user_api._url')
 def test_get_owner(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
                    mocked_account_resource_id, capsys):
     mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
@@ -35,7 +35,7 @@ def test_get_owner(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_owner_apikey_id')
 @patch('lecli.api_utils.get_owner_apikey')
-@patch('lecli.user_api._url')
+@patch('lecli.user.user_api._url')
 def test_delete_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
                      mocked_account_resource_id, capsys):
     mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
@@ -56,7 +56,7 @@ def test_delete_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_owner_apikey_id')
 @patch('lecli.api_utils.get_owner_apikey')
-@patch('lecli.user_api._url')
+@patch('lecli.user.user_api._url')
 def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
                            mocked_account_resource_id, capsys):
     mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
@@ -80,7 +80,7 @@ def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_owner_apikey_id')
 @patch('lecli.api_utils.get_owner_apikey')
-@patch('lecli.user_api._url')
+@patch('lecli.user.user_api._url')
 def test_add_new_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
                       mocked_account_resource_id, capsys):
     mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
@@ -103,7 +103,7 @@ def test_add_new_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
 @patch('lecli.api_utils.get_account_resource_id')
 @patch('lecli.api_utils.get_owner_apikey_id')
 @patch('lecli.api_utils.get_owner_apikey')
-@patch('lecli.user_api._url')
+@patch('lecli.user.user_api._url')
 def test_list_users(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
                     mocked_account_resource_id, capsys):
     mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
