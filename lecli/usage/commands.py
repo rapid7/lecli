@@ -3,7 +3,7 @@ Module for usage commands
 """
 import click
 
-from lecli.usage import usage_api
+from lecli.usage import api
 
 
 @click.command()
@@ -12,7 +12,7 @@ from lecli.usage import usage_api
 def get_usage(start, end):
     """Get account's usage information"""
     if all([start, end]):
-        usage_api.get_usage(start, end)
+        api.get_usage(start, end)
     else:
         click.echo("Example usage: lecli get usage -s '2016-01-01' -e '2016-06-01'")
         click.echo("Note: Start and end dates should be in ISO-8601 format: YYYY-MM-DD")

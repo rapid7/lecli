@@ -3,13 +3,13 @@ Module for user commands
 """
 import click
 
-from lecli.user import user_api
+from lecli.user import api
 
 
 @click.command()
 def get_users():
     """Get list of users in account"""
-    user_api.list_users()
+    api.list_users()
 
 
 @click.command()
@@ -33,32 +33,34 @@ def create_user(first, last, email, userkey, force):
 
     elif first and last and email is not None:
         if force:
-            user_api.add_new_user(first, last, email)
+            api.add_new_user(first, last, email)
         else:
             if click.confirm('Please confirm you want to add user ' + first + ' ' + last):
-                user_api.add_new_user(first, last, email)
+                api.add_new_user(first, last, email)
 
     elif userkey is not None:
         if force:
-            user_api.add_existing_user(userkey)
+            api.add_existing_user(userkey)
         else:
             if click.confirm('Please confirm you want to add user with User Key ' + userkey):
-                user_api.add_existing_user(userkey)
+                api.add_existing_user(userkey)
 
 
 @click.command()
 @click.option('-u', '--userkey', type=click.STRING,
               help='User Key of user to be deleted')
 def delete_user(userkey):
-    """Delete a user from account"""
+    """Remove a user from this account and delete it.
+    If the user is associated with other accounts,
+    it will be removed from this account but not delete."""
     if userkey is None:
-        click.echo('Example usage: lecli deleteuser -u 12345678-aaaa-bbbb-1234-1234cb123456')
+        click.echo('Example usage: lecli delete user -u 12345678-aaaa-bbbb-1234-1234cb123456')
 
     else:
-        user_api.delete_user(userkey)
+        api.delete_user(userkey)
 
 
 @click.command()
 def get_owner():
     """Get account owner details"""
-    user_api.get_owner()
+    api.get_owner()

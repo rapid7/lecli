@@ -4,7 +4,7 @@ Module for query commands
 import click
 
 from lecli import api_utils
-from lecli.query import query_api
+from lecli.query import api
 
 
 @click.command()
@@ -43,11 +43,11 @@ def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefro
         leql = api_utils.get_named_query(querynick)
 
     if all([logkeys, leql, timefrom, timeto]):
-        query_api.post_query(logkeys, leql, time_from=timefrom, time_to=timeto)
+        api.post_query(logkeys, leql, time_from=timefrom, time_to=timeto)
     elif all([logkeys, leql, datefrom, dateto]):
-        query_api.post_query(logkeys, leql, date_from=datefrom, date_to=dateto)
+        api.post_query(logkeys, leql, date_from=datefrom, date_to=dateto)
     elif all([logkeys, relative_range]):
-        query_api.post_query(logkeys, leql, time_range=relative_range)
+        api.post_query(logkeys, leql, time_range=relative_range)
     else:
         click.echo("Example usage: lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q "
                    "'where(method=GET) calculate(count)' -f 1465370400 -t 1465370500")
@@ -91,11 +91,11 @@ def get_events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto, r
         logkeys = api_utils.get_named_logkey_group(loggroup)
 
     if all([logkeys, timefrom, timeto]):
-        query_api.get_events(logkeys, time_from=timefrom, time_to=timeto)
+        api.get_events(logkeys, time_from=timefrom, time_to=timeto)
     elif all([logkeys, datefrom, dateto]):
-        query_api.get_events(logkeys, date_from=datefrom, date_to=dateto)
+        api.get_events(logkeys, date_from=datefrom, date_to=dateto)
     elif all([logkeys, relative_range]):
-        query_api.get_events(logkeys, time_range=relative_range)
+        api.get_events(logkeys, time_range=relative_range)
     else:
         click.echo("Example usage: lecli get events 12345678-aaaa-bbbb-1234-1234cb123456 "
                    "-f 1465370400 -t 1465370500")
@@ -130,12 +130,12 @@ def get_recent_events(logkeys, lognick, loggroup, last, relative_range):
         logkeys = api_utils.get_named_logkey_group(loggroup)
 
     if all([logkeys, relative_range]):
-        query_api.get_recent_events(logkeys, time_range=relative_range)
+        api.get_recent_events(logkeys, time_range=relative_range)
     elif all([logkeys, last]):
-        query_api.get_recent_events(logkeys, last_x_seconds=last)
+        api.get_recent_events(logkeys, last_x_seconds=last)
     else:
         click.echo(
-            'Example usage: lecli recentevents \'12345678-aaaa-bbbb-1234-1234cb123456\' -l 200')
+            'Example usage: lecli get recentevents 12345678-aaaa-bbbb-1234-1234cb123456 -l 200')
         click.echo('Example usage: lecli get recentevents -n mynicknamedlog -l 200')
         click.echo('Example usage: lecli get recentevents -g myloggroup -l 200')
         click.echo("Example usage: lecli get recentevents -g myloggroup -r 'last 50 mins'")

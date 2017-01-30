@@ -10,6 +10,7 @@ from lecli.saved_query import commands as saved_query_commands
 from lecli.team import commands as team_commands
 from lecli.usage import commands as usage_commands
 from lecli.user import commands as user_commands
+from lecli import deprecated_commands
 
 
 @click.group()
@@ -53,7 +54,6 @@ def delete():
 if __name__ == '__main__':
     cli()
 
-
 cli.add_command(query_commands.query)
 
 get.add_command(query_commands.get_events, "events")
@@ -71,11 +71,30 @@ create.add_command(team_commands.create_team, "team")
 create.add_command(user_commands.create_user, "user")
 
 update.add_command(saved_query_commands.update_saved_query, "savedquery")
-update.add_command(team_commands.addusertoteam, "team_with_user")
+update.add_command(team_commands.updateteam, "team")
 
 rename.add_command(team_commands.rename_team, "team")
 
 delete.add_command(saved_query_commands.delete_saved_query, "savedquery")
 delete.add_command(team_commands.delete_team, "team")
-delete.add_command(team_commands.deleteuserfromteam, "user_from_team")
 delete.add_command(user_commands.delete_user, "user")
+
+cli.add_command(deprecated_commands.addusertoteam)
+cli.add_command(deprecated_commands.adduser)
+cli.add_command(deprecated_commands.createsavedquery)
+cli.add_command(deprecated_commands.createteam)
+cli.add_command(deprecated_commands.deletesavedquery)
+cli.add_command(deprecated_commands.deleteteam)
+cli.add_command(deprecated_commands.deleteuser)
+cli.add_command(deprecated_commands.deleteuserfromteam)
+cli.add_command(deprecated_commands.events)
+cli.add_command(deprecated_commands.getowner)
+cli.add_command(deprecated_commands.getsavedqueries)
+cli.add_command(deprecated_commands.getsavedquery)
+cli.add_command(deprecated_commands.getteams)
+cli.add_command(deprecated_commands.getteam)
+cli.add_command(deprecated_commands.listusers)
+cli.add_command(deprecated_commands.recentevents)
+cli.add_command(deprecated_commands.renameteam)
+cli.add_command(deprecated_commands.updatesavedquery)
+cli.add_command(deprecated_commands.usage)
