@@ -70,7 +70,7 @@ def create_log(logname, params):
     try:
         response = requests.post(_url(), json=request_params, headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Creating log gailed, status code: %d' % response.status_code)
+            sys.stderr.write('Create log failed, status code: %d' % response.status_code)
             sys.exit(1)
         elif response.status_code == 201:
             api_utils.pretty_print_string_as_json(response.text)
@@ -83,7 +83,7 @@ def delete_log(log_id):
     """
     Delete a log with the provided log ID
     """
-    url = _url() + '/' + log_id
+    url = "/".join([_url(), log_id])
     headers = api_utils.generate_headers('rw')
 
     try:
@@ -108,7 +108,7 @@ def replace_log(log_id, params):
     try:
         response = requests.put(url, json=params, headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Updating log with details: %s failed with status code: %d' % params,
+            sys.stderr.write('Update log with details: %s failed with status code: %d' % params,
                              response.status_code)
             sys.exit(1)
         elif response.status_code == 200:

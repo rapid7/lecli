@@ -58,42 +58,42 @@ def getlog(logid):
 
 
 @click.command()
-@click.argument('log_id', type=click.STRING)
+@click.argument('logid', type=click.STRING)
 @click.argument('name', type=click.STRING)
-def renamelog(log_id, name):
+def renamelog(logid, name):
     """
     Rename a log with the name provided
     """
-    api.rename_log(log_id, name)
+    api.rename_log(logid, name)
 
 
 @click.command()
-@click.argument('log_id', type=click.STRING)
+@click.argument('logid', type=click.STRING)
 @click.argument('filename', type=click.Path(exists=True, dir_okay=False))
-def replacelog(log_id, filename):
+def replacelog(logid, filename):
     """
     Replace a log of a given id with new details
     """
     with open(filename) as json_data:
         try:
             params = json.load(json_data)
-            api.replace_log(log_id, params)
+            api.replace_log(logid, params)
         except ValueError as error:
             sys.stderr.write(error.message + '\n')
             sys.exit(1)
 
 
 @click.command()
-@click.argument('log_id', type=click.STRING)
+@click.argument('logid', type=click.STRING)
 @click.argument('filename', type=click.Path(exists=True, dir_okay=False))
-def updatelog(log_id, filename):
+def updatelog(logid, filename):
     """
     Update a log of a given id with new details
     """
     with open(filename) as json_data:
         try:
             params = json.load(json_data)
-            api.update_log(log_id, params)
+            api.update_log(logid, params)
         except ValueError as error:
             sys.stderr.write(error.message + '\n')
             sys.exit(1)
