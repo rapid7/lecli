@@ -7,13 +7,16 @@ import base64
 import hashlib
 import hmac
 import os
+import json
 
 import datetime
+import validators
 from appdirs import user_config_dir
 
 import lecli
 
 AUTH_SECTION = 'Auth'
+URL_SECTION = 'Url'
 CONFIG = ConfigParser.ConfigParser()
 CONFIG_FILE_PATH = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
 
@@ -55,8 +58,14 @@ def init_config():
         dummy_config.set(AUTH_SECTION, 'owner_api_key', '')
         dummy_config.set(AUTH_SECTION, 'rw_api_key', '')
 
+
         dummy_config.add_section('LogNicknames')
         dummy_config.add_section("LogGroups")
+        dummy_config.add_section('Url')
+        dummy_config.set(URL_SECTION, 'log_management_url',
+                         'https://rest.logentries.com/management')
+
+
         dummy_config.write(config_file)
         config_file.close()
         print "An empty config file created in path %s, please check and configure it. To learn " \
@@ -285,3 +294,45 @@ def gensignature(api_key, date, content_type, request_method, query_path, reques
     digest.update(canonical_string)
 
     return digest.digest()
+
+
+def get_management_url():
+    """
+    Get management url from the config file
+    """
+    config_key = 'management_url'
+    try:
+        url = CONFIG.get(URL_SECTION, config_key)
+        if validators.url(str(url)):
+            return url
+        else:
+            print_config_error_and_exit(URL_SECTION, 'Log Management URL(%s)' % config_key)
+    except ConfigParser.NoOptionError:
+        print_config_error_and_exit(URL_SECTION, 'Log Management URL(%s)' % config_key)
+
+
+def pretty_print_string_as_json(text):
+    """
+    Pretty prints a json string
+    """
+    print json.dumps(json.loads(text), indent=4, sort_keys=True)
+
+
+def combine_objects(left, right):
+    """
+    Merge two objects
+    """
+    if isinstance(left, dict) and isinstance(right, dict):
+        result = {}
+        for key, value in left.iteritems():
+            if key not in right:
+                result[key] = value
+            else:
+                result[key] = combine_objects(value, right[key])
+        for key, value in right.iteritems():
+            if key not in left:
+                result[key] = value
+        return result
+    if isinstance(left, list) and isinstance(right, list):
+        return left + right
+    return right
