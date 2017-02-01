@@ -226,7 +226,7 @@ def test_generate_management_url(mocked_management_url):
 
     result = api_utils.get_management_url()
 
-    assert "https://rest.logentries.com/management/logs" in result
+    assert "https://rest.logentries.com/management" in result
 
 
 def test_combine_objects():

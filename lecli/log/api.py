@@ -2,7 +2,6 @@
 Log API module.
 """
 import sys
-import json
 import requests
 
 from lecli import api_utils
@@ -22,7 +21,7 @@ def handle_get_log_response(response):
     if response_utils.response_error(response):
         sys.exit(1)
     elif response.status_code == 200:
-        sys.stdout.write(json.dumps(response.json(), indent=4, sort_keys=True))
+        api_utils.pretty_print_string_as_json(response.text)
 
 
 def get_logs():
