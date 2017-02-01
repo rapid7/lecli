@@ -233,12 +233,12 @@ Rename a team with the given UUID to given name.
 ####Add User to a Team
 Add a new user to a team with the given UUID and user UUID respectively.
 
-    lecli update team_with_user <team id> <user key>
+    lecli update team add_user <team id> <user key>
 
 ####Delete User from a Team
 Add a new user to a team with the given UUID and user UUID respectively.
 
-    lecli delete user_from_team <team id> <user key>
+    lecli update team delete_user <team id> <user key>
 
 
 **Account Usage**
