@@ -55,3 +55,25 @@ def updateteam(command, teamid, userkey):
         api.delete_user_from_team(teamid, userkey)
     else:
         click.echo('Missing argument "command".')
+
+
+@click.command()
+@click.argument('teamid', type=click.STRING, default=None)
+@click.argument('userkey', type=click.STRING, default=None)
+def addusertoteam(teamid, userkey):
+    """
+    DEPRECATED
+    Update the team with the provided id with name and user.
+    This will add the user to this team if it exists"""
+    api.add_user_to_team(teamid, userkey)
+
+
+@click.command()
+@click.argument('teamid', type=click.STRING, default=None)
+@click.argument('userkey', type=click.STRING, default=None)
+def deleteuserfromteam(teamid, userkey):
+    """
+    DEPRECATED
+    Delete the user with the given userkey from the team
+    """
+    api.delete_user_from_team(teamid, userkey)
