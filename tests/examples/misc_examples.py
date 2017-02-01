@@ -1,7 +1,7 @@
 TEST_OWNER_APIKEY = 'test_owner_apikey'
 TEST_OWNER_APIKEY_ID = 'test_owner_apikey_id'
 TEST_ACCOUNT_RESOURCE_ID = 'test_account_resource_id'
-TEST_MANAGEMENT_URL = 'https://rest.logentries.com/management/logs'
+TEST_MANAGEMENT_URL = 'https://rest.logentries.com/management'
 
 TEST_USER_KEY = "test_user_key"
 DUMMY_USER_CONTENT = {"user": {"first_name": "",
@@ -39,7 +39,7 @@ MOCK_USAGE_URL = 'https://mydummyurl.com/usage'
 
 MOCK_SAVED_QUERY_URL = 'https://mydummyurl.com/saved_queries'
 
-MOCK_LOGAPI_URL = 'https://mydummyurl.com/management'
+MOCK_LOGAPI_URL = 'https://mydummyurl.com/management/logs'
 
 TEST_TEAM_ID = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 
