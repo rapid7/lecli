@@ -6,12 +6,38 @@ import requests
 
 from lecli import api_utils
 from lecli import response_utils
+from tabulate import tabulate
 
 def _url():
     """
     Get rest query url of log resource id
     """
     return api_utils.get_management_url() + '/logs'
+
+
+def print_logs(response):
+    """
+    Print logs.
+    """
+    data = response if isinstance(response, list) else [response]
+    for item in data:
+        if 'id' in item:
+            print "ID: %s" % item['id']
+        if 'name' in item:
+            print "Name: %s" % item['name']
+        if 'logsets_info' in item and item['logsets_info']:
+            print "Logsets: %s" % tabulate(item['logsets_info'])
+        if 'tokens' in item and item['tokens']:
+            print "Tokens: %s" % item['tokens']
+        if 'token_seed' in item:
+            print "Token Seed: %s" % item['token_seed']
+        if 'source_type' in item:
+            print "Source Type: %s" % item['source_type']
+        if 'structures' in item and item['structures']:
+            print "Structures: %s" % item['structures']
+        if 'user_data' in item:
+            print "User Data: %s" % item['user_data']
+
 
 
 def handle_get_log_response(response):
@@ -21,7 +47,8 @@ def handle_get_log_response(response):
     if response_utils.response_error(response):
         sys.exit(1)
     elif response.status_code == 200:
-        api_utils.pretty_print_string_as_json(response.text)
+        key_name = 'logs' if 'logs' in response.json() else 'log'
+        print_logs(response.json()[key_name])
 
 
 def get_logs():
@@ -72,7 +99,7 @@ def create_log(logname, params):
             sys.stderr.write('Create log failed, status code: %d' % response.status_code)
             sys.exit(1)
         elif response.status_code == 201:
-            api_utils.pretty_print_string_as_json(response.text)
+            print_logs(response.json()['log'])
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
@@ -112,7 +139,7 @@ def replace_log(log_id, params):
             sys.exit(1)
         elif response.status_code == 200:
             sys.stdout.write('Log: %s updated to:\n' % log_id)
-            api_utils.pretty_print_string_as_json(response.text)
+            print_logs(response.json()['log'])
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)

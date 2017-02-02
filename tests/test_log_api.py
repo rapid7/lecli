@@ -3,8 +3,6 @@ import httpretty
 import pytest
 
 from mock import patch
-from mock import MagicMock
-
 from lecli.log import api
 from examples import misc_examples as misc_ex
 from examples import response_examples as resp_ex
@@ -25,7 +23,7 @@ def test_get_logs(mocked_url, mocked_ro_apikey, capsys):
     api.get_logs()
     out, err = capsys.readouterr()
 
-    assert '"id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"' in out
+    assert 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX' in out
 
 
 @httpretty.activate
@@ -45,7 +43,7 @@ def test_get_log(mocked_url, mocked_ro_apikey, capsys):
 
     out, err = capsys.readouterr()
 
-    assert '"id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"' in out
+    assert 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX' in out
 
 
 @httpretty.activate

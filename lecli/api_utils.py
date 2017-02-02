@@ -7,7 +7,6 @@ import base64
 import hashlib
 import hmac
 import os
-import json
 
 import datetime
 import validators
@@ -309,13 +308,6 @@ def get_management_url():
             print_config_error_and_exit(URL_SECTION, 'Log Management URL(%s)' % config_key)
     except ConfigParser.NoOptionError:
         print_config_error_and_exit(URL_SECTION, 'Log Management URL(%s)' % config_key)
-
-
-def pretty_print_string_as_json(text):
-    """
-    Pretty prints a json string
-    """
-    print json.dumps(json.loads(text), indent=4, sort_keys=True)
 
 
 def combine_objects(left, right):
