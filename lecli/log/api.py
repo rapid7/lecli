@@ -37,7 +37,7 @@ def print_logs(response):
             print "Structures: %s" % item['structures']
         if 'user_data' in item:
             print "User Data: %s" % item['user_data']
-
+        print "\n"
 
 
 def handle_get_log_response(response):
