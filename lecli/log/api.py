@@ -6,38 +6,12 @@ import requests
 
 from lecli import api_utils
 from lecli import response_utils
-from tabulate import tabulate
 
 def _url():
     """
     Get rest query url of log resource id
     """
     return api_utils.get_management_url() + '/logs'
-
-
-def print_logs(response):
-    """
-    Print logs.
-    """
-    data = response if isinstance(response, list) else [response]
-    for item in data:
-        if 'id' in item:
-            print "ID: %s" % item['id']
-        if 'name' in item:
-            print "Name: %s" % item['name']
-        if 'logsets_info' in item and item['logsets_info']:
-            print "Logsets: %s" % tabulate(item['logsets_info'])
-        if 'tokens' in item and item['tokens']:
-            print "Tokens: %s" % item['tokens']
-        if 'token_seed' in item:
-            print "Token Seed: %s" % item['token_seed']
-        if 'source_type' in item:
-            print "Source Type: %s" % item['source_type']
-        if 'structures' in item and item['structures']:
-            print "Structures: %s" % item['structures']
-        if 'user_data' in item:
-            print "User Data: %s" % item['user_data']
-        print "\n"
 
 
 def handle_get_log_response(response):
@@ -47,8 +21,7 @@ def handle_get_log_response(response):
     if response_utils.response_error(response):
         sys.exit(1)
     elif response.status_code == 200:
-        key_name = 'logs' if 'logs' in response.json() else 'log'
-        print_logs(response.json()[key_name])
+        api_utils.pretty_print_string_as_json(response.text)
 
 
 def get_logs():
@@ -99,7 +72,7 @@ def create_log(logname, params):
             sys.stderr.write('Create log failed, status code: %d' % response.status_code)
             sys.exit(1)
         elif response.status_code == 201:
-            print_logs(response.json()['log'])
+            api_utils.pretty_print_string_as_json(response.text)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
@@ -139,7 +112,7 @@ def replace_log(log_id, params):
             sys.exit(1)
         elif response.status_code == 200:
             sys.stdout.write('Log: %s updated to:\n' % log_id)
-            print_logs(response.json()['log'])
+            api_utils.pretty_print_string_as_json(response.text)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
@@ -162,6 +135,23 @@ def rename_log(log_id, log_name):
         sys.exit(1)
 
 
+def check_logset_exists(params):
+    if params['log']['logsets_info']:
+        for item in params['log']['logsets_info']:
+            if item['id']:
+                url = api_utils.get_management_url() + '/logsets/' + item['id']
+                headers = api_utils.generate_headers('ro')
+                try:
+                    response = requests.get(url, headers=headers)
+                    if response.status_code is not 200:
+                         return False
+                except requests.exceptions.RequestException as error:
+                    sys.stderr.write(error)
+                    sys.exit(1)
+    return True
+
+
+
 def update_log(log_id, params):
     """
     Update a log with the details provided
@@ -169,10 +159,15 @@ def update_log(log_id, params):
     url = "/".join([_url(), log_id])
     headers = api_utils.generate_headers('ro')
 
-    try:
-        response = requests.get(url, headers=headers)
-        existing_log = response.json()
-        replace_log(log_id, api_utils.combine_objects(existing_log, params))
-    except requests.exceptions.RequestException as error:
-        sys.stderr.write(error)
-        sys.exit(1)
+    if check_logset_exists(params):
+        try:
+            response = requests.get(url, headers=headers)
+            existing_log = response.json()
+            replace_log(log_id, api_utils.combine_objects(existing_log, params))
+        except requests.exceptions.RequestException as error:
+            sys.stderr.write(error)
+            sys.exit(1)
+    else:
+        sys.stderr.write("One or more of the specified logsets does not exist.\n")
+
+

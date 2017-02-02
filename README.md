@@ -360,6 +360,8 @@ Create a new log with a given name or from a provided JSON file.
 Logs can be created with a given name and default values by providing the name. 
 If you wish to supply additional information, the (relative or full) path to a JSON file can be provided.
 
+Note that only creation of a single log object is supported at this time.
+
 Example JSON:
 
     {
