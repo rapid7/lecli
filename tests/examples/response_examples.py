@@ -186,3 +186,35 @@ saved_query_error_response = {
     "fields": ["time_range"],
     "messages": ["Invalid query: time_range cannot be specified with from and/or to fields"]
 }
+
+
+log_response = {
+    "log" : {
+        "id" : "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+        "name" : "Test Log",
+        "logsets_info" : [{
+            "id" : "XXXXXXXX-ABCD-ABCD-ABCD-XXXXXXXXXXXX",
+            "name" : "Test Logset 1",
+            "links" : {
+                "rel" : "Self",
+                "href" : "http://mydummyurl.com/management/logsets/XXXXXXXX-ABCD-ABCD-ABCD-XXXXXXXXXXXX"
+            }
+        },
+        {
+            "id" : "XXXXXXXX-DCBA-DCBA-DCBA-XXXXXXXXXXXX",
+            "name" : "Test Logset 2",
+            "links" : {
+                "rel" : "Self",
+                "href" : "http://mydummyurl.com/management/logsets/XXXXXXXX-DCBA-DCBA-DCBA-XXXXXXXXXXXX"
+            }
+        }],
+        "source_type" : "token",
+        "token_seed" : "12345678-abcd-efgh-ijkl-12345678",
+        "tokens": [{}],
+        "structures" : [{}],
+        "user_data": {
+            "LocationDescription" : "All logs for DC1",
+            "le_hostname" : "testhost"
+        }
+    }
+}

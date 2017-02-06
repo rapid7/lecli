@@ -218,3 +218,53 @@ def test_get_invalid_named_group_key(capsys):
             assert result is None
             assert nick_to_query in out
             assert 'was not found' in out
+
+
+@patch('lecli.api_utils.get_management_url')
+def test_generate_management_url(mocked_management_url):
+    mocked_management_url.return_value = misc_ex.TEST_MANAGEMENT_URL
+
+    result = api_utils.get_management_url()
+
+    assert "https://rest.logentries.com/management" in result
+
+
+def test_combine_objects():
+    left = { "log": {
+                "id": "21dd21e7-708a-4bc4-bf45-ffbc78190ecd",
+                "logsets_info": [],
+                "name": "test_log_old",
+                "structures": [],
+                "tokens": [],
+                "user_data": {}
+                }
+            }
+
+    right = { "log": {
+                "name": "test_log_new",
+                "structures": [],
+                "tokens": [],
+                "user_data": {},
+                "logsets_info": [{
+                    "id": "e227f890-7742-47b4-86b2-5ff1d345397e",
+                    "name": "test_logset"
+                    }]
+                }
+            }
+
+    expected_result = { "log":{
+                        "id": "21dd21e7-708a-4bc4-bf45-ffbc78190ecd",
+                        "logsets_info": [{
+                            "id": "e227f890-7742-47b4-86b2-5ff1d345397e",
+                            "name": "test_logset"
+                            }],
+                        "name": "test_log_new",
+                        "structures": [],
+                        "tokens": [],
+                        "user_data": {}
+                            }
+                        }
+
+    result = api_utils.combine_objects(left, right)
+
+    assert result == expected_result

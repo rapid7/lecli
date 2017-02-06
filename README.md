@@ -55,6 +55,15 @@ owner_api_key = 12345678-aaaa-bbbb-1234-1234cb12345c
 rw_api_key = 12345678-aaaa-bbbb-1234-1234cb12345d
 ```
 
+You will also need to set your log management URL. This defaults to:
+    
+    https://rest.logentries.com/management
+
+This value can be updated in the URL section of the CLI configuration file:
+
+    [Url]
+    log_management_url=https://<some_url>/management
+
 **Query and Events**
 --------------------
 The event and query functionality of the CLI supports a number of different ways to query events and statistics.
@@ -319,3 +328,99 @@ Mandatory positional argument:
 Example:
 
     lecli delete savedquery <uuid of the saved query>
+    
+     
+**Log Management**
+----------------------
+
+The CLI allows you to retrieve and manage logs. You can retrieve a specific or all logs, as well as create, delete, replace and rename logs. 
+Retrieving logs requires a valid read-only API key in your configuration file.
+The remaining actions also require a valid read-write API key.
+
+####Retrieve all logs
+Retrieve all logs:
+
+Example:
+    
+    lecli get logs
+    
+####Retrieve a specific log
+Retrieve a log with a given ID.
+
+Mandatory positional argument:
+- UUID of the log to the retrieved.
+
+Example:
+    
+    lecli get log <log_id>
+    
+####Create a new log
+Create a new log with a given name or from a provided JSON file.
+
+Logs can be created with a given name and default values by providing the name. 
+If you wish to supply additional information, the (relative or full) path to a JSON file can be provided.
+
+Note that only creation of a single log object is supported at this time.
+
+Example JSON:
+
+    {
+        "name": "log name",
+        "logsets_info": [
+            {
+                "id": "logset id",
+                "name": "logset name"
+            }
+         ]
+     }
+     
+Example:
+
+    lecli create log -n <name>
+    lecli create log -f <path_to_json_file>
+    
+    
+####Rename a log
+Rename a log with the provided ID.
+
+Mandatory positional arguments:
+- UUID of the log to be renamed
+- New name of the log
+
+Example:
+    
+    lecli rename log <log_id> <new_name>
+    
+####Update a log
+Add information to a given log.
+
+Mandatory positional arguments:
+- UUID of the log to be updated
+- Full or relative path to a JSON file containing the updated log information
+
+Example:
+    
+    lecli update log <log_id> <path_to_json_file>
+    
+
+####Delete a log
+Deletes a log with the provided ID.
+
+Mandatory positional argument:
+- UUID of the log to be deleted
+
+Example:
+
+    lecli delete log <log_id>
+    
+    
+####Replace a log
+Replaces a log with the provided log.
+
+Mandatory positional argument:
+- UUID of the log to be replaced
+- Full or relative path to JSON file containing a valid log object
+
+Example:
+
+    lecli replace log <log_id> <path_to_json_file>

@@ -1,6 +1,7 @@
 TEST_OWNER_APIKEY = 'test_owner_apikey'
 TEST_OWNER_APIKEY_ID = 'test_owner_apikey_id'
 TEST_ACCOUNT_RESOURCE_ID = 'test_account_resource_id'
+TEST_MANAGEMENT_URL = 'https://rest.logentries.com/management'
 
 TEST_USER_KEY = "test_user_key"
 DUMMY_USER_CONTENT = {"user": {"first_name": "",
@@ -17,6 +18,8 @@ TEST_QUERY = 'where(logID) calculate(count) sort(desc) limit(3)'
 TEST_LOG_KEY = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 TEST_LOG_GROUP = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX\n' \
                  'YYYYYYYY-YYYY-YYYY-YYYY-YYYYYYYYYYYY'
+
+TEST_LOG_RESOURCE_ID = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 
 TIME_FROM = '1465370400'
 TIME_TO = '1465370500'
@@ -35,6 +38,8 @@ MOCK_TEAMSAPI_URL = 'http://mydummyurl.com/teams'
 MOCK_USAGE_URL = 'https://mydummyurl.com/usage'
 
 MOCK_SAVED_QUERY_URL = 'https://mydummyurl.com/saved_queries'
+
+MOCK_LOGAPI_URL = 'https://mydummyurl.com/management/logs'
 
 TEST_TEAM_ID = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 

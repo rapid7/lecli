@@ -10,6 +10,7 @@ from lecli.saved_query import commands as saved_query_commands
 from lecli.team import commands as team_commands
 from lecli.usage import commands as usage_commands
 from lecli.user import commands as user_commands
+from lecli.log import commands as log_commands
 from lecli import deprecated_commands
 
 
@@ -46,6 +47,12 @@ def rename():
 
 
 @cli.group()
+def replace():
+    """Replace a resource"""
+    pass
+
+
+@cli.group()
 def delete():
     """Delete a resource"""
     pass
@@ -65,19 +72,27 @@ get.add_command(team_commands.get_teams, "teams")
 get.add_command(usage_commands.get_usage, "usage")
 get.add_command(user_commands.get_owner, "owner")
 get.add_command(user_commands.get_users, "users")
+get.add_command(log_commands.getlog, "log")
+get.add_command(log_commands.getlogs, "logs")
 
 create.add_command(saved_query_commands.create_saved_query, "savedquery")
 create.add_command(team_commands.create_team, "team")
 create.add_command(user_commands.create_user, "user")
+create.add_command(log_commands.createlog, "log")
 
 update.add_command(saved_query_commands.update_saved_query, "savedquery")
 update.add_command(team_commands.updateteam, "team")
+update.add_command(log_commands.updatelog, "log")
 
 rename.add_command(team_commands.rename_team, "team")
+rename.add_command(log_commands.renamelog, "log")
+
+replace.add_command(log_commands.replacelog, "log")
 
 delete.add_command(saved_query_commands.delete_saved_query, "savedquery")
 delete.add_command(team_commands.delete_team, "team")
 delete.add_command(user_commands.delete_user, "user")
+delete.add_command(log_commands.deletelog, "log")
 
 cli.add_command(deprecated_commands.addusertoteam)
 cli.add_command(deprecated_commands.adduser)
