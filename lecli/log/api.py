@@ -136,15 +136,23 @@ def rename_log(log_id, log_name):
 
 
 def check_logset_exists(params):
-    if params['log']['logsets_info']:
-        for item in params['log']['logsets_info']:
+    """
+    Check if a logset exists
+    """
+    if 'logsets_info' in params:
+        if 'log' in params:
+            updates = params['log']['logsets_info']
+        else:
+            updates = params['logsets_info']
+
+        for item in updates:
             if item['id']:
                 url = api_utils.get_management_url() + '/logsets/' + item['id']
                 headers = api_utils.generate_headers('ro')
                 try:
                     response = requests.get(url, headers=headers)
                     if response.status_code is not 200:
-                         return False
+                        return False
                 except requests.exceptions.RequestException as error:
                     sys.stderr.write(error)
                     sys.exit(1)
@@ -169,5 +177,3 @@ def update_log(log_id, params):
             sys.exit(1)
     else:
         sys.stderr.write("One or more of the specified logsets does not exist.\n")
-
-
