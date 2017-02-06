@@ -107,8 +107,7 @@ def replace_log(log_id, params):
     try:
         response = requests.put(url, json=params, headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Update log with details: %s failed with status code: %d' % params,
-                             response.status_code)
+            sys.stderr.write('Update log failed with status code: %d\n' % response.status_code)
             sys.exit(1)
         elif response.status_code == 200:
             sys.stdout.write('Log: %s updated to:\n' % log_id)
