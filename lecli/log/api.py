@@ -126,9 +126,13 @@ def rename_log(log_id, log_name):
 
     try:
         response = requests.get(url, headers=headers)
-        params = response.json()
-        params['log']['name'] = log_name
-        replace_log(log_id, params)
+        if response.status_code is not 200:
+            sys.stderr.write('Rename log failed with stats code: %d \n' % response.status_code)
+            sys.exit(1)
+        else:
+            params = response.json()
+            params['log']['name'] = log_name
+            replace_log(log_id, params)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
