@@ -2,4 +2,4 @@ language: python
 python:
   - "2.7"
 install: "pip install -r dev-requirements.pip"
-script: py.test tests
+script: pylint lecli && py.test tests

@@ -1,8 +1,12 @@
-import json
-
+"""
+Team API module.
+"""
+import sys
 import requests
+from tabulate import tabulate
 
-from lecli import apiutils
+from lecli import api_utils
+from lecli import response_utils
 
 
 def _url():
@@ -10,81 +14,67 @@ def _url():
     Get rest query url of account resource id.
     """
     return 'https://rest.logentries.com/management/accounts/%s/teams' % \
-           apiutils.get_account_resource_id()
-
-
-def response_error(response):
-    """
-    Check response if it has any errors.
-    """
-    if response.headers.get('X-RateLimit-Remaining') is not None:
-        if int(response.headers['X-RateLimit-Remaining']) == 0:
-            print 'Error: Rate Limit Reached, will reset in %s seconds' % response.headers.get(
-                'X-RateLimit-Reset')
-            return True
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as error:
-        print 'Request Error:', error.message
-        if response.status_code == 500:
-            print 'Your account may have no owner assigned. ' \
-                  'Please visit www.logentries.com for information on assigning an account owner.'
-        return True
-
-    if response.status_code == 200:
-        if response.headers['Content-Type'] != 'application/json':
-            print 'Unexpected Content Type Received in Response: %s' % response.headers[
-                'Content-Type']
-            return True
-    return False
+           api_utils.get_account_resource_id()
 
 
 def print_teams(response):
     """
     Print teams.
     """
-    print json.dumps(response, indent=4, sort_keys=True)
+    for item in response:
+        print "ID: %s" % item['id']
+        print "Name: %s" % item['name']
+        print "Users: %s" % tabulate(item['users'])
+
+
+def print_team(response):
+    """
+    Print team.
+    """
+    print "ID: %s" % response['id']
+    print "Name: %s" % response['name']
+    print "Users: %s" % tabulate(response['users'])
 
 
 def handle_get_teams_response(response):
     """
     Handle get teams response.
     """
-    if response_error(response):
-        exit(1)
+    if response_utils.response_error(response):
+        sys.exit(1)
     elif response.status_code == 200:
         if response.json().get('teams'):
             print_teams(response.json()['teams'])
         elif response.json().get('team'):
-            print_teams(response.json()['team'])
+            print_team(response.json()['team'])
 
 
 def get_teams():
     """
     Get teams associated with the user.
     """
-    headers = apiutils.generate_headers('rw')
+    headers = api_utils.generate_headers('rw')
     try:
         response = requests.request('GET', _url(), data='', headers=headers)
         handle_get_teams_response(response)
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
 def get_team(team_id):
     """
     Get a specific team.
     """
-    headers = apiutils.generate_headers('rw')
+    headers = api_utils.generate_headers('rw')
     params = {'teamid': team_id}
     try:
         response = requests.get(_url() + "/" + team_id, params=params,
                                 headers=headers)
         handle_get_teams_response(response)
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
 def create_team(name):
@@ -97,19 +87,19 @@ def create_team(name):
             'users': []
         }
     }
-    headers = apiutils.generate_headers('rw')
+    headers = api_utils.generate_headers('rw')
 
     try:
         response = requests.post(_url(), json=params, headers=headers)
-        if response_error(response):
+        if response_utils.response_error(response):
             print 'Creating team failed, status code: %d' % response.status_code
-            exit(1)
+            sys.exit(1)
         elif response.status_code == 201:
             print 'Team created with name: %s' % name
 
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
 def delete_team(team_id):
@@ -117,18 +107,18 @@ def delete_team(team_id):
     Delete a team with the provided team ID.
     """
     url = _url() + '/' + team_id
-    headers = apiutils.generate_headers('rw')
+    headers = api_utils.generate_headers('rw')
 
     try:
         response = requests.delete(url, headers=headers)
-        if response_error(response):  # Check response has no errors
+        if response_utils.response_error(response):  # Check response has no errors
             print 'Delete team failed, status code: %d' % response.status_code
-            exit(1)
+            sys.exit(1)
         elif response.status_code == 204:
             print 'Deleted team with id: %s' % team_id
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
 def rename_team(team_id, team_name):
@@ -146,26 +136,26 @@ def rename_team(team_id, team_name):
             ]
         }
     }
-    headers = apiutils.generate_headers('rw')
+    headers = api_utils.generate_headers('rw')
 
     try:
         response = requests.patch(url, json=params, headers=headers)
-        if response_error(response):  # Check response has no errors
+        if response_utils.response_error(response):  # Check response has no errors
             print 'Renaming team with id: %s failed, status code: %d' \
                   % (team_id, response.status_code)
-            exit(1)
+            sys.exit(1)
         elif response.status_code == 200:
             print "Team: '%s' renamed to: '%s'" % (team_id, team_name)
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
-def add_user_to_team(team_id, user_id):
+def add_user_to_team(team_id, user_key):
     """
-    Add user with the provided user_id to team with provided team_id.
+    Add user with the provided user_key to team with provided team_id.
     """
-    headers = apiutils.generate_headers('rw')
+    headers = api_utils.generate_headers('rw')
     params = {'teamid': team_id}
     try:
         response = requests.request('GET', _url() + '/' + team_id, params=params,
@@ -176,38 +166,38 @@ def add_user_to_team(team_id, user_id):
                 'team': {
                     'name': response.json()['team']['name'],
                     'users': [
-                        # we are doing a patch request here so it's safe to include the user_id
+                        # we are doing a patch request here so it's safe to include the user_key
                         # we want to add here
-                        {'id': user_id}
+                        {'id': user_key}
                     ]
                 }
             }
-            headers = apiutils.generate_headers('rw')
+            headers = api_utils.generate_headers('rw')
             try:
                 response = requests.patch(url, json=params, headers=headers)
-                if response_error(response):  # Check response has no errors
-                    print 'Adding user to team with id: %s failed, status code: %d' \
+                if response_utils.response_error(response):  # Check response has no errors
+                    print 'Adding user to team with key: %s failed, status code: %d' \
                           % (team_id, response.status_code)
-                    exit(1)
+                    sys.exit(1)
                 elif response.status_code == 200:
-                    print "Added user with id: '%s' to team" % user_id
+                    print "Added user with key: '%s' to team" % user_key
             except requests.exceptions.RequestException as error:
-                print error
-                exit(1)
-        elif response_error(response):
+                sys.stderr.write(error)
+                sys.exit(1)
+        elif response_utils.response_error(response):
             print 'Cannot find team. Adding user to team %s failed, ' \
                   'status code: %d' % (team_id, response.status_code)
-            exit(1)
+            sys.exit(1)
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
 
 
-def delete_user_from_team(team_id, user_id):
+def delete_user_from_team(team_id, user_key):
     """
     Delete a user from a team.
     """
-    headers = apiutils.generate_headers('rw')
+    headers = api_utils.generate_headers('rw')
     params = {'teamid': team_id}
     try:
         response = requests.request('GET', _url() + '/' + team_id, params=params,
@@ -218,25 +208,25 @@ def delete_user_from_team(team_id, user_id):
                 'team': {
                     'name': response.json()['team']['name'],
                     'users': [user for user in response.json()['team']['users'] if user['id'] !=
-                              user_id]
+                              user_key]
                 }
             }
-            headers = apiutils.generate_headers('rw')
+            headers = api_utils.generate_headers('rw')
             try:
                 response = requests.put(url, json=params, headers=headers)
-                if response_error(response):  # Check response has no errors
-                    print 'Deleting user from team with id: %s failed, status code: %d' \
+                if response_utils.response_error(response):  # Check response has no errors
+                    print 'Deleting user from team with key: %s failed, status code: %d' \
                           % (team_id, response.status_code)
-                    exit(1)
+                    sys.exit(1)
                 elif response.status_code == 200:
-                    print "Deleted user with id: '%s' from team: %s" % (user_id, team_id)
+                    print "Deleted user with key: '%s' from team: %s" % (user_key, team_id)
             except requests.exceptions.RequestException as error:
-                print error
-                exit(1)
-        elif response_error(response):
+                sys.stderr.write(error)
+                sys.exit(1)
+        elif response_utils.response_error(response):
             print 'Cannot find team. Deleting user from team %s failed, ' \
                   'status code: %d' % (team_id, response.status_code)
-            exit(1)
+            sys.exit(1)
     except requests.exceptions.RequestException as error:
-        print error
-        exit(1)
+        sys.stderr.write(error)
+        sys.exit(1)
