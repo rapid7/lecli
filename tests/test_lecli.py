@@ -370,3 +370,4 @@ def test_replace_logset(mocked_replace_logset):
         os.remove('logset.json')
     except OSError:
         pass
+
