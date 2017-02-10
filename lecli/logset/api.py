@@ -2,6 +2,7 @@
 Logset API module.
 """
 import sys
+import json
 import requests
 
 from lecli import api_utils
@@ -21,7 +22,7 @@ def handle_response(response, error_message, success_code, success_message=None)
         sys.exit(1)
     elif response.status_code == success_code:
         if success_message:
-            print success_message
+            sys.stdout.write(success_message)
         else:
             api_utils.pretty_print_string_as_json(response.text)
 
@@ -197,3 +198,14 @@ def delete_log(logset_id, log_id):
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
+
+def replace_logset_from_file(logset_id, filename):
+    """Helper method to load file contents as json
+        in order to call replace"""
+    with open(filename) as json_data:
+        try:
+            params = json.load(json_data)
+            replace_logset(logset_id, params)
+        except ValueError as error:
+            sys.stderr.write(error.message + '\n')
+            sys.exit(1)

@@ -69,8 +69,6 @@ def updatelogset(command, logset_id, log_id):
         api.add_log(logset_id, log_id)
     elif command == 'delete_log':
         api.delete_log(logset_id, log_id)
-    else:
-        click.echo('Missing argument "command".')
 
 
 @click.command()
@@ -88,10 +86,4 @@ def replacelogset(logset_id, filename):
     """
     Replace a logset of a given id with new details
     """
-    with open(filename) as json_data:
-        try:
-            params = json.load(json_data)
-            api.replace_logset(logset_id, params)
-        except ValueError as error:
-            sys.stderr.write(error.message + '\n')
-            sys.exit(1)
+    api.replace_logset_from_file(logset_id, filename)

@@ -41,8 +41,6 @@ MOCK_SAVED_QUERY_URL = 'https://mydummyurl.com/saved_queries'
 
 MOCK_LOGAPI_URL = 'https://mydummyurl.com/management/logs'
 
-MOCK_LOGSETAPI_URL = 'https://mydummyurl.com/management/logsets'
-
 TEST_TEAM_ID = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 
 USAGE_DATE_FROM = '2016-03-01'

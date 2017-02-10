@@ -7,15 +7,16 @@ from examples import misc_examples as misc_ex
 from examples import response_examples as resp_ex
 from lecli.logset import api
 
+LOGSET_API = 'https://mydummyurl.com/management/logsets'
 
 @httpretty.activate
 @patch('lecli.api_utils.get_ro_apikey')
 @patch('lecli.logset.api._url')
 def test_get_logsets(mocked_url, mocked_ro_apikey, capsys):
-    mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+    mocked_url.return_value = LOGSET_API
     mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_LOGSETAPI_URL,
+    httpretty.register_uri(httpretty.GET, LOGSET_API,
                            status=200,
                            content_type='application/json',
                            body=json.dumps(resp_ex.logsets_response))
@@ -30,10 +31,10 @@ def test_get_logsets(mocked_url, mocked_ro_apikey, capsys):
 @patch('lecli.api_utils.get_ro_apikey')
 @patch('lecli.logset.api._url')
 def test_get_logset(mocked_url, mocked_ro_apikey, capsys):
-    mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+    mocked_url.return_value = LOGSET_API
     mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_LOGSETAPI_URL + '/XXXXXXXX-XXXX-YYYY-XXXX-XXXXXXXXXXXX',
+    httpretty.register_uri(httpretty.GET, LOGSET_API + '/XXXXXXXX-XXXX-YYYY-XXXX-XXXXXXXXXXXX',
                            status=200,
                            content_type='application/json',
                            body=json.dumps(resp_ex.logsets_response))
@@ -48,10 +49,10 @@ def test_get_logset(mocked_url, mocked_ro_apikey, capsys):
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.logset.api._url')
 def test_create_logset_with_name(mocked_url, mocked_rw_apikey, capsys):
-    mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+    mocked_url.return_value = LOGSET_API
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-    httpretty.register_uri(httpretty.POST, misc_ex.MOCK_LOGSETAPI_URL,
+    httpretty.register_uri(httpretty.POST, LOGSET_API,
                            status=201,
                            content_type='application/json',
                            body=json.dumps(resp_ex.create_logset_response))
@@ -66,10 +67,10 @@ def test_create_logset_with_name(mocked_url, mocked_rw_apikey, capsys):
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.logset.api._url')
 def test_create_logset_from_file(mocked_url, mocked_rw_apikey, capsys):
-    mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+    mocked_url.return_value = LOGSET_API
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-    httpretty.register_uri(httpretty.POST, misc_ex.MOCK_LOGSETAPI_URL,
+    httpretty.register_uri(httpretty.POST, LOGSET_API,
                            status=201,
                            content_type='application/json',
                            body=json.dumps(resp_ex.create_logset_response))
@@ -92,10 +93,10 @@ def test_create_logset_from_file(mocked_url, mocked_rw_apikey, capsys):
 @patch('lecli.logset.api._url')
 def test_create_logset_invalid_json(mocked_url, mocked_rw_apikey, capsys):
     with pytest.raises(SystemExit) as exit:
-        mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+        mocked_url.return_value = LOGSET_API
         mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-        httpretty.register_uri(httpretty.POST, misc_ex.MOCK_LOGSETAPI_URL,
+        httpretty.register_uri(httpretty.POST, LOGSET_API,
                                status=400,
                                content_type='application/json',
                                body='Client Error: Bad Request for url: https://rest.logentries.com/management/logsets')
@@ -119,14 +120,14 @@ def test_create_logset_invalid_json(mocked_url, mocked_rw_apikey, capsys):
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.logset.api._url')
 def test_rename_logset(mocked_url, mocked_rw_apikey, mocked_ro_apikey, capsys):
-    mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+    mocked_url.return_value = LOGSET_API
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
     mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
     response_body = '{"logset": {"id": "XXXXXXXX-XXXX-YYYY-XXXX-XXXXXXXX","logs_info": [],"name": "old logset name"}}'
     expected_result = '{"logset": {"id": "XXXXXXXX-XXXX-YYYY-XXXX-XXXXXXXX","logs_info": [],"name": "new logset name"}}'
 
-    resource_url = misc_ex.MOCK_LOGSETAPI_URL + '/XXXXXXXX-XXXX-YYYY-XXXX-XXXXXXXX'
+    resource_url = LOGSET_API + '/XXXXXXXX-XXXX-YYYY-XXXX-XXXXXXXX'
 
     httpretty.register_uri(httpretty.GET, resource_url,
                            status=200,
@@ -150,10 +151,10 @@ def test_rename_logset(mocked_url, mocked_rw_apikey, mocked_ro_apikey, capsys):
 @patch('lecli.logset.api._url')
 def test_rename_unknown_logset(mocked_url, mocked_rw_apikey, mocked_ro_apikey, capsys):
     with pytest.raises(SystemExit) as exit:
-        mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+        mocked_url.return_value = LOGSET_API
         mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-        httpretty.register_uri(httpretty.GET, misc_ex.MOCK_LOGSETAPI_URL + '/XXXXXXXX-XXXX-0000-XXXX-XXXXXXXX',
+        httpretty.register_uri(httpretty.GET, LOGSET_API + '/XXXXXXXX-XXXX-0000-XXXX-XXXXXXXX',
                                status=404,
                                content_type='application/json')
 
@@ -169,16 +170,16 @@ def test_rename_unknown_logset(mocked_url, mocked_rw_apikey, mocked_ro_apikey, c
 @patch('lecli.api_utils.get_ro_apikey')
 @patch('lecli.logset.api._url')
 def test_add_log_to_logset(mocked_url, mocked_ro_apikey, mocked_rw_apikey, capsys):
-    mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+    mocked_url.return_value = LOGSET_API
     mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_LOGSETAPI_URL + '/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX',
+    httpretty.register_uri(httpretty.GET, LOGSET_API + '/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX',
                            status=200,
                            content_type='application/json',
                            body=resp_ex.basic_logset_response)
 
-    httpretty.register_uri(httpretty.PUT, misc_ex.MOCK_LOGSETAPI_URL + '/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX',
+    httpretty.register_uri(httpretty.PUT, LOGSET_API + '/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX',
                            status=200,
                            content_type='application/json',
                            body=resp_ex.basic_logset_response_with_log)
@@ -196,16 +197,16 @@ def test_add_log_to_logset(mocked_url, mocked_ro_apikey, mocked_rw_apikey, capsy
 @patch('lecli.logset.api._url')
 def test_add_unknown_log_to_logset(mocked_url, mocked_ro_apikey, mocked_rw_apikey, capsys):
     with pytest.raises(SystemExit) as exit:
-        mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+        mocked_url.return_value = LOGSET_API
         mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
         mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-        httpretty.register_uri(httpretty.GET, misc_ex.MOCK_LOGSETAPI_URL + '/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX',
+        httpretty.register_uri(httpretty.GET, LOGSET_API + '/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX',
                                status=200,
                                content_type='application/json',
                                body=resp_ex.basic_logset_response)
 
-        httpretty.register_uri(httpretty.PUT, misc_ex.MOCK_LOGSETAPI_URL + '/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX',
+        httpretty.register_uri(httpretty.PUT, LOGSET_API + '/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX',
                                status=400,
                                content_type='application/json')
 
@@ -222,11 +223,11 @@ def test_add_unknown_log_to_logset(mocked_url, mocked_ro_apikey, mocked_rw_apike
 @patch('lecli.logset.api._url')
 def test_add_log_to_unknown_logset(mocked_url, mocked_ro_apikey, mocked_rw_apikey, capsys):
    with pytest.raises(SystemExit) as exit:
-       mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+       mocked_url.return_value = LOGSET_API
        mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
        mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-       httpretty.register_uri(httpretty.GET, misc_ex.MOCK_LOGSETAPI_URL + '/123',
+       httpretty.register_uri(httpretty.GET, LOGSET_API + '/123',
                               status=404,
                               content_type='application/json')
 
@@ -242,16 +243,16 @@ def test_add_log_to_unknown_logset(mocked_url, mocked_ro_apikey, mocked_rw_apike
 @patch('lecli.api_utils.get_ro_apikey')
 @patch('lecli.logset.api._url')
 def test_remove_log_from_logset(mocked_url, mocked_ro_apikey, mocked_rw_apikey, capsys):
-    mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+    mocked_url.return_value = LOGSET_API
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
     mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_LOGSETAPI_URL +'/123',
+    httpretty.register_uri(httpretty.GET, LOGSET_API +'/123',
                            status=200,
                            content_type='application/json',
                            body=resp_ex.basic_logset_response_with_log)
 
-    httpretty.register_uri(httpretty.PUT, misc_ex.MOCK_LOGSETAPI_URL + '/123',
+    httpretty.register_uri(httpretty.PUT, LOGSET_API + '/123',
                            status=200,
                            content_Type='application/json',
                            body=resp_ex.basic_logset_response)
@@ -266,10 +267,10 @@ def test_remove_log_from_logset(mocked_url, mocked_ro_apikey, mocked_rw_apikey, 
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.logset.api._url')
 def test_delete_logset(mocked_url, mocked_rw_apikey, capsys):
-    mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+    mocked_url.return_value = LOGSET_API
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-    httpretty.register_uri(httpretty.DELETE, misc_ex.MOCK_LOGSETAPI_URL + '/123',
+    httpretty.register_uri(httpretty.DELETE, LOGSET_API + '/123',
                            status=204,
                            content_type='application/json')
 
@@ -284,10 +285,10 @@ def test_delete_logset(mocked_url, mocked_rw_apikey, capsys):
 @patch('lecli.logset.api._url')
 def test_delete_unknown_logset(mocked_url, mocked_rw_apikey, capsys):
     with pytest.raises(SystemExit) as exit:
-        mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+        mocked_url.return_value = LOGSET_API
         mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-        httpretty.register_uri(httpretty.DELETE, misc_ex.MOCK_LOGSETAPI_URL + '/123',
+        httpretty.register_uri(httpretty.DELETE, LOGSET_API + '/123',
                                status=404,
                                content_type='application/json')
 
@@ -303,14 +304,14 @@ def test_delete_unknown_logset(mocked_url, mocked_rw_apikey, capsys):
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.logset.api._url')
 def test_delete_logset_with_log_in_another_logset(mocked_url, mocked_rw_apikey, mocked_ro_apikey, capsys):
-    mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+    mocked_url.return_value = LOGSET_API
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
     mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
-    httpretty.register_uri(httpretty.DELETE, misc_ex.MOCK_LOGSETAPI_URL + '/123',
+    httpretty.register_uri(httpretty.DELETE, LOGSET_API + '/123',
                            status=204, content_type='application/json')
 
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_LOGSETAPI_URL + '/456',
+    httpretty.register_uri(httpretty.GET, LOGSET_API + '/456',
                            status=200, content_type='application/json',
                            body=resp_ex.basic_logset_response_with_log)
 
@@ -326,11 +327,9 @@ def test_delete_logset_with_log_in_another_logset(mocked_url, mocked_rw_apikey, 
 @patch('lecli.logset.api._url')
 def test_replace_logset(mocked_url, mocked_rw_apikey, capsys):
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    mocked_url.return_value = misc_ex.MOCK_LOGSETAPI_URL
+    mocked_url.return_value = LOGSET_API
 
-    dest_url = misc_ex.MOCK_LOGSETAPI_URL + '/123'
-
-    httpretty.register_uri(httpretty.PUT, dest_url,
+    httpretty.register_uri(httpretty.PUT, LOGSET_API + '/123',
                            status=200,
                            body=resp_ex.basic_logset_response_with_log,
                            content_type='application/json')
