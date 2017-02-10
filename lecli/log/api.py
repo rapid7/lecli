@@ -162,7 +162,6 @@ def check_logset_exists(params):
     return True
 
 
-
 def update_log(log_id, params):
     """
     Update a log with the details provided

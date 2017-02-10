@@ -140,6 +140,53 @@ team_response = {
     ]
 }
 
+logsets_response = {
+  "logset": {
+    "id": "XXXXXXXX-XXXX-YYYY-XXXX-XXXXXXXXXXXX",
+    "name": "Test Logset",
+    "description": "Example logset",
+    "user_data": {},
+    "logs_info": [
+      {
+        "id": "XXXXXXXX-ABCD-YYYY-DCBA-XXXXXXXXXXXX",
+        "name": "SyslogD Log",
+        "links": [
+          {
+            "rel": "Self",
+            "href": "https://rest.logentries.com/management/logs/d42eaaaf-b9d3-319c-92fd-6559443df876"
+          }
+        ]
+      },
+      {
+        "id": "XXXXXXXX-1234-ABCD-1234-XXXXXXXXXXXX",
+        "name": "Another log goes here",
+        "links": [
+          {
+            "rel": "Self",
+            "href": "https://rest.logentries.com/management/logs/41bfa038-3a7a-4bde-89bb-df39c1b13e04"
+          }
+        ]
+      }
+    ]
+  }
+}
+
+basic_logset_response = '{"logset": {"id": "XXXXXXXX-XXXX-YYYY-XXXX-XXXXXXXX", "logs_info": [],"name": "new logset name"}}'
+
+basic_logset_response_with_log = '{"logset": {"id": "XXXXXXXX-XXXX-YYYY-XXXX-XXXXXXXX", "logs_info": [{"id":"XXXXXXXX-ABCD-YYYY-DCBA-XXXXXXXXXXXX"}],"name": "new logset name"}}'
+
+
+create_logset_response = {
+    "logset": {
+        "description": "",
+        "id": "abcd1234-abcd-0000-abcd-abcd1234",
+        "logs_info": [],
+        "name": "Test Logset",
+        "user_data": {}
+    }
+}
+
+
 usage_response = {
     "id": "123456789012345678901234567890123456",
     "name": "Test",

@@ -424,3 +424,102 @@ Mandatory positional argument:
 Example:
 
     lecli replace log <log_id> <path_to_json_file>
+    
+    
+   
+**Logset Management**
+----------------------
+
+The CLI allows you to retrieve and manage logsets. You can retrieve all or single logsets as well as create, 
+delete and rename logsets. You can also add or remove a log to a logset. These actions require a valid read-write and read-only API key in your configuration file.
+
+
+####Retrieve all logsets
+Retrieve all logsets.
+
+Example:
+    
+    lecli get logsets
+
+####Retrieve a specific logset
+
+Retrieve a logset with a given ID.
+
+Mandatory positional argument:
+- UUID of the logset to be retrieved.
+
+Example:
+    
+    lecli get logset <logset_id>
+
+
+####Create a new logset
+
+Create a new logset with a given name or from a provided json file.
+
+Logsets can be created with a given name and default values by providing the name. 
+If you wish to supply additional information, the (relative or full) path to a JSON file can be provided.
+
+Example JSON:
+
+    {
+        "name": "logset name",
+        "logs_info": [
+            {
+                "id": "log id",,
+                "name": "log name"
+            }
+        ]
+    }
+
+Example:
+
+    lecli create logset -n <name>
+    lecli create logset -f <path_to_json_file>
+
+####Rename a logset
+Rename a logset with the provided ID.
+
+Mandatory positional arguments:
+- UUID of the logset to be renamed
+- New name of the logset
+
+Example:
+
+    lecli rename logset <logset_id> <new_name>
+
+####Update a logset
+Add or remove log information to a given logset.
+
+Mandatory positional arguments:
+- UUID of the logset to be updated
+- UUID of the log to be added or removed
+
+Examples:
+    
+    lecli update logset add_log <logset_id> <log_id>
+    lecli update logset delete_log <logset_id> <log_id>
+
+
+####Delete a logset
+Deletes a logset with the provided ID.
+
+Mandatory positional argument:
+- UUID of the logset to be deleted
+
+Example:
+
+    lecli delete logset <logset_id>
+
+
+####Replace a logset
+Replaces a logset with the provided logset.
+
+Mandator positional arguments:
+- UUID of the logset to be replaced
+- Full or relative path to JSON file containing a valid logset object
+
+Example:
+
+    lecli replace logset <logset_id> <path_to_json_file>
+    

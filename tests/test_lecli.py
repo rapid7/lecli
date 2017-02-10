@@ -299,3 +299,75 @@ def test_not_a_file(mocked_create_log):
     runner.invoke(cli.log_commands.createlog, ['123', 'not_a_file'])
 
     assert not mocked_create_log.called
+
+
+@patch('lecli.logset.api.get_logsets')
+def test_get_logsets(mocked_get_logsets):
+    runner = CliRunner()
+    runner.invoke(cli.logset_commands.getlogsets)
+
+    mocked_get_logsets.assert_called_once()
+
+
+@patch('lecli.logset.api.get_logset')
+def test_get_logset(mocked_get_logset):
+    runner = CliRunner()
+    runner.invoke(cli.logset_commands.getlogset, ['1234'])
+
+    mocked_get_logset.assert_called_once_with('1234')
+
+
+@patch('lecli.logset.api.create_logset')
+def test_create_logset_with_name(mocked_create_logset):
+    runner = CliRunner()
+    runner.invoke(cli.logset_commands.createlogset, ['-n', 'Test Logset'])
+
+    mocked_create_logset.assert_called_once_with('Test Logset', None)
+
+
+@patch('lecli.logset.api.rename_logset')
+def test_rename_logset(mocked_rename_logset):
+    runner = CliRunner()
+    runner.invoke(cli.logset_commands.renamelogset, ['123', 'new_name'])
+
+    mocked_rename_logset.assert_called_once_with('123', 'new_name')
+
+
+@patch('lecli.logset.api.add_log')
+def test_add_log_to_logset(mocked_add_log_to_logset):
+    runner = CliRunner()
+    runner.invoke(cli.logset_commands.updatelogset, ['add_log','123', 'abc'])
+
+    mocked_add_log_to_logset.assert_called_once_with('123', 'abc')
+
+
+@patch('lecli.logset.api.delete_log')
+def test_remove_log_from_logset(mocked_delete_log_from_logset):
+    runner = CliRunner()
+    runner.invoke(cli.logset_commands.updatelogset, ['delete_log','123', 'abc'])
+
+    mocked_delete_log_from_logset.assert_called_once_with('123', 'abc')
+
+
+@patch('lecli.logset.api.delete_logset')
+def test_delete_logset(mocked_delete_logset):
+    runner = CliRunner()
+    runner.invoke(cli.logset_commands.deletelogset, ['123'])
+
+    mocked_delete_logset.assert_called_once_with('123')
+
+
+@patch('lecli.logset.api.replace_logset')
+def test_replace_logset(mocked_replace_logset):
+    runner = CliRunner()
+    with open('logset.json', 'w') as f:
+        f.write('{"logset": {"id": "ba2b371a-87fa-40ee-97fd-e9b0d2424b2f","name": "new logset"}}')
+
+    runner.invoke(cli.logset_commands.replacelogset, ['1234', 'logset.json'])
+
+    mocked_replace_logset.assert_called_once()
+    try:
+        os.remove('logset.json')
+    except OSError:
+        pass
+
