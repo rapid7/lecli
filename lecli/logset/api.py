@@ -140,11 +140,11 @@ def add_log(logset_id, log_id):
     Add a log to the logset
     """
     params = {
-        "logs_info": [
-            {
-                "id": log_id,
-            }
-        ]
+        "logset":{
+            "logs_info": [{
+                "id": str(log_id)
+            }]
+        }
     }
 
     url = "/".join([_url(), logset_id])
@@ -173,7 +173,8 @@ def extract_log_from_logset(logset, log_id):
                 pruned_logset.append(log)
 
     if pruned_logset is not []:
-        return pruned_logset
+        logset['logset']['logs_info'] = pruned_logset
+        return logset
     else:
         sys.stderr.write("Log %s does not exist in logset ", (log_id))
         sys.exit(1)
