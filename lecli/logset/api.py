@@ -143,9 +143,8 @@ def add_log(logset_id, log_id):
         "logset":{
             "logs_info": [{
                 "id": str(log_id)
-            }
-        ]}
-
+            }]
+        }
     }
 
     url = "/".join([_url(), logset_id])
