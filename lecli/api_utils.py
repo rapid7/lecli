@@ -57,14 +57,12 @@ def init_config():
         dummy_config.set(AUTH_SECTION, 'owner_api_key_id', '')
         dummy_config.set(AUTH_SECTION, 'owner_api_key', '')
         dummy_config.set(AUTH_SECTION, 'rw_api_key', '')
-
+        dummy_config.set(AUTH_SECTION, 'ro_api_key', '')
 
         dummy_config.add_section('LogNicknames')
         dummy_config.add_section("LogGroups")
         dummy_config.add_section('Url')
-        dummy_config.set(URL_SECTION, 'log_management_url',
-                         'https://rest.logentries.com/management')
-
+        dummy_config.set(URL_SECTION, 'management_url', 'https://rest.logentries.com/management')
 
         dummy_config.write(config_file)
         config_file.close()
@@ -87,7 +85,6 @@ def load_config():
     if len(files_read) != 1:
         print "Error: Config file '%s' not found, generating one..." % CONFIG_FILE_PATH
         init_config()
-        sys.exit(1)
         print_config_error_and_exit()
     if not CONFIG.has_section(AUTH_SECTION):
         print_config_error_and_exit(section=AUTH_SECTION)

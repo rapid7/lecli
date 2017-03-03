@@ -158,21 +158,24 @@ def test_replace_log(mocked_url, mocked_rw_apikey, capsys):
 def test_update_log(management_url, mocked_url, mocked_rw_apikey, mocked_ro_apikey, capsys):
     test_log_id = misc_ex.TEST_LOG_RESOURCE_ID
     mocked_url.return_value = misc_ex.MOCK_LOGAPI_URL
-    management_url.return_value = misc_ex.MOCK_LOGAPI_URL
+    management_url.return_value = misc_ex.TEST_MANAGEMENT_URL
     mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
     mocked_ro_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
 
     request_body = '{"log": {"name": "test.log", "logsets_info": [], "source_type": "token"}}'
     expected_result = '{"log": {"name": "test.log", ' \
-                      '"logsets_info": [{"id": "e227f890-7742-47b4-86b2-5ff1d345397e","name": "test_logset"}],' \
-                      ' "source_type": "token"}}'
+                      '"logsets_info": [{"id": "e227f890-7742-47b4-86b2-5ff1d345397e",' \
+                      '"name": "test_logset"}], "source_type": "token"}}'
 
-    httpretty.register_uri(httpretty.GET, mocked_url.return_value + '/logsets/e227f890-7742-47b4-86b2-5ff1d345397e',
-                           status=200, content_type='application/json', body=request_body)
-    httpretty.register_uri(httpretty.GET, management_url.return_value + '/' + misc_ex.TEST_LOG_RESOURCE_ID,
-                           status=200, content_type='application/json', body=request_body)
-    httpretty.register_uri(httpretty.PUT, management_url.return_value + '/' + misc_ex.TEST_LOG_RESOURCE_ID,
-                           status=200, content_type='application/json', body=expected_result)
+    httpretty.register_uri(httpretty.GET, management_url.return_value +
+                           '/logsets/e227f890-7742-47b4-86b2-5ff1d345397e', status=200,
+                           content_type='application/json', body=request_body)
+    httpretty.register_uri(httpretty.GET, mocked_url.return_value + '/' +
+                           misc_ex.TEST_LOG_RESOURCE_ID, status=200,
+                           content_type='application/json', body=request_body)
+    httpretty.register_uri(httpretty.PUT, mocked_url.return_value + '/' +
+                           misc_ex.TEST_LOG_RESOURCE_ID, status=200,
+                           content_type='application/json', body=expected_result)
 
     logset_info = {
         "logsets_info": [
