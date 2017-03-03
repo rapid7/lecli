@@ -304,8 +304,8 @@ def get_management_url():
             return url
         else:
             print_config_error_and_exit(URL_SECTION, 'Log Management URL(%s)' % config_key)
-    except ConfigParser.NoOptionError:
-        print_config_error_and_exit(URL_SECTION, 'Log Management URL(%s)' % config_key)
+    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        return 'https://rest.logentries.com/management'
 
 
 def pretty_print_string_as_json(text):

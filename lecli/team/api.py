@@ -13,8 +13,8 @@ def _url():
     """
     Get rest query url of account resource id.
     """
-    return 'https://rest.logentries.com/management/accounts/%s/teams' % \
-           api_utils.get_account_resource_id()
+    return '%s/accounts/%s/teams' % \
+           (api_utils.get_management_url(), api_utils.get_account_resource_id())
 
 
 def print_teams(response):

@@ -7,6 +7,7 @@ import requests
 from lecli import api_utils
 from lecli import response_utils
 
+
 def _url():
     """
     Get rest query url of log resource id

@@ -16,11 +16,11 @@ def _url(endpoint):
     Get rest query url of account resource id.
     """
     if endpoint == 'owner':
-        return 'https://rest.logentries.com/management/accounts/%s/owners' % \
-               api_utils.get_account_resource_id()
+        return '%s/accounts/%s/owners' % \
+               (api_utils.get_management_url(), api_utils.get_account_resource_id())
     elif endpoint == 'user':
-        return 'https://rest.logentries.com/management/accounts/%s/users' % \
-               api_utils.get_account_resource_id()
+        return '%s/accounts/%s/users' % \
+               (api_utils.get_management_url(), api_utils.get_account_resource_id())
 
 
 def handle_userlist_response(response):
