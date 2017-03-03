@@ -229,6 +229,12 @@ def test_generate_management_url(mocked_management_url):
     assert "https://rest.logentries.com/management" in result
 
 
+def test_default_management_url():
+    result = api_utils.get_management_url()
+
+    assert "https://rest.logentries.com/management" in result
+
+
 def test_combine_objects():
     left = { "log": {
                 "id": "21dd21e7-708a-4bc4-bf45-ffbc78190ecd",
