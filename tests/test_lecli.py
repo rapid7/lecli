@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from click.testing import CliRunner
 from mock import patch
@@ -68,6 +69,14 @@ def test_events(mocked_get_events):
                                misc_ex.TIME_TO])
 
     assert mocked_get_events.called
+
+
+@patch('lecli.query.api.tail_logs')
+def test_live_tail(mocked_tail_logs):
+    runner = CliRunner()
+    runner.invoke(cli.query_commands.tail_events, [str(uuid.uuid4())])
+
+    assert mocked_tail_logs.called
 
 
 @patch('lecli.query.api.get_events')
@@ -371,3 +380,40 @@ def test_replace_logset(mocked_replace_logset):
     except OSError:
         pass
 
+
+@patch('lecli.api_key.api.create')
+def test_create_apikey(mocked_create_apikey):
+    runner = CliRunner()
+    with open('file.json', 'w') as f:
+        f.write('{"test": {"key": "value"}}')
+
+    runner.invoke(cli.api_key_commands.create_api_key, ['file.json'])
+    mocked_create_apikey.assert_called_once()
+    try:
+        os.remove('file.json')
+    except OSError:
+        pass
+
+
+@patch('lecli.api_key.api.delete')
+def test_delete_apikey(mocked_delete_apikey):
+    runner = CliRunner()
+    runner.invoke(cli.api_key_commands.delete_api_key, ['123'])
+
+    mocked_delete_apikey.assert_called_once_with('123')
+
+
+@patch('lecli.api_key.api.update')
+def test_enable_apikey(mocked_update_apikey):
+    runner = CliRunner()
+    runner.invoke(cli.api_key_commands.update_api_key, ['123', '--enable'])
+
+    mocked_update_apikey.assert_called_once_with('123', True)
+
+
+@patch('lecli.api_key.api.update')
+def test_disable_apikey(mocked_update_apikey):
+    runner = CliRunner()
+    runner.invoke(cli.api_key_commands.update_api_key, ['123', '--disable'])
+
+    mocked_update_apikey.assert_called_once_with('123', False)

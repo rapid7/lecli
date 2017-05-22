@@ -1,0 +1,126 @@
+import json
+import sys
+
+import requests
+
+from lecli import api_utils
+from lecli import response_utils
+
+
+def _url(api_key_id=None):
+    """
+    Get rest query "path" and "url" respectively
+    """
+    nodes = ['management', 'accounts', api_utils.get_account_resource_id(), 'apikeys']
+    if api_key_id:
+        nodes.append(api_key_id)
+
+    return api_utils.build_url(nodes)
+
+
+def handle_api_key_response(response):
+    """
+    Handle get api key response
+    """
+    if response_utils.response_error(response):
+        sys.exit(1)
+    elif response.status_code in [200, 201]:
+        api_utils.pretty_print_string_as_json(response.text)
+
+
+def delete(api_key_id):
+    """
+    Delete an api key with the provided ID
+    """
+    action, url = _url(api_key_id)
+    headers = api_utils.generate_headers('owner', method='DELETE', body='', action=action)
+
+    try:
+        response = requests.delete(url, headers=headers)
+        if response_utils.response_error(response):
+            sys.stderr.write('Deleting api key failed, status code: %d' % response.status_code)
+            sys.exit(1)
+        elif response.status_code == 204:
+            sys.stdout.write('Deleted api key with id: %s \n' % api_key_id)
+    except requests.exceptions.RequestException as error:
+        sys.stderr.write(error)
+        sys.exit(1)
+
+
+def get(api_key_id):
+    """
+    Get a specific apikey
+    """
+    _, url = _url(api_key_id)
+    headers = api_utils.generate_headers('rw')
+    try:
+        response = requests.get(url, headers=headers)
+        handle_api_key_response(response)
+    except requests.exceptions.RequestException as error:
+        sys.stderr.write(error)
+        sys.exit(1)
+
+
+def list():
+    """
+    Get apikeys associated with the account - this uses rw apikey so does not return owner api keys
+    """
+    action, url = _url()
+    headers = api_utils.generate_headers('rw', method='GET', body='', action=action)
+    try:
+        response = requests.get(url, headers=headers)
+        handle_api_key_response(response)
+    except requests.exceptions.RequestException as error:
+        sys.stderr.write(error)
+        sys.exit(1)
+
+
+def create(payload):
+    """
+    Delete an api key with the provided ID
+    """
+    action, url = _url()
+
+    headers = api_utils.generate_headers('owner', method='POST', body=json.dumps(payload),
+                                         action=action)
+
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        if response_utils.response_error(response):
+            sys.stderr.write('Create api key failed, status code: %d' % response.status_code)
+            sys.exit(1)
+        elif response.status_code == 201:
+            sys.stdout.write('Created api key with payload: %s\n' % payload)
+            handle_api_key_response(response)
+    except requests.exceptions.RequestException as error:
+        sys.stderr.write(error)
+        sys.exit(1)
+
+
+def update(api_key_id, active):
+    """
+    Enable or disable an api key with given ID
+    """
+    action, url = _url(api_key_id)
+    payload = {
+        "apikey":
+            {
+                "active": active
+            }
+    }
+
+    headers = api_utils.generate_headers('owner', method='PATCH', body=json.dumps(payload),
+                                         action=action)
+    try:
+        response = requests.patch(url, json=payload, headers=headers)
+        if response_utils.response_error(response):
+            sys.stderr.write('Failed to %s api key with id: %s \n' %
+                             ('enable' if active else 'disable', api_key_id))
+            sys.exit(1)
+        elif response.status_code == 200:
+            sys.stdout.write('%s api key with id: %s\n' %
+                             ('Enabled' if active else 'Disabled', api_key_id))
+            handle_api_key_response(response)
+    except requests.exceptions.RequestException as error:
+        sys.stderr.write(error)
+        sys.exit(1)

@@ -3,12 +3,12 @@ Query API module.
 """
 from __future__ import division
 
-import sys
 import json
+import sys
 import time
-import datetime
 
 import click
+import datetime
 import requests
 from termcolor import colored
 
@@ -22,7 +22,7 @@ def _url(path):
     """
     Get rest query url of a specific path.
     """
-    return 'https://rest.logentries.com/query/%s/' % path
+    return api_utils.get_query_url() + '/' + path
 
 
 def handle_response(response, progress_bar):
@@ -47,6 +47,23 @@ def handle_response(response, progress_bar):
             handle_response(next_response, progress_bar)
     elif response.status_code == 202:
         continue_request(response, progress_bar)
+
+
+def handle_tail(response, poll_interval, poll_iteration=1000):
+    """
+    handle tailing loop
+    """
+    for i in range(poll_iteration):
+        if response_utils.response_error(response):
+            sys.exit(1)
+        elif response.status_code == 200:
+            print_response(response)
+
+        # fetch results from the next link
+        if 'links' in response.json():
+            next_url = response.json()['links'][0]['href']
+            time.sleep(poll_interval)
+            response = fetch_results(next_url)
 
 
 def continue_request(response, progress_bar):
@@ -146,6 +163,27 @@ def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=N
                                  json=payload)
         with click.progressbar(length=100, label='Progress') as progress_bar:
             handle_response(response, progress_bar)
+    except requests.exceptions.RequestException as error:
+        click.echo(error)
+        sys.exit(1)
+
+
+def tail_logs(logkeys, leql, label, poll_interval):
+    """
+    tail given logs
+    """
+    payload = {'logs': logkeys}
+
+    if leql:
+        payload.update({'leql': {'statement': leql}})
+
+    if label:
+        payload.update({'label': str(label)})
+
+    try:
+        response = requests.post(_url("live") + "/logs", headers=api_utils.generate_headers('rw'),
+                                 json=payload)
+        handle_tail(response, poll_interval)
     except requests.exceptions.RequestException as error:
         click.echo(error)
         sys.exit(1)

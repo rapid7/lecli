@@ -234,6 +234,26 @@ def test_continue_request(mocked_headers, mocked_response_handle):
     teardown_httpretty()
 
 
+@patch('lecli.api_utils.generate_headers')
+@patch('lecli.query.api.handle_tail')
+@patch('lecli.query.api._url')
+def test_live_tail_api(mocked_url, mocked_handle_tail, mocked_generate_headers):
+    setup_httpretty()
+
+    mocked_url.return_value = misc_ex.MOCK_QUERYAPI_URL
+    httpretty.register_uri(httpretty.POST,
+                           misc_ex.MOCK_QUERYAPI_URL + "/logs",
+                           content_type='application/json',
+                           body=json.dumps({}))
+
+    api.tail_logs(logkeys=misc_ex.TEST_LOG_KEY, label=None, leql=None, poll_interval=0.5)
+
+    assert mocked_generate_headers.called
+    assert mocked_handle_tail.called
+
+    teardown_httpretty()
+
+
 def test_handle_response(capsys):
     setup_httpretty()
 
@@ -252,3 +272,4 @@ def test_handle_response(capsys):
     assert "Message contents3" in out
 
     teardown_httpretty()
+
