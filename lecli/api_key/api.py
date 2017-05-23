@@ -1,3 +1,6 @@
+"""
+Api Keys API module.
+"""
 import json
 import sys
 
@@ -36,7 +39,7 @@ def delete(api_key_id):
     try:
         response = requests.delete(url, headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Deleting api key failed, status code: %d' % response.status_code)
+            sys.stderr.write('Deleting api key failed.')
             sys.exit(1)
         elif response.status_code == 204:
             sys.stdout.write('Deleted api key with id: %s \n' % api_key_id)
@@ -60,7 +63,7 @@ def get(api_key_id):
         sys.exit(1)
 
 
-def list(owner=False):
+def get_all(owner=False):
     """
     Get apikeys associated with the account - this uses rw apikey so does not return owner api keys
     """
@@ -77,7 +80,7 @@ def list(owner=False):
 
 def create(payload):
     """
-    Delete an api key with the provided ID
+    Create an api key with the provided ID
     """
     action, url = _url()
 
@@ -87,10 +90,9 @@ def create(payload):
     try:
         response = requests.post(url, headers=headers, json=payload)
         if response_utils.response_error(response):
-            sys.stderr.write('Create api key failed, status code: %d' % response.status_code)
+            sys.stderr.write('Create api key failed.')
             sys.exit(1)
         elif response.status_code == 201:
-            sys.stdout.write('Created api key with payload: %s\n' % payload)
             handle_api_key_response(response)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)

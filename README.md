@@ -544,7 +544,7 @@ Api keys of an account can be managed via lecli. Lecli supports creating(POST), 
 Get a list of api keys belongs to the used account.
 Uses `rw` or `owner` api key.
 
-Note: this does not show owner api key unless `--owner option is supplied.
+Note: this does not show owner api key unless `--owner` option is supplied.
 
 Example:
 

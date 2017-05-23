@@ -158,6 +158,7 @@ def get_recent_events(logkeys, lognick, loggroup, last, relative_range):
 @click.option('-i', '--poll_interval', type=click.FLOAT, default=1.0,
               help='Request interval of live tail in seconds, default is 1.0 second.')
 def tail_events(logkeys, lognick, loggroup, leql, label, poll_interval):
+    """Tail events of given logkey(s) with provided options"""
     if lognick:
         logkeys = api_utils.get_named_logkey(lognick)
     elif loggroup:

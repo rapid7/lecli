@@ -6,9 +6,9 @@ from __future__ import division
 import json
 import sys
 import time
+import datetime
 
 import click
-import datetime
 import requests
 from termcolor import colored
 
@@ -55,7 +55,7 @@ def handle_tail(response, poll_interval, poll_iteration=1000):
     """
     handle tailing loop
     """
-    for i in range(poll_iteration):
+    for _ in range(poll_iteration):
         if response_utils.response_error(response):
             sys.exit(1)
         elif response.status_code == 200:
@@ -66,6 +66,8 @@ def handle_tail(response, poll_interval, poll_iteration=1000):
             next_url = response.json()['links'][0]['href']
             time.sleep(poll_interval)
             response = fetch_results(next_url)
+        else:
+            click.echo('No continue link found in the received response.', err=True)
 
 
 def continue_request(response, progress_bar):

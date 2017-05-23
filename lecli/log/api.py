@@ -90,7 +90,7 @@ def delete_log(log_id):
     try:
         response = requests.delete(_url(('logs', log_id))[1], headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Delete log failed, status code: %d' % response.status_code)
+            sys.stderr.write('Delete log failed.')
             sys.exit(1)
         elif response.status_code == 204:
             sys.stdout.write('Deleted log with id: %s \n' % log_id)
@@ -108,7 +108,7 @@ def replace_log(log_id, params):
     try:
         response = requests.put(_url(('logs', log_id))[1], json=params, headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Update log failed with status code: %d\n' % response.status_code)
+            sys.stderr.write('Update log failed.\n')
             sys.exit(1)
         elif response.status_code == 200:
             sys.stdout.write('Log: %s updated to:\n' % log_id)
@@ -127,7 +127,7 @@ def rename_log(log_id, log_name):
     try:
         response = requests.get(_url(('logs', log_id))[1], headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Rename log failed with status code: %d\n' % response.status_code)
+            sys.stderr.write('Rename log failed.\n')
             sys.exit(1)
         elif response.status_code == 200:
             params = response.json()

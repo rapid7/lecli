@@ -77,8 +77,7 @@ def create_logset(logset_name=None, params=None):
 
     try:
         response = requests.post(_url()[1], json=request_params, headers=headers)
-        handle_response(response,
-                        'Creating logset failed, status code: %d' % response.status_code, 201)
+        handle_response(response, 'Creating logset failed.\n', 201)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
@@ -92,8 +91,8 @@ def delete_logset(logset_id):
 
     try:
         response = requests.delete(_url((logset_id,))[1], headers=headers)
-        handle_response(response, 'Delete logset failed, status code: %d \n' % response.status_code,
-                        204, 'Deleted logset with id: %s \n' % logset_id)
+        handle_response(response, 'Delete logset failed.\n', 204,
+                        'Deleted logset with id: %s \n' % logset_id)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
@@ -108,7 +107,7 @@ def rename_logset(logset_id, logset_name):
     try:
         response = requests.get(_url((logset_id,))[1], headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Rename logset failed with status code: %d\n' % response.status_code)
+            sys.stderr.write('Rename logset failed.\n')
             sys.exit(1)
         elif response.status_code == 200:
             params = response.json()
@@ -127,9 +126,7 @@ def replace_logset(logset_id, params):
 
     try:
         response = requests.put(_url((logset_id,))[1], json=params, headers=headers)
-        handle_response(response,
-                        'Update logset with details %s failed with status code: %d\n'
-                        % (params, response.status_code), 200)
+        handle_response(response, 'Update logset with details %s failed.\n' % params, 200)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)

@@ -93,7 +93,7 @@ def delete_saved_query(query_id):
     try:
         response = requests.delete(_url((query_id,))[1], headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Delete saved query failed, status code: %d' % response.status_code)
+            sys.stderr.write('Delete saved query failed.\n')
         elif response.status_code == 204:
             click.echo('Deleted saved query with id: %s' % query_id)
     except requests.exceptions.RequestException as error:
@@ -131,7 +131,7 @@ def create_saved_query(name, statement, from_ts=None, to_ts=None, time_range=Non
     try:
         response = requests.post(_url()[1], json=params, headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Creating saved query failed, status code: %d' % response.status_code)
+            sys.stderr.write('Creating saved query failed.\n')
             _pretty_print_saved_query_error(response)
         elif response.status_code == 201:
             click.echo('Saved query created with name: %s' % name)
@@ -183,7 +183,7 @@ def update_saved_query(query_id, name=None, statement=None, from_ts=None, to_ts=
     try:
         response = requests.patch(_url((query_id,))[1], json=params, headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Updating saved query failed, status code: %d' % response.status_code)
+            sys.stderr.write('Updating saved query failed.\n')
             _pretty_print_saved_query_error(response)
         elif response.status_code == 200:
             click.echo('Saved query with id %s updated.' % query_id)

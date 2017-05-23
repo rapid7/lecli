@@ -1,7 +1,10 @@
+"""
+Api Keys commands module.
+"""
 import json
+import sys
 
 import click
-import sys
 
 from lecli.api_key import api
 
@@ -21,7 +24,7 @@ def get_api_keys(owner):
     """
     Get all api keys
     """
-    api.list(owner)
+    api.get_all(owner)
 
 
 @click.command()
@@ -34,11 +37,11 @@ def create_api_key(filename):
         with open(filename) as json_data:
             try:
                 params = json.load(json_data)
-                print params
-                api.create(params)
             except ValueError as error:
                 sys.stderr.write(error.message + '\n')
                 sys.exit(1)
+
+            api.create(params)
     else:
         click.echo('Example usage: lecli create apikey path_to_file.json')
 

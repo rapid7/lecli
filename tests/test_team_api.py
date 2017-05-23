@@ -88,7 +88,7 @@ def test_delete_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, c
     api.delete_team(test_team_id)
     out, err = capsys.readouterr()
 
-    assert "Deleted team with id: %s\n" % test_team_id == out
+    assert "Deleted team with id: %s.\n" % test_team_id == out
 
 
 @httpretty.activate
@@ -128,8 +128,7 @@ def test_add_user_to_team(mocked_url, mocked_rw_apikey, mocked_account_resource_
     user_id_to_add = "user_id"
     api.add_user_to_team(test_team_id, user_id_to_add)
     out, err = capsys.readouterr()
-
-    assert "Added user with key: '%s' to team\n" % user_id_to_add == out
+    assert "Added user with key: %s to team.\n" % user_id_to_add == out
 
 
 @httpretty.activate
@@ -147,9 +146,9 @@ def test_delete_user_from_team(mocked_url, mocked_rw_apikey, mocked_account_reso
     httpretty.register_uri(httpretty.PUT, MOCK_API_URL, status=200,
                            content_type='application/json')
 
-    user_id_to_add = "user_id"
+    user_id_to_add = str(uuid.uuid4())
     api.delete_user_from_team(test_team_id, user_id_to_add)
     out, err = capsys.readouterr()
 
-    assert "Deleted user with key: '%s' from team" % user_id_to_add in out
+    assert "Deleted user with key: '%s' from team: %s\n" % (user_id_to_add, test_team_id) == out
 

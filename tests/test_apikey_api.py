@@ -22,9 +22,10 @@ def test_get_api_keys(mocked_url, mocked_rw_apikey, mocked_account_resource_id, 
                            content_type='application/json',
                            body=json.dumps({}))
 
-    api.list()
+    api.get_all()
 
     out, err = capsys.readouterr()
+    assert out
     assert not err
 
 
@@ -91,7 +92,6 @@ def test_create_api_key(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
 
     out, err = capsys.readouterr()
     assert not err
-    assert 'Created api key with payload' in out
 
 
 @httpretty.activate
@@ -114,6 +114,7 @@ def test_disable_api_key(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id
     api.update(api_key_id, False)
 
     out, err = capsys.readouterr()
+    assert {'apikey': {'active': False}} == json.loads(httpretty.last_request().body)
     assert not err
     assert 'Disabled api key with id: %s' % api_key_id in out
 
@@ -138,5 +139,6 @@ def test_enable_api_key(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
     api.update(api_key_id, True)
 
     out, err = capsys.readouterr()
+    assert {'apikey': {'active': True}} == json.loads(httpretty.last_request().body)
     assert not err
     assert 'Enabled api key with id: %s' % api_key_id in out

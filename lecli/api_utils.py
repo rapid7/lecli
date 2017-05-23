@@ -19,6 +19,7 @@ AUTH_SECTION = 'Auth'
 URL_SECTION = 'Url'
 CONFIG = ConfigParser.ConfigParser()
 CONFIG_FILE_PATH = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
+DEFAULT_API_URL = 'https://rest.logentries.com'
 
 
 def print_config_error_and_exit(section=None, config_key=None, value=None):
@@ -305,7 +306,7 @@ def get_api_url():
         else:
             print_config_error_and_exit(URL_SECTION, 'REST API URL(%s)' % config_key)
     except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        return 'https://rest.logentries.com'
+        return DEFAULT_API_URL
 
 
 def build_url(nodes):
