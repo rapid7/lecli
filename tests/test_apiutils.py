@@ -216,19 +216,19 @@ def test_get_invalid_named_group_key(capsys):
             assert 'was not found' in out
 
 
-@patch('lecli.api_utils.get_management_url')
-def test_generate_management_url(mocked_management_url):
-    mocked_management_url.return_value = MOCK_API_URL
+@patch('lecli.api_utils.get_api_url')
+def test_generate_api_url(mocked_api_url):
+    mocked_api_url.return_value = MOCK_API_URL
 
-    result = api_utils.get_management_url()
+    result = api_utils.get_api_url()
 
     assert MOCK_API_URL in result
 
 
-def test_default_management_url():
-    result = api_utils.get_management_url()
+def test_default_api_url():
+    result = api_utils.get_api_url()
 
-    assert "https://rest.logentries.com/management" in result
+    assert "https://rest.logentries.com" in result
 
 
 def test_combine_objects():

@@ -13,8 +13,8 @@ def _url():
     """
     Get rest query url of account resource id.
     """
-    return 'https://rest.logentries.com/usage/accounts/%s' % \
-           api_utils.get_account_resource_id()
+    ordered_path_parts = ['usage', 'accounts', api_utils.get_account_resource_id()]
+    return api_utils.build_url(ordered_path_parts)
 
 
 def _handle_get_usage_response(response):
@@ -42,7 +42,7 @@ def get_usage(start, end):
     params = {'from': start,
               'to': end}
     try:
-        response = requests.get(_url(), params=params, headers=headers)
+        response = requests.get(_url()[1], params=params, headers=headers)
         if response_utils.response_error(response):
             sys.stderr.write("Getting account usage failed. Status code %s"
                              % response.status_code)

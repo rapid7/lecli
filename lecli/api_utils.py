@@ -293,36 +293,6 @@ def gensignature(api_key, date, content_type, request_method, query_path, reques
     return digest.digest()
 
 
-def get_management_url():
-    """
-    Get management url from the config file
-    """
-    config_key = 'management_url'
-    try:
-        url = CONFIG.get(URL_SECTION, config_key)
-        if validators.url(str(url)):
-            return url
-        else:
-            print_config_error_and_exit(URL_SECTION, 'Log Management URL(%s)' % config_key)
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        return 'https://rest.logentries.com/management'
-
-
-def get_query_url():
-    """
-    Get management url from the config file
-    """
-    config_key = 'query_url'
-    try:
-        url = CONFIG.get(URL_SECTION, config_key)
-        if validators.url(str(url)):
-            return url
-        else:
-            print_config_error_and_exit(URL_SECTION, 'Log Query URL(%s)' % config_key)
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        return 'https://rest.logentries.com/query'
-
-
 def get_api_url():
     """
     Get management url from the config file

@@ -18,11 +18,13 @@ from lecli import response_utils
 ALL_EVENTS_QUERY = "where(/.*/)"
 
 
-def _url(path):
+def _url(provided_path_parts=()):
     """
     Get rest query url of a specific path.
     """
-    return api_utils.get_query_url() + '/' + path
+    ordered_path_parts = ['query']
+    ordered_path_parts.extend(provided_path_parts)
+    return api_utils.build_url(ordered_path_parts)
 
 
 def handle_response(response, progress_bar):
@@ -104,7 +106,7 @@ def get_recent_events(log_keys, last_x_seconds=1200, time_range=None):
     payload = {"logs": log_keys, "leql": leql}
 
     try:
-        response = requests.post(_url('logs'), headers=api_utils.generate_headers('rw'),
+        response = requests.post(_url(('logs',))[1], headers=api_utils.generate_headers('rw'),
                                  json=payload)
         with click.progressbar(length=100, label='Progress') as progress_bar:
             handle_response(response, progress_bar)
@@ -132,7 +134,7 @@ def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=N
     payload = {"logs": log_keys, "leql": leql}
 
     try:
-        response = requests.post(_url('logs'), headers=api_utils.generate_headers('rw'),
+        response = requests.post(_url(('logs',))[1], headers=api_utils.generate_headers('rw'),
                                  json=payload)
         with click.progressbar(length=100, label='Progress') as progress_bar:
             handle_response(response, progress_bar)
@@ -159,7 +161,7 @@ def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=N
     payload = {"logs": log_keys, "leql": leql}
 
     try:
-        response = requests.post(_url('logs'), headers=api_utils.generate_headers('rw'),
+        response = requests.post(_url(('logs',))[1], headers=api_utils.generate_headers('rw'),
                                  json=payload)
         with click.progressbar(length=100, label='Progress') as progress_bar:
             handle_response(response, progress_bar)
@@ -181,8 +183,8 @@ def tail_logs(logkeys, leql, label, poll_interval):
         payload.update({'label': str(label)})
 
     try:
-        response = requests.post(_url("live") + "/logs", headers=api_utils.generate_headers('rw'),
-                                 json=payload)
+        response = requests.post(_url(('live', 'logs'))[1],
+                                 headers=api_utils.generate_headers('rw'), json=payload)
         handle_tail(response, poll_interval)
     except requests.exceptions.RequestException as error:
         click.echo(error)

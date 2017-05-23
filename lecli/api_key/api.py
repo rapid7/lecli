@@ -7,15 +7,13 @@ from lecli import api_utils
 from lecli import response_utils
 
 
-def _url(api_key_id=None):
+def _url(provided_parts=()):
     """
     Get rest query "path" and "url" respectively
     """
-    nodes = ['management', 'accounts', api_utils.get_account_resource_id(), 'apikeys']
-    if api_key_id:
-        nodes.append(api_key_id)
-
-    return api_utils.build_url(nodes)
+    ordered_path_parts = ['management', 'accounts', api_utils.get_account_resource_id(), 'apikeys']
+    ordered_path_parts.extend(provided_parts)
+    return api_utils.build_url(ordered_path_parts)
 
 
 def handle_api_key_response(response):
@@ -32,7 +30,7 @@ def delete(api_key_id):
     """
     Delete an api key with the provided ID
     """
-    action, url = _url(api_key_id)
+    action, url = _url((api_key_id,))
     headers = api_utils.generate_headers('owner', method='DELETE', body='', action=action)
 
     try:
@@ -51,7 +49,7 @@ def get(api_key_id):
     """
     Get a specific apikey
     """
-    _, url = _url(api_key_id)
+    _, url = _url((api_key_id,))
     headers = api_utils.generate_headers('rw')
     try:
         response = requests.get(url, headers=headers)
@@ -101,7 +99,7 @@ def update(api_key_id, active):
     """
     Enable or disable an api key with given ID
     """
-    action, url = _url(api_key_id)
+    action, url = _url((api_key_id,))
     payload = {
         "apikey":
             {

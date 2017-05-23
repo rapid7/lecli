@@ -87,8 +87,7 @@ def test_prettyprint_statistics_groups(capsys):
         }
     }
 
-    httpretty.register_uri(httpretty.GET, MOCK_API_URL,
-                           content_type='application/json',
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL, content_type='application/json',
                            body=json.dumps(sample_group_response))
     response = requests.get(MOCK_API_URL)
     api.prettyprint_statistics(response)
@@ -174,8 +173,7 @@ def test_prettyprint_statistics_timeseries_with_empty_result(capsys):
         }
     }
 
-    httpretty.register_uri(httpretty.GET, MOCK_API_URL,
-                           content_type='application/json',
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL, content_type='application/json',
                            body=json.dumps(sample_empty_ts_response))
     response = requests.get(MOCK_API_URL)
     api.prettyprint_statistics(response)
@@ -190,8 +188,7 @@ def test_prettyprint_statistics_timeseries_with_empty_result(capsys):
 def test_prettyprint_events(capsys):
     setup_httpretty()
 
-    httpretty.register_uri(httpretty.GET, MOCK_API_URL,
-                           content_type='application/json',
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL, content_type='application/json',
                            body=json.dumps(SAMPLE_EVENTS_RESPONSE))
     response = requests.get(MOCK_API_URL)
     api.prettyprint_events(response)
@@ -209,13 +206,12 @@ def test_prettyprint_events(capsys):
 @patch('lecli.query.api._url')
 def test_post_query_with_time(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
-    mocked_url.return_value = MOCK_API_URL
+    mocked_url.return_value = '', MOCK_API_URL
 
     httpretty.register_uri(httpretty.POST, MOCK_API_URL,
                            content_type='application/json',
                            body=json.dumps(SAMPLE_EVENTS_RESPONSE))
-    api.post_query('', '', time_from='from',
-                   time_to='to')
+    api.post_query('', '', time_from='from', time_to='to')
 
     out, err = capsys.readouterr()
 
@@ -231,7 +227,7 @@ def test_post_query_with_time(mocked_url, mocked_generate_headers, capsys):
 @patch('lecli.query.api._url')
 def test_post_query_with_date(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
-    mocked_url.return_value = MOCK_API_URL
+    mocked_url.return_value = '', MOCK_API_URL
     httpretty.register_uri(httpretty.POST, MOCK_API_URL,
                            content_type='application/json',
                            body=json.dumps(SAMPLE_EVENTS_RESPONSE))
@@ -251,7 +247,7 @@ def test_post_query_with_date(mocked_url, mocked_generate_headers, capsys):
 @patch('lecli.query.api._url')
 def test_post_query_with_relative_range(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
-    mocked_url.return_value = MOCK_API_URL
+    mocked_url.return_value = '', MOCK_API_URL
     httpretty.register_uri(httpretty.POST, MOCK_API_URL,
                            content_type='application/json',
                            body=json.dumps(SAMPLE_EVENTS_RESPONSE))
@@ -272,7 +268,7 @@ def test_post_query_with_relative_range(mocked_url, mocked_generate_headers, cap
 @patch('lecli.query.api._url')
 def test_get_events(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
-    mocked_url.return_value = MOCK_API_URL
+    mocked_url.return_value = '', MOCK_API_URL
 
     httpretty.register_uri(httpretty.POST, MOCK_API_URL,
                            content_type='application/json',
@@ -293,7 +289,7 @@ def test_get_events(mocked_url, mocked_generate_headers, capsys):
 @patch('lecli.query.api._url')
 def test_get_recent_events(mocked_url, mocked_generate_headers, capsys):
     setup_httpretty()
-    mocked_url.return_value = MOCK_API_URL
+    mocked_url.return_value = '', MOCK_API_URL
 
     httpretty.register_uri(httpretty.POST, MOCK_API_URL,
                            content_type='application/json',
@@ -363,8 +359,8 @@ def test_continue_request(mocked_headers, mocked_response_handle):
 def test_live_tail_api(mocked_url, mocked_handle_tail, mocked_generate_headers):
     setup_httpretty()
 
-    mocked_url.return_value = MOCK_API_URL
-    httpretty.register_uri(httpretty.POST, MOCK_API_URL + "/logs", content_type='application/json',
+    mocked_url.return_value = '', MOCK_API_URL
+    httpretty.register_uri(httpretty.POST, MOCK_API_URL, content_type='application/json',
                            body=json.dumps({}))
 
     api.tail_logs(logkeys=str(uuid.uuid4()), label=None, leql=None, poll_interval=0.5)

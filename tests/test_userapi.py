@@ -26,7 +26,7 @@ def test_get_owner(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
     mocked_owner_apikey.return_value = str(uuid.uuid4())
     mocked_owner_apikey_id.return_value = str(uuid.uuid4())
     mocked_account_resource_id.return_value = str(uuid.uuid4())
-    mocked_url.return_value = MOCK_API_URL
+    mocked_url.return_value = '', MOCK_API_URL
 
     httpretty.register_uri(httpretty.GET, MOCK_API_URL, body='{"owners": "ownerinfo"}',
                            content_type='application/json', )
@@ -47,11 +47,10 @@ def test_delete_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
     mocked_owner_apikey.return_value = str(uuid.uuid4())
     mocked_owner_apikey_id.return_value = str(uuid.uuid4())
     mocked_account_resource_id.return_value = str(uuid.uuid4())
-    mocked_url.return_value = MOCK_API_URL
+    mocked_url.return_value = '', MOCK_API_URL
 
     user_key = str(uuid.uuid4())
-    dest_url = MOCK_API_URL + '/' + user_key
-    httpretty.register_uri(httpretty.DELETE, dest_url, status=204)
+    httpretty.register_uri(httpretty.DELETE, MOCK_API_URL, status=204)
 
     api.delete_user(user_key)
 
@@ -69,14 +68,11 @@ def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_
     mocked_owner_apikey.return_value = str(uuid.uuid4())
     mocked_owner_apikey_id.return_value = str(uuid.uuid4())
     mocked_account_resource_id.return_value = str(uuid.uuid4())
-    mocked_url.return_value = MOCK_API_URL
+    mocked_url.return_value = '', MOCK_API_URL
 
     user_key = str(uuid.uuid4())
-    dest_url = MOCK_API_URL + '/' + user_key
-    httpretty.register_uri(httpretty.POST, dest_url,
-                           body=json.dumps(DUMMY_USER_RESPONSE),
-                           status=200,
-                           content_type='application/json')
+    httpretty.register_uri(httpretty.POST, MOCK_API_URL, body=json.dumps(DUMMY_USER_RESPONSE),
+                           status=200, content_type='application/json')
 
     api.add_existing_user(user_key)
 
@@ -94,7 +90,7 @@ def test_add_new_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
     mocked_owner_apikey.return_value = str(uuid.uuid4())
     mocked_owner_apikey_id.return_value = str(uuid.uuid4())
     mocked_account_resource_id.return_value = str(uuid.uuid4())
-    mocked_url.return_value = MOCK_API_URL
+    mocked_url.return_value = '', MOCK_API_URL
 
     httpretty.register_uri(httpretty.POST, MOCK_API_URL, body=json.dumps(DUMMY_USER_RESPONSE),
                            status=200, content_type='application/json')
@@ -115,7 +111,7 @@ def test_list_users(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
     mocked_owner_apikey.return_value = str(uuid.uuid4())
     mocked_owner_apikey_id.return_value = str(uuid.uuid4())
     mocked_account_resource_id.return_value = str(uuid.uuid4())
-    mocked_url.return_value = MOCK_API_URL
+    mocked_url.return_value = '', MOCK_API_URL
 
     httpretty.register_uri(httpretty.GET, MOCK_API_URL, body='{"users":"userinfo"}',
                            content_type="application/json")

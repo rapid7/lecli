@@ -9,12 +9,13 @@ from lecli import api_utils
 from lecli import response_utils
 
 
-def _url():
+def _url(provided_path_parts=()):
     """
     Get rest query url of account resource id.
     """
-    return '%s/accounts/%s/teams' % \
-           (api_utils.get_management_url(), api_utils.get_account_resource_id())
+    ordered_path_parts = ['management', 'accounts', api_utils.get_account_resource_id(), 'teams']
+    ordered_path_parts.extend(provided_path_parts)
+    return api_utils.build_url(ordered_path_parts)
 
 
 def print_teams(response):
@@ -55,7 +56,7 @@ def get_teams():
     """
     headers = api_utils.generate_headers('rw')
     try:
-        response = requests.request('GET', _url(), data='', headers=headers)
+        response = requests.get(_url()[1], data='', headers=headers)
         handle_get_teams_response(response)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
@@ -69,8 +70,7 @@ def get_team(team_id):
     headers = api_utils.generate_headers('rw')
     params = {'teamid': team_id}
     try:
-        response = requests.get(_url() + "/" + team_id, params=params,
-                                headers=headers)
+        response = requests.get(_url((team_id,))[1], params=params, headers=headers)
         handle_get_teams_response(response)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
@@ -90,7 +90,7 @@ def create_team(name):
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.post(_url(), json=params, headers=headers)
+        response = requests.post(_url()[1], json=params, headers=headers)
         if response_utils.response_error(response):
             print 'Creating team failed, status code: %d' % response.status_code
             sys.exit(1)
@@ -106,11 +106,10 @@ def delete_team(team_id):
     """
     Delete a team with the provided team ID.
     """
-    url = _url() + '/' + team_id
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.delete(url, headers=headers)
+        response = requests.delete(_url((team_id,))[1], headers=headers)
         if response_utils.response_error(response):  # Check response has no errors
             print 'Delete team failed, status code: %d' % response.status_code
             sys.exit(1)
@@ -125,7 +124,6 @@ def rename_team(team_id, team_name):
     """
     Rename team with the provided team_id.
     """
-    url = _url() + '/' + team_id
     params = {
         'team': {
             'name': team_name,
@@ -139,7 +137,7 @@ def rename_team(team_id, team_name):
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.patch(url, json=params, headers=headers)
+        response = requests.patch(_url((team_id,))[1], json=params, headers=headers)
         if response_utils.response_error(response):  # Check response has no errors
             print 'Renaming team with id: %s failed, status code: %d' \
                   % (team_id, response.status_code)
@@ -158,10 +156,8 @@ def add_user_to_team(team_id, user_key):
     headers = api_utils.generate_headers('rw')
     params = {'teamid': team_id}
     try:
-        response = requests.request('GET', _url() + '/' + team_id, params=params,
-                                    headers=headers)
+        response = requests.get(_url((team_id,))[1], params=params, headers=headers)
         if response.status_code == 200:
-            url = _url() + '/' + team_id
             params = {
                 'team': {
                     'name': response.json()['team']['name'],
@@ -174,7 +170,7 @@ def add_user_to_team(team_id, user_key):
             }
             headers = api_utils.generate_headers('rw')
             try:
-                response = requests.patch(url, json=params, headers=headers)
+                response = requests.patch(_url((team_id,))[1], json=params, headers=headers)
                 if response_utils.response_error(response):  # Check response has no errors
                     print 'Adding user to team with key: %s failed, status code: %d' \
                           % (team_id, response.status_code)
@@ -200,10 +196,9 @@ def delete_user_from_team(team_id, user_key):
     headers = api_utils.generate_headers('rw')
     params = {'teamid': team_id}
     try:
-        response = requests.request('GET', _url() + '/' + team_id, params=params,
+        response = requests.request('GET', _url((team_id,))[1], params=params,
                                     headers=headers)
         if response.status_code == 200:
-            url = _url() + '/' + team_id
             params = {
                 'team': {
                     'name': response.json()['team']['name'],
@@ -213,7 +208,7 @@ def delete_user_from_team(team_id, user_key):
             }
             headers = api_utils.generate_headers('rw')
             try:
-                response = requests.put(url, json=params, headers=headers)
+                response = requests.put(_url((team_id,))[1], json=params, headers=headers)
                 if response_utils.response_error(response):  # Check response has no errors
                     print 'Deleting user from team with key: %s failed, status code: %d' \
                           % (team_id, response.status_code)

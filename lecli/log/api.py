@@ -8,14 +8,13 @@ from lecli import api_utils
 from lecli import response_utils
 
 
-def _url(resource='logs', resource_id=None):
+def _url(provided_parts=('logs',)):
     """
     Get rest query url of log resource id
     """
-    nodes = ['management', resource]
-    if resource_id:
-        nodes.append(resource_id)
-    return api_utils.build_url(nodes)
+    ordered_path_parts = ['management']
+    ordered_path_parts.extend(provided_parts)
+    return api_utils.build_url(ordered_path_parts)
 
 
 def handle_get_log_response(response):
@@ -47,7 +46,7 @@ def get_log(log_id):
     """
     headers = api_utils.generate_headers('ro')
     try:
-        response = requests.get(_url(resource_id=log_id)[1], headers=headers)
+        response = requests.get(_url(('logs', log_id))[1], headers=headers)
         handle_get_log_response(response)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
@@ -89,7 +88,7 @@ def delete_log(log_id):
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.delete(_url(resource_id=log_id)[1], headers=headers)
+        response = requests.delete(_url(('logs', log_id))[1], headers=headers)
         if response_utils.response_error(response):
             sys.stderr.write('Delete log failed, status code: %d' % response.status_code)
             sys.exit(1)
@@ -107,7 +106,7 @@ def replace_log(log_id, params):
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.put(_url(resource_id=log_id)[1], json=params, headers=headers)
+        response = requests.put(_url(('logs', log_id))[1], json=params, headers=headers)
         if response_utils.response_error(response):
             sys.stderr.write('Update log failed with status code: %d\n' % response.status_code)
             sys.exit(1)
@@ -126,7 +125,7 @@ def rename_log(log_id, log_name):
     headers = api_utils.generate_headers('ro')
 
     try:
-        response = requests.get(_url(resource_id=log_id)[1], headers=headers)
+        response = requests.get(_url(('logs', log_id))[1], headers=headers)
         if response_utils.response_error(response):
             sys.stderr.write('Rename log failed with status code: %d\n' % response.status_code)
             sys.exit(1)
@@ -151,7 +150,7 @@ def check_logset_exists(params):
 
         for item in updates:
             if item['id']:
-                url = _url('logsets', item['id'])[1]
+                url = _url(('logsets', item['id']))[1]
                 headers = api_utils.generate_headers('ro')
                 try:
                     response = requests.get(url, headers=headers)
@@ -167,7 +166,7 @@ def update_log(log_id, params):
     """
     Update a log with the details provided
     """
-    url = _url(resource_id=log_id)[1]
+    url = _url(('logs', log_id))[1]
     headers = api_utils.generate_headers('ro')
 
     if check_logset_exists(params):
