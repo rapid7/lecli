@@ -49,8 +49,9 @@ def get(api_key_id):
     """
     Get a specific apikey
     """
-    _, url = _url((api_key_id,))
-    headers = api_utils.generate_headers('rw')
+    action, url = _url((api_key_id,))
+    headers = api_utils.generate_headers('rw', method='GET', body='',
+                                         action=action)
     try:
         response = requests.get(url, headers=headers)
         handle_api_key_response(response)
@@ -59,12 +60,13 @@ def get(api_key_id):
         sys.exit(1)
 
 
-def list():
+def list(owner=False):
     """
     Get apikeys associated with the account - this uses rw apikey so does not return owner api keys
     """
     action, url = _url()
-    headers = api_utils.generate_headers('rw', method='GET', body='', action=action)
+    headers = api_utils.generate_headers('owner' if owner else 'rw', method='GET', body='',
+                                         action=action)
     try:
         response = requests.get(url, headers=headers)
         handle_api_key_response(response)

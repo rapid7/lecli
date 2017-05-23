@@ -134,7 +134,19 @@ Logentries REST API also supports relative time ranges instead of absolute `star
   - week, weeks
   - month, months
   - year, years
-    
+
+####Live Tail
+Logentries REST API supports tailing log events in real time. Lecli makes use of this with `tail events` command. While logkeys(space separated log keys) is a mandatory argument for this command, `--leql`, `--lognick` and `--loggroup` options are supported for this command.
+Another option is `--poll-interval` or `-i`, which is the request interval to the live tail API. Defaults to 1.0 seconds. As this may affect api key limits, it should be used carefully.
+
+Example usage:
+
+    lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456
+    lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456 -i 5.0 --leql 'where(event=login)'
+    lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456 -q 'where(event)'
+    lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456 --loggroup myloggroup
+    lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456 --lognick mylognick
+
 
 **Log Nicknames, Log Groups, and Query Nicknames**
 --------------------------------------------------
@@ -523,3 +535,73 @@ Example:
 
     lecli replace logset <logset_id> <path_to_json_file>
     
+
+**Api Key Management**
+--------------------------
+Api keys of an account can be managed via lecli. Lecli supports creating(POST), listing(GET ALL), retrieving(GET), deleting(DELETE) and updating(PATCH) api keys via command line. 
+
+####List api keys
+Get a list of api keys belongs to the used account.
+Uses `rw` or `owner` api key.
+
+Note: this does not show owner api key unless `--owner option is supplied.
+
+Example:
+
+    lecli get apikeys
+    lecli get apikeys --owner
+
+####Get an api key
+Get a specific api keys
+Uses `rw` api key.
+
+Mandatory positional argument:
+- UUID of the api key to be retrieved.
+
+Example:
+
+    lecli get apikey <uuid of the apikey>
+
+####Create a new api key
+Create a new api key with the given arguments from a provided json file.
+Uses `owner` api key.
+
+Example JSON:
+
+    {
+        "api_key": [
+            {
+                "acl_type": "ReadOnly",
+                "active": true,
+            }
+        ]
+    }
+    
+Note: If an acl_type of api key exists already, it cannot be created again. It needs to be `deleted` first to be created.
+
+####Update an api key
+Update an api key to either disable or enable it.
+Uses `owner` api key.
+
+Mandatory positional argument:
+- UUID of the api key to be updated.
+
+Optional named arguments:
+- '--enable': Enable the given api key
+- '--disable': Disable the given api key
+    
+Examples:
+
+    lecli update apikey <uuid of the api key> --enable
+    lecli update apikey <uuid of the api key> --disable
+
+####Delete an api key
+Delete an api key.
+Uses `owner` api key.
+
+Mandatory positional argument:
+- UUID of the api key to be deleted.
+
+Example:
+
+    lecli delete apikey <uuid of the api key>

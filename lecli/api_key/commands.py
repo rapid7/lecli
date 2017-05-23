@@ -16,11 +16,12 @@ def get_api_key(api_key):
 
 
 @click.command()
-def get_api_keys():
+@click.option('--owner/--no-owner', default=False)
+def get_api_keys(owner):
     """
     Get all api keys
     """
-    api.list()
+    api.list(owner)
 
 
 @click.command()
