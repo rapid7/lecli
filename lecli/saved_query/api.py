@@ -13,7 +13,7 @@ def _url():
     """
     Get rest query url of account resource id.
     """
-    return 'https://rest.logentries.com/query/saved_queries'
+    return api_utils.get_query_url() + '/saved_queries'
 
 
 def _pretty_print_saved_query(query):

@@ -62,8 +62,6 @@ def init_config():
         dummy_config.add_section('LogNicknames')
         dummy_config.add_section("LogGroups")
         dummy_config.add_section('Url')
-        dummy_config.set(URL_SECTION, 'management_url', 'https://rest.logentries.com/management')
-        dummy_config.set(URL_SECTION, 'query_url', 'https://rest.logentries.com/query')
         dummy_config.set(URL_SECTION, 'api_url', 'https://rest.logentries.com')
 
         dummy_config.write(config_file)

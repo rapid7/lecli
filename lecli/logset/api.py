@@ -1,12 +1,14 @@
 """
 Logset API module.
 """
-import sys
 import json
+import sys
+
 import requests
 
 from lecli import api_utils
 from lecli import response_utils
+
 
 def _url():
     """
@@ -199,6 +201,7 @@ def delete_log(logset_id, log_id):
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
+
 
 def replace_logset_from_file(logset_id, filename):
     """Helper method to load file contents as json

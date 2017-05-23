@@ -19,8 +19,8 @@ def response_error(response):
     except requests.exceptions.HTTPError as error:
         print "Request Error:", error.message
         if response.status_code == 500:
-            sys.stderr.write('Your account may have no owner assigned. ' \
-                  'Please visit www.logentries.com for information on '
+            sys.stderr.write('Your account may have no owner assigned. '
+                             'Please visit www.logentries.com for information on '
                              'assigning an account owner. \n')
         return True
 

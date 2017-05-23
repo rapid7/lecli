@@ -1,11 +1,25 @@
 import json
+import uuid
 
 import httpretty
 from mock import patch
 
-from examples import misc_examples as misc_ex
-from examples import response_examples as resp_ex
 from lecli.team import api
+
+MOCK_API_URL = 'http://mydummylink.com'
+TEAM_RESPONSE = {
+    'id': '123456789012345678901234567890123456',
+    'name': 'my_team',
+    'users': [
+        {
+            'id': '123456789012345678901234567890123456',
+            'links': {
+                'href': 'https://dummy.link',
+                'ref': 'Self'
+            }
+        }
+    ]
+}
 
 
 @httpretty.activate
@@ -13,13 +27,13 @@ from lecli.team import api
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team.api._url')
 def test_get_teams(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
-    mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
-    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_TEAMSAPI_URL,
+    mocked_url.return_value = MOCK_API_URL
+    mocked_rw_apikey.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL,
                            status=200,
                            content_type='application/json',
-                           body=json.dumps({'teams': [resp_ex.team_response]}))
+                           body=json.dumps({'teams': [TEAM_RESPONSE]}))
 
     api.get_teams()
     out, err = capsys.readouterr()
@@ -32,14 +46,14 @@ def test_get_teams(mocked_url, mocked_rw_apikey, mocked_account_resource_id, cap
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team.api._url')
 def test_get_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
-    team_id = misc_ex.TEST_TEAM_ID
-    mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
-    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_TEAMSAPI_URL + '/' + team_id,
+    team_id = str(uuid.uuid4())
+    mocked_url.return_value = MOCK_API_URL
+    mocked_rw_apikey.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL + '/' + team_id,
                            status=200,
                            content_type='application/json',
-                           body=json.dumps({'team': resp_ex.team_response}))
+                           body=json.dumps({'team': TEAM_RESPONSE}))
 
     api.get_team(team_id)
     out, err = capsys.readouterr()
@@ -52,10 +66,10 @@ def test_get_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, caps
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team.api._url')
 def test_create_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
-    mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
-    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    httpretty.register_uri(httpretty.POST, misc_ex.MOCK_TEAMSAPI_URL,
+    mocked_url.return_value = MOCK_API_URL
+    mocked_rw_apikey.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    httpretty.register_uri(httpretty.POST, MOCK_API_URL,
                            status=201,
                            content_type='application/json')
 
@@ -70,17 +84,17 @@ def test_create_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, c
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team.api._url')
 def test_delete_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
-    test_team_id = misc_ex.TEST_TEAM_ID
-    mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
-    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    httpretty.register_uri(httpretty.DELETE, misc_ex.MOCK_TEAMSAPI_URL + "/" + test_team_id,
+    test_team_id = str(uuid.uuid4())
+    mocked_url.return_value = MOCK_API_URL
+    mocked_rw_apikey.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    httpretty.register_uri(httpretty.DELETE, MOCK_API_URL + "/" + test_team_id,
                            status=204)
 
     api.delete_team(test_team_id)
     out, err = capsys.readouterr()
 
-    assert "Deleted team with id: %s\n" % misc_ex.TEST_TEAM_ID == out
+    assert "Deleted team with id: %s\n" % test_team_id == out
 
 
 @httpretty.activate
@@ -88,13 +102,11 @@ def test_delete_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, c
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team.api._url')
 def test_rename_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
-    test_team_id = misc_ex.TEST_TEAM_ID
-    mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
-    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    httpretty.register_uri(httpretty.PATCH,
-                           misc_ex.MOCK_TEAMSAPI_URL + "/" + test_team_id,
-                           status=200,
+    test_team_id = str(uuid.uuid4())
+    mocked_url.return_value = MOCK_API_URL
+    mocked_rw_apikey.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    httpretty.register_uri(httpretty.PATCH, MOCK_API_URL + "/" + test_team_id, status=200,
                            content_type='application/json')
 
     new_name_for_team = "new_test_team_name"
@@ -109,16 +121,14 @@ def test_rename_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, c
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team.api._url')
 def test_add_user_to_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
-    test_team_id = misc_ex.TEST_TEAM_ID
-    mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
-    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_TEAMSAPI_URL + "/" + test_team_id,
-                           status=200,
-                           body=json.dumps({'team': resp_ex.team_response}),
+    test_team_id = str(uuid.uuid4())
+    mocked_url.return_value = MOCK_API_URL
+    mocked_rw_apikey.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL + "/" + test_team_id, status=200,
+                           body=json.dumps({'team': TEAM_RESPONSE}),
                            content_type='application/json')
-    httpretty.register_uri(httpretty.PATCH, misc_ex.MOCK_TEAMSAPI_URL + "/" + test_team_id,
-                           status=200,
+    httpretty.register_uri(httpretty.PATCH, MOCK_API_URL + "/" + test_team_id, status=200,
                            content_type='application/json')
 
     user_id_to_add = "user_id"
@@ -133,16 +143,14 @@ def test_add_user_to_team(mocked_url, mocked_rw_apikey, mocked_account_resource_
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.team.api._url')
 def test_delete_user_from_team(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
-    test_team_id = misc_ex.TEST_TEAM_ID
-    mocked_url.return_value = misc_ex.MOCK_TEAMSAPI_URL
-    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_TEAMSAPI_URL + "/" + test_team_id,
-                           status=200,
-                           body=json.dumps({'team': resp_ex.team_response}),
+    test_team_id = str(uuid.uuid4())
+    mocked_url.return_value = MOCK_API_URL
+    mocked_rw_apikey.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL + "/" + test_team_id, status=200,
+                           body=json.dumps({'team': TEAM_RESPONSE}),
                            content_type='application/json')
-    httpretty.register_uri(httpretty.PUT, misc_ex.MOCK_TEAMSAPI_URL + "/" + test_team_id,
-                           status=200,
+    httpretty.register_uri(httpretty.PUT, MOCK_API_URL + "/" + test_team_id, status=200,
                            content_type='application/json')
 
     user_id_to_add = "user_id"
