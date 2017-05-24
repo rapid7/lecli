@@ -153,11 +153,9 @@ def get_recent_events(logkeys, lognick, loggroup, last, relative_range):
               help='Name of log group defined in config file')
 @click.option('-l', '--leql', type=click.STRING, default=None,
               help='LEQL query to filter')
-@click.option('--label', type=click.UUID, default=None,
-              help='Label to filter')
 @click.option('-i', '--poll_interval', type=click.FLOAT, default=1.0,
               help='Request interval of live tail in seconds, default is 1.0 second.')
-def tail_events(logkeys, lognick, loggroup, leql, label, poll_interval):
+def tail_events(logkeys, lognick, loggroup, leql, poll_interval):
     """Tail events of given logkey(s) with provided options"""
     if lognick:
         logkeys = api_utils.get_named_logkey(lognick)
@@ -165,6 +163,6 @@ def tail_events(logkeys, lognick, loggroup, leql, label, poll_interval):
         logkeys = api_utils.get_named_logkey_group(loggroup)
 
     if len(logkeys) > 0:
-        api.tail_logs(logkeys, leql, label, poll_interval)
+        api.tail_logs(logkeys, leql, poll_interval)
     else:
         click.echo("Example usage: lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456")

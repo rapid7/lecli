@@ -172,7 +172,7 @@ def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=N
         sys.exit(1)
 
 
-def tail_logs(logkeys, leql, label, poll_interval):
+def tail_logs(logkeys, leql, poll_interval):
     """
     tail given logs
     """
@@ -180,9 +180,6 @@ def tail_logs(logkeys, leql, label, poll_interval):
 
     if leql:
         payload.update({'leql': {'statement': leql}})
-
-    if label:
-        payload.update({'label': str(label)})
 
     try:
         response = requests.post(_url(('live', 'logs'))[1],

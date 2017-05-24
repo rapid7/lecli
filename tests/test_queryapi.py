@@ -363,7 +363,7 @@ def test_live_tail_api(mocked_url, mocked_handle_tail, mocked_generate_headers):
     httpretty.register_uri(httpretty.POST, MOCK_API_URL, content_type='application/json',
                            body=json.dumps({}))
 
-    api.tail_logs(logkeys=str(uuid.uuid4()), label=None, leql=None, poll_interval=0.5)
+    api.tail_logs(logkeys=str(uuid.uuid4()), leql=None, poll_interval=0.5)
 
     assert mocked_generate_headers.called
     assert mocked_handle_tail.called
