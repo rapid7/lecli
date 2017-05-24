@@ -8,6 +8,7 @@ from lecli.query import api
 
 
 @click.command()
+# nargs (-1) makes sure multiple log keys is supported
 @click.argument('logkeys', type=click.STRING, nargs=-1)
 @click.option('-n', '--lognick', default=None,
               help='Nickname of log in config file')
@@ -66,20 +67,21 @@ def query(logkeys, lognick, loggroup, leql, querynick, timefrom, timeto, datefro
 
 
 @click.command()
+# nargs (-1) makes sure multiple log keys is supported
 @click.argument('logkeys', type=click.STRING, nargs=-1)
-@click.option('-n', '--lognick', default=None,
+@click.option('-n', '--lognick', type=click.STRING,
               help='Nickname of log in config file')
-@click.option('-g', '--loggroup', default=None,
+@click.option('-g', '--loggroup', type=click.STRING,
               help='Name of log group defined in config file')
-@click.option('-f', '--timefrom',
-              help='Time to get events from (unix epoch)', type=int)
-@click.option('-t', '--timeto',
-              help='Time to get events to (unix epoch)', type=int)
-@click.option('--datefrom',
+@click.option('-f', '--timefrom', type=click.INT,
+              help='Time to get events from (unix epoch)')
+@click.option('-t', '--timeto', type=click.INT,
+              help='Time to get events to (unix epoch)')
+@click.option('--datefrom', type=click.STRING,
               help='Date/Time to get events from (ISO-8601 datetime)')
-@click.option('--dateto',
+@click.option('--dateto', type=click.STRING,
               help='Date/Time to get events to (ISO-8601 datetime)')
-@click.option('-r', '--relative_range',
+@click.option('-r', '--relative_range', type=click.STRING,
               help='Relative range to query until now (Examples: today, yesterday, '
                    'last x timeunit: last 2 hours, last 6 weeks etc.')
 def get_events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto, relative_range):
@@ -110,15 +112,16 @@ def get_events(logkeys, lognick, loggroup, timefrom, timeto, datefrom, dateto, r
 
 
 @click.command()
+# nargs (-1) makes sure multiple log keys is supported
 @click.argument('logkeys', type=click.STRING, nargs=-1)
-@click.option('-n', '--lognick', default=None,
+@click.option('-n', '--lognick', type=click.STRING, default=None,
               help='Nickname of log in config file')
-@click.option('-g', '--loggroup', default=None,
+@click.option('-g', '--loggroup', type=click.STRING, default=None,
               help='Name of log group defined in config file')
-@click.option('-l', '--last', default=1200,
+@click.option('-l', '--last', type=click.INT, default=1200,
               help='Time window from now to now-X in seconds over which events will be returned '
                    '(Defaults to 20 mins)')
-@click.option('-r', '--relative_range',
+@click.option('-r', '--relative_range', type=click.STRING,
               help='Relative range to query until now (Examples: today, yesterday, '
                    'last x timeunit: last 2 hours, last 6 weeks etc.')
 def get_recent_events(logkeys, lognick, loggroup, last, relative_range):
@@ -139,3 +142,27 @@ def get_recent_events(logkeys, lognick, loggroup, last, relative_range):
         click.echo('Example usage: lecli get recentevents -n mynicknamedlog -l 200')
         click.echo('Example usage: lecli get recentevents -g myloggroup -l 200')
         click.echo("Example usage: lecli get recentevents -g myloggroup -r 'last 50 mins'")
+
+
+@click.command()
+# nargs (-1) makes sure multiple log keys is supported
+@click.argument('logkeys', type=click.STRING, nargs=-1)
+@click.option('-n', '--lognick', type=click.STRING, default=None,
+              help='Nickname of log in config file')
+@click.option('-g', '--loggroup', type=click.STRING, default=None,
+              help='Name of log group defined in config file')
+@click.option('-l', '--leql', type=click.STRING, default=None,
+              help='LEQL query to filter')
+@click.option('-i', '--poll_interval', type=click.FLOAT, default=1.0,
+              help='Request interval of live tail in seconds, default is 1.0 second.')
+def tail_events(logkeys, lognick, loggroup, leql, poll_interval):
+    """Tail events of given logkey(s) with provided options"""
+    if lognick:
+        logkeys = api_utils.get_named_logkey(lognick)
+    elif loggroup:
+        logkeys = api_utils.get_named_logkey_group(loggroup)
+
+    if len(logkeys) > 0:
+        api.tail_logs(logkeys, leql, poll_interval)
+    else:
+        click.echo("Example usage: lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456")

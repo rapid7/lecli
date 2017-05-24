@@ -1,7 +1,9 @@
+import uuid
+
+import time
 from click.testing import CliRunner
 from mock import patch
 
-from examples import misc_examples as misc_ex
 from lecli import deprecated_commands
 
 
@@ -22,7 +24,7 @@ def test_userdel(mocked_delete_user):
     assert "This method is deprecated" in result.output
     assert "Example usage: lecli delete user -u 12345678-aaaa-bbbb-1234-1234cb123456" in result.output
 
-    runner.invoke(deprecated_commands.deleteuser, ['-u', misc_ex.TEST_USER_KEY])
+    runner.invoke(deprecated_commands.deleteuser, ['-u', str(uuid.uuid4())])
     assert mocked_delete_user.called
 
 
@@ -51,7 +53,7 @@ def test_userlist(mocked_list_users):
 @patch('lecli.query.api.get_recent_events')
 def test_recentevents(mocked_recent_events):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.recentevents, [str(misc_ex.TEST_LOG_GROUP)])
+    result = runner.invoke(deprecated_commands.recentevents, [''])
 
     assert "This method is deprecated" in result.output
     assert mocked_recent_events.called
@@ -60,7 +62,7 @@ def test_recentevents(mocked_recent_events):
 @patch('lecli.query.api.get_recent_events')
 def test_recentevents_with_relative_range(mocked_recent_events):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.recentevents, [str(misc_ex.TEST_LOG_GROUP), '-r', misc_ex.RELATIVE_TIME])
+    result = runner.invoke(deprecated_commands.recentevents, ['', '-r', 'last 3 min'])
 
     assert "This method is deprecated" in result.output
     assert mocked_recent_events.called
@@ -69,8 +71,8 @@ def test_recentevents_with_relative_range(mocked_recent_events):
 @patch('lecli.query.api.get_events')
 def test_events(mocked_get_events):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.events, [str(misc_ex.TEST_LOG_GROUP), '-f', misc_ex.TIME_FROM, '-t',
-                               misc_ex.TIME_TO])
+    result = runner.invoke(deprecated_commands.events, ['', '-f', int(time.time()), '-t',
+                                                        int(time.time())])
 
     assert "This method is deprecated" in result.output
     assert mocked_get_events.called
@@ -79,7 +81,7 @@ def test_events(mocked_get_events):
 @patch('lecli.query.api.get_events')
 def test_events_with_relative_range(mocked_get_events):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.events, [str(misc_ex.TEST_LOG_GROUP), '-r', misc_ex.RELATIVE_TIME])
+    result = runner.invoke(deprecated_commands.events, ['', '-r', 'last 3 min'])
 
     assert "This method is deprecated" in result.output
     assert mocked_get_events.called
@@ -97,7 +99,7 @@ def test_get_teams(mocked_get_teams):
 @patch('lecli.team.api.get_team')
 def test_get_team(mocked_get_team):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.getteam, [str(misc_ex.TEST_TEAM_ID)])
+    result = runner.invoke(deprecated_commands.getteam, [str(uuid.uuid4())])
 
     assert "This method is deprecated" in result.output
     assert mocked_get_team.called
@@ -115,7 +117,7 @@ def test_create_team(mocked_create_team):
 @patch('lecli.team.api.delete_team')
 def test_delete_team(mocked_delete_team):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.deleteteam, [str(misc_ex.TEST_TEAM_ID)])
+    result = runner.invoke(deprecated_commands.deleteteam, [str(uuid.uuid4())])
 
     assert "This method is deprecated" in result.output
     assert mocked_delete_team.called
@@ -124,7 +126,7 @@ def test_delete_team(mocked_delete_team):
 @patch('lecli.team.api.rename_team')
 def test_rename_team(mocked_rename_team):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.renameteam, [str(misc_ex.TEST_TEAM_ID), "new_name"])
+    result = runner.invoke(deprecated_commands.renameteam, [str(uuid.uuid4()), "new_name"])
 
     assert "This method is deprecated" in result.output
     assert mocked_rename_team.called
@@ -133,7 +135,7 @@ def test_rename_team(mocked_rename_team):
 @patch('lecli.team.api.add_user_to_team')
 def test_add_user_to_team(mocked_add_user):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.addusertoteam, [str(misc_ex.TEST_TEAM_ID), "test_user_name"])
+    result = runner.invoke(deprecated_commands.addusertoteam, [str(uuid.uuid4()), "test_user_name"])
 
     assert "This method is deprecated" in result.output
     assert mocked_add_user.called
@@ -142,7 +144,7 @@ def test_add_user_to_team(mocked_add_user):
 @patch('lecli.usage.api.get_usage')
 def test_add_user_to_team(mocked_get_usage):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.usage, ['-s', misc_ex.USAGE_DATE_FROM, '-e', misc_ex.USAGE_DATE_TO])
+    result = runner.invoke(deprecated_commands.usage, ['-s', 'start', '-e', 'end'])
 
     assert "This method is deprecated" in result.output
     assert mocked_get_usage.called
@@ -151,7 +153,8 @@ def test_add_user_to_team(mocked_get_usage):
 @patch('lecli.saved_query.api.create_saved_query')
 def test_create_saved_query(mocked_create_saved_query):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.createsavedquery, ['new_saved_query', 'where(/*/)', '-f', 10, '-t', 1000])
+    result = runner.invoke(deprecated_commands.createsavedquery, ['new_saved_query',
+                                                                  'where(/*/)', '-f', 10, '-t', 1000])
 
     assert "This method is deprecated" in result.output
     assert mocked_create_saved_query.called
@@ -160,8 +163,8 @@ def test_create_saved_query(mocked_create_saved_query):
 @patch('lecli.saved_query.api.update_saved_query')
 def test_update_saved_query(mocked_update_saved_query):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.updatesavedquery, ['123456789012345678901234567890123456', '-f', 10, '-t',
-                                         1000])
+    result = runner.invoke(deprecated_commands.updatesavedquery, [str(uuid.uuid4()), '-f', 10,
+                                                                  '-t', 1000])
 
     assert "This method is deprecated" in result.output
     assert mocked_update_saved_query.called
@@ -170,7 +173,7 @@ def test_update_saved_query(mocked_update_saved_query):
 @patch('lecli.saved_query.api.get_saved_query')
 def test_get_saved_query(mocked_get_saved_query):
     runner = CliRunner()
-    result = runner.invoke(deprecated_commands.getsavedquery, ['123456789012345678901234567890123456'])
+    result = runner.invoke(deprecated_commands.getsavedquery, [str(uuid.uuid4())])
 
     assert "This method is deprecated" in result.output
     assert mocked_get_saved_query.called

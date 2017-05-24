@@ -8,11 +8,13 @@ from lecli import api_utils
 from lecli import response_utils
 
 
-def _url():
+def _url(provided_parts=('logs',)):
     """
     Get rest query url of log resource id
     """
-    return api_utils.get_management_url() + '/logs'
+    ordered_path_parts = ['management']
+    ordered_path_parts.extend(provided_parts)
+    return api_utils.build_url(ordered_path_parts)
 
 
 def handle_get_log_response(response):
@@ -31,7 +33,7 @@ def get_logs():
     """
     headers = api_utils.generate_headers('ro')
     try:
-        response = requests.request('GET', _url(), headers=headers)
+        response = requests.get(_url()[1], headers=headers)
         handle_get_log_response(response)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
@@ -44,7 +46,7 @@ def get_log(log_id):
     """
     headers = api_utils.generate_headers('ro')
     try:
-        response = requests.get("/".join([_url(), log_id]), headers=headers)
+        response = requests.get(_url(('logs', log_id))[1], headers=headers)
         handle_get_log_response(response)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
@@ -68,7 +70,7 @@ def create_log(logname, params):
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.post(_url(), json=request_params, headers=headers)
+        response = requests.post(_url()[1], json=request_params, headers=headers)
         if response_utils.response_error(response):
             sys.stderr.write('Create log failed, status code: %d' % response.status_code)
             sys.exit(1)
@@ -83,13 +85,12 @@ def delete_log(log_id):
     """
     Delete a log with the provided log ID
     """
-    url = "/".join([_url(), log_id])
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.delete(url, headers=headers)
+        response = requests.delete(_url(('logs', log_id))[1], headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Delete log failed, status code: %d' % response.status_code)
+            sys.stderr.write('Delete log failed.')
             sys.exit(1)
         elif response.status_code == 204:
             sys.stdout.write('Deleted log with id: %s \n' % log_id)
@@ -102,13 +103,12 @@ def replace_log(log_id, params):
     """
     Replace the given log with the details provided
     """
-    url = "/".join([_url(), log_id])
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.put(url, json=params, headers=headers)
+        response = requests.put(_url(('logs', log_id))[1], json=params, headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Update log failed with status code: %d\n' % response.status_code)
+            sys.stderr.write('Update log failed.\n')
             sys.exit(1)
         elif response.status_code == 200:
             sys.stdout.write('Log: %s updated to:\n' % log_id)
@@ -122,13 +122,12 @@ def rename_log(log_id, log_name):
     """
     Rename the given log with the provided name
     """
-    url = "/".join([_url(), log_id])
     headers = api_utils.generate_headers('ro')
 
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(_url(('logs', log_id))[1], headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Rename log failed with status code: %d\n' % response.status_code)
+            sys.stderr.write('Rename log failed.\n')
             sys.exit(1)
         elif response.status_code == 200:
             params = response.json()
@@ -151,7 +150,7 @@ def check_logset_exists(params):
 
         for item in updates:
             if item['id']:
-                url = api_utils.get_management_url() + '/logsets/' + item['id']
+                url = _url(('logsets', item['id']))[1]
                 headers = api_utils.generate_headers('ro')
                 try:
                     response = requests.get(url, headers=headers)
@@ -167,7 +166,7 @@ def update_log(log_id, params):
     """
     Update a log with the details provided
     """
-    url = "/".join([_url(), log_id])
+    url = _url(('logs', log_id))[1]
     headers = api_utils.generate_headers('ro')
 
     if check_logset_exists(params):

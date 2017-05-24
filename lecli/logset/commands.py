@@ -79,6 +79,7 @@ def deletelogset(logset_id):
     """
     api.delete_logset(logset_id)
 
+
 @click.command()
 @click.argument('logset_id', type=click.STRING)
 @click.argument('filename', type=click.Path(exists=True, dir_okay=False))

@@ -11,16 +11,13 @@ from lecli import api_utils
 from lecli import response_utils
 
 
-def _url(endpoint):
+def _url(provided_path_parts=()):
     """
     Get rest query url of account resource id.
     """
-    if endpoint == 'owner':
-        return '%s/accounts/%s/owners' % \
-               (api_utils.get_management_url(), api_utils.get_account_resource_id())
-    elif endpoint == 'user':
-        return '%s/accounts/%s/users' % \
-               (api_utils.get_management_url(), api_utils.get_account_resource_id())
+    ordered_path_parts = ['management', 'accounts', api_utils.get_account_resource_id()]
+    ordered_path_parts.extend(provided_path_parts)
+    return api_utils.build_url(ordered_path_parts)
 
 
 def handle_userlist_response(response):
@@ -65,10 +62,10 @@ def list_users():
     """
     List users that is in the current account.
     """
-    action = 'management/accounts/%s/users' % api_utils.get_account_resource_id()
+    action, url = _url(('users',))
     try:
-        response = requests.request('GET', _url('user'), headers=api_utils.generate_headers(
-            'owner', 'GET', action, ''))
+        response = requests.request('GET', url,
+                                    headers=api_utils.generate_headers('owner', 'GET', action, ''))
         handle_userlist_response(response)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
@@ -79,7 +76,7 @@ def add_new_user(first_name, last_name, email):
     """
     Add a new user to the current account.
     """
-    action = 'management/accounts/%s/users' % api_utils.get_account_resource_id()
+    action, url = _url(('users',))
     json_content = {
         "user":
             {
@@ -92,7 +89,7 @@ def add_new_user(first_name, last_name, email):
     headers = api_utils.generate_headers('owner', method='POST', action=action, body=body)
 
     try:
-        response = requests.request('POST', _url('user'), json=json_content, headers=headers)
+        response = requests.request('POST', url, json=json_content, headers=headers)
         handle_create_user_response(response)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
@@ -103,8 +100,7 @@ def add_existing_user(user_key):
     """
     Add a user that already exist to the current account.
     """
-    url = _url('user') + '/' + str(user_key)
-    action = url.split("com/")[1]
+    action, url = _url(('users', user_key))
     headers = api_utils.generate_headers('owner', method='POST', action=action, body='')
 
     try:
@@ -119,8 +115,7 @@ def delete_user(user_key):
     """
     Delete a user from the current account.
     """
-    url = _url('user') + '/' + str(user_key)
-    action = url.split("com/")[1]
+    action, url = _url(('users', user_key))
     headers = api_utils.generate_headers('owner', method='DELETE', action=action, body='')
 
     try:
@@ -139,10 +134,10 @@ def get_owner():
     """
     Get owner information of the current account.
     """
-    action = 'management/accounts/%s/owners' % api_utils.get_account_resource_id()
+    action, url = _url(('owners',))
     try:
-        response = requests.request('GET', _url('owner'), headers=api_utils.generate_headers(
-            'owner', 'GET', action, ''))
+        response = requests.request('GET', url,
+                                    headers=api_utils.generate_headers('owner', 'GET', action, ''))
         handle_userlist_response(response)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)

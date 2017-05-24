@@ -1,18 +1,22 @@
 """
 Logset API module.
 """
-import sys
 import json
+import sys
+
 import requests
 
 from lecli import api_utils
 from lecli import response_utils
 
-def _url():
+
+def _url(provided_path_parts=()):
     """
     Get rest query url of logset resource id.
     """
-    return api_utils.get_management_url() + '/logsets'
+    ordered_path_parts = ['management', 'logsets']
+    ordered_path_parts.extend(provided_path_parts)
+    return api_utils.build_url(ordered_path_parts)
 
 
 def handle_response(response, error_message, success_code, success_message=None):
@@ -33,7 +37,7 @@ def get_logsets():
     """
     headers = api_utils.generate_headers('ro')
     try:
-        response = requests.request('GET', _url(), headers=headers)
+        response = requests.request('GET', _url()[1], headers=headers)
         handle_response(response, 'Unable to fetch logsets\n', 200)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
@@ -46,8 +50,7 @@ def get_logset(logset_id):
     """
     headers = api_utils.generate_headers('ro')
     try:
-        response = requests.get(_url() + "/" + logset_id,
-                                headers=headers)
+        response = requests.get(_url((logset_id,))[1], headers=headers)
         handle_response(response, 'Unable to fetch logset %s \n' % logset_id, 200)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
@@ -73,9 +76,8 @@ def create_logset(logset_name=None, params=None):
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.post(_url(), json=request_params, headers=headers)
-        handle_response(response,
-                        'Creating logset failed, status code: %d' % response.status_code, 201)
+        response = requests.post(_url()[1], json=request_params, headers=headers)
+        handle_response(response, 'Creating logset failed.\n', 201)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
@@ -85,13 +87,12 @@ def delete_logset(logset_id):
     """
     Delete the logset with the given id
     """
-    url = _url() + '/' + logset_id
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.delete(url, headers=headers)
-        handle_response(response, 'Delete logset failed, status code: %d \n' % response.status_code,
-                        204, 'Deleted logset with id: %s \n' % logset_id)
+        response = requests.delete(_url((logset_id,))[1], headers=headers)
+        handle_response(response, 'Delete logset failed.\n', 204,
+                        'Deleted logset with id: %s \n' % logset_id)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
@@ -101,13 +102,12 @@ def rename_logset(logset_id, logset_name):
     """
     Rename a given logset
     """
-    url = "/".join([_url(), logset_id])
     headers = api_utils.generate_headers('ro')
 
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(_url((logset_id,))[1], headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Rename logset failed with status code: %d\n' % response.status_code)
+            sys.stderr.write('Rename logset failed.\n')
             sys.exit(1)
         elif response.status_code == 200:
             params = response.json()
@@ -122,14 +122,11 @@ def replace_logset(logset_id, params):
     """
     Replace a given logset with the details provided
     """
-    url = "/".join([_url(), logset_id])
     headers = api_utils.generate_headers('rw')
 
     try:
-        response = requests.put(url, json=params, headers=headers)
-        handle_response(response,
-                        'Update logset with details %s failed with status code: %d\n'
-                        % (params, response.status_code), 200)
+        response = requests.put(_url((logset_id,))[1], json=params, headers=headers)
+        handle_response(response, 'Update logset with details %s failed.\n' % params, 200)
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
@@ -146,12 +143,10 @@ def add_log(logset_id, log_id):
             }]
         }
     }
-
-    url = "/".join([_url(), logset_id])
     headers = api_utils.generate_headers('ro')
 
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(_url((logset_id,))[1], headers=headers)
         if response_utils.response_error(response):
             sys.stderr.write('Add log %s to logset %s failed\n'
                              % (log_id, logset_id))
@@ -186,8 +181,7 @@ def delete_log(logset_id, log_id):
     """
     headers = api_utils.generate_headers('ro')
     try:
-        response = requests.get(_url() + "/" + logset_id,
-                                headers=headers)
+        response = requests.get(_url((logset_id,))[1], headers=headers)
         if response_utils.response_error(response):
             sys.stderr.write('Delete log %s from logset %s failed\n'
                              % (log_id, logset_id))
@@ -199,6 +193,7 @@ def delete_log(logset_id, log_id):
     except requests.exceptions.RequestException as error:
         sys.stderr.write(error)
         sys.exit(1)
+
 
 def replace_logset_from_file(logset_id, filename):
     """Helper method to load file contents as json

@@ -7,6 +7,7 @@ import click
 
 from lecli.log import api
 
+
 @click.command()
 @click.option('-n', '--name', type=click.STRING, help="Name of new log")
 @click.option('-f', '--filename', type=click.Path(exists=True, dir_okay=False),

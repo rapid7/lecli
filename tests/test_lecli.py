@@ -1,10 +1,11 @@
 import os
+import uuid
 
+import time
 from click.testing import CliRunner
 from mock import patch
 from mock import MagicMock
 
-from examples import misc_examples as misc_ex
 from lecli import cli
 
 
@@ -23,8 +24,9 @@ def test_userdel(mocked_delete_user):
 
     assert result.output == "Example usage: lecli delete user -u 12345678-aaaa-bbbb-1234-1234cb123456\n"
 
-    runner.invoke(cli.user_commands.delete_user, ['-u', misc_ex.TEST_USER_KEY])
-    mocked_delete_user.assert_called_once_with(misc_ex.TEST_USER_KEY)
+    user_key = str(uuid.uuid4())
+    runner.invoke(cli.user_commands.delete_user, ['-u', user_key])
+    mocked_delete_user.assert_called_once_with(user_key)
 
 
 @patch('lecli.user.api.add_new_user')
@@ -48,7 +50,7 @@ def test_userlist(mocked_list_users):
 @patch('lecli.query.api.get_recent_events')
 def test_recentevents(mocked_recent_events):
     runner = CliRunner()
-    runner.invoke(cli.query_commands.get_recent_events, [str(misc_ex.TEST_LOG_GROUP)])
+    runner.invoke(cli.query_commands.get_recent_events, ['test'])
 
     assert mocked_recent_events.called
 
@@ -56,7 +58,7 @@ def test_recentevents(mocked_recent_events):
 @patch('lecli.query.api.get_recent_events')
 def test_recentevents_with_relative_range(mocked_recent_events):
     runner = CliRunner()
-    runner.invoke(cli.query_commands.get_recent_events, [str(misc_ex.TEST_LOG_GROUP), '-r', misc_ex.RELATIVE_TIME])
+    runner.invoke(cli.query_commands.get_recent_events, ['test', '-r', 'last 3 min'])
 
     assert mocked_recent_events.called
 
@@ -64,16 +66,23 @@ def test_recentevents_with_relative_range(mocked_recent_events):
 @patch('lecli.query.api.get_events')
 def test_events(mocked_get_events):
     runner = CliRunner()
-    runner.invoke(cli.query_commands.get_events, [str(misc_ex.TEST_LOG_GROUP), '-f', misc_ex.TIME_FROM, '-t',
-                               misc_ex.TIME_TO])
+    runner.invoke(cli.query_commands.get_events, ['', '-f', int(time.time()), '-t', int(time.time())])
 
     assert mocked_get_events.called
+
+
+@patch('lecli.query.api.tail_logs')
+def test_live_tail(mocked_tail_logs):
+    runner = CliRunner()
+    runner.invoke(cli.query_commands.tail_events, [str(uuid.uuid4())])
+
+    assert mocked_tail_logs.called
 
 
 @patch('lecli.query.api.get_events')
 def test_events_with_relative_range(mocked_get_events):
     runner = CliRunner()
-    runner.invoke(cli.query_commands.get_events, [str(misc_ex.TEST_LOG_GROUP), '-r', misc_ex.RELATIVE_TIME])
+    runner.invoke(cli.query_commands.get_events, ['', '-r', 'last 3 min'])
 
     assert mocked_get_events.called
 
@@ -81,18 +90,15 @@ def test_events_with_relative_range(mocked_get_events):
 @patch('lecli.query.api.post_query')
 def test_query(mocked_post_query):
     runner = CliRunner()
-    runner.invoke(cli.query_commands.query, [str(misc_ex.TEST_LOG_GROUP), '-l', misc_ex.TEST_QUERY, '-f',
-                              misc_ex.TIME_FROM, '-t',
-                              misc_ex.TIME_TO])
-
+    runner.invoke(cli.query_commands.query, [str(uuid.uuid4()), '-l', 'where(event)', '-f',
+                                             int(time.time()), '-t', int(time.time())])
     assert mocked_post_query.called
 
 
 @patch('lecli.query.api.post_query')
 def test_query_with_relative_range(mocked_post_query):
     runner = CliRunner()
-    runner.invoke(cli.query_commands.query, [str(misc_ex.TEST_LOG_GROUP), '-l', misc_ex.TEST_QUERY, '-r',
-                              misc_ex.RELATIVE_TIME])
+    runner.invoke(cli.query_commands.query, ['', '-l', '', '-r', 'last 3 min'])
 
     assert mocked_post_query.called
 
@@ -108,7 +114,7 @@ def test_get_teams(mocked_get_teams):
 @patch('lecli.team.api.get_team')
 def test_get_team(mocked_get_team):
     runner = CliRunner()
-    runner.invoke(cli.team_commands.get_team, [str(misc_ex.TEST_TEAM_ID)])
+    runner.invoke(cli.team_commands.get_team, [str(uuid.uuid4())])
 
     assert mocked_get_team.called
 
@@ -124,7 +130,7 @@ def test_create_team(mocked_create_team):
 @patch('lecli.team.api.delete_team')
 def test_delete_team(mocked_delete_team):
     runner = CliRunner()
-    runner.invoke(cli.team_commands.delete_team, [str(misc_ex.TEST_TEAM_ID)])
+    runner.invoke(cli.team_commands.delete_team, [str(uuid.uuid4())])
 
     assert mocked_delete_team.called
 
@@ -132,7 +138,7 @@ def test_delete_team(mocked_delete_team):
 @patch('lecli.team.api.rename_team')
 def test_rename_team(mocked_rename_team):
     runner = CliRunner()
-    runner.invoke(cli.team_commands.rename_team, [str(misc_ex.TEST_TEAM_ID), "new_name"])
+    runner.invoke(cli.team_commands.rename_team, [str(uuid.uuid4()), "new_name"])
 
     assert mocked_rename_team.called
 
@@ -140,7 +146,7 @@ def test_rename_team(mocked_rename_team):
 @patch('lecli.team.api.add_user_to_team')
 def test_add_user_to_team(mocked_add_user):
     runner = CliRunner()
-    runner.invoke(cli.team_commands.addusertoteam, [str(misc_ex.TEST_TEAM_ID), "test_user_name"])
+    runner.invoke(cli.team_commands.addusertoteam, [str(uuid.uuid4()), "test_user_name"])
 
     assert mocked_add_user.called
 
@@ -148,7 +154,7 @@ def test_add_user_to_team(mocked_add_user):
 @patch('lecli.usage.api.get_usage')
 def test_add_user_to_team(mocked_get_usage):
     runner = CliRunner()
-    runner.invoke(cli.usage_commands.get_usage, ['-s', misc_ex.USAGE_DATE_FROM, '-e', misc_ex.USAGE_DATE_TO])
+    runner.invoke(cli.usage_commands.get_usage, ['-s', 'start', '-e', 'end'])
 
     assert mocked_get_usage.called
 
@@ -371,3 +377,40 @@ def test_replace_logset(mocked_replace_logset):
     except OSError:
         pass
 
+
+@patch('lecli.api_key.api.create')
+def test_create_apikey(mocked_create_apikey):
+    runner = CliRunner()
+    with open('file.json', 'w') as f:
+        f.write('{"test": {"key": "value"}}')
+
+    runner.invoke(cli.api_key_commands.create_api_key, ['file.json'])
+    mocked_create_apikey.assert_called_once()
+    try:
+        os.remove('file.json')
+    except OSError:
+        pass
+
+
+@patch('lecli.api_key.api.delete')
+def test_delete_apikey(mocked_delete_apikey):
+    runner = CliRunner()
+    runner.invoke(cli.api_key_commands.delete_api_key, ['123'])
+
+    mocked_delete_apikey.assert_called_once_with('123')
+
+
+@patch('lecli.api_key.api.update')
+def test_enable_apikey(mocked_update_apikey):
+    runner = CliRunner()
+    runner.invoke(cli.api_key_commands.update_api_key, ['123', '--enable'])
+
+    mocked_update_apikey.assert_called_once_with('123', True)
+
+
+@patch('lecli.api_key.api.update')
+def test_disable_apikey(mocked_update_apikey):
+    runner = CliRunner()
+    runner.invoke(cli.api_key_commands.update_api_key, ['123', '--disable'])
+
+    mocked_update_apikey.assert_called_once_with('123', False)

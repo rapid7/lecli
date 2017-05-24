@@ -19,6 +19,7 @@ AUTH_SECTION = 'Auth'
 URL_SECTION = 'Url'
 CONFIG = ConfigParser.ConfigParser()
 CONFIG_FILE_PATH = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
+DEFAULT_API_URL = 'https://rest.logentries.com'
 
 
 def print_config_error_and_exit(section=None, config_key=None, value=None):
@@ -62,7 +63,7 @@ def init_config():
         dummy_config.add_section('LogNicknames')
         dummy_config.add_section("LogGroups")
         dummy_config.add_section('Url')
-        dummy_config.set(URL_SECTION, 'management_url', 'https://rest.logentries.com/management')
+        dummy_config.set(URL_SECTION, 'api_url', 'https://rest.logentries.com')
 
         dummy_config.write(config_file)
         config_file.close()
@@ -293,19 +294,29 @@ def gensignature(api_key, date, content_type, request_method, query_path, reques
     return digest.digest()
 
 
-def get_management_url():
+def get_api_url():
     """
     Get management url from the config file
     """
-    config_key = 'management_url'
+    config_key = 'api_url'
     try:
         url = CONFIG.get(URL_SECTION, config_key)
         if validators.url(str(url)):
             return url
         else:
-            print_config_error_and_exit(URL_SECTION, 'Log Management URL(%s)' % config_key)
+            print_config_error_and_exit(URL_SECTION, 'REST API URL(%s)' % config_key)
     except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-        return 'https://rest.logentries.com/management'
+        return DEFAULT_API_URL
+
+
+def build_url(nodes):
+    """
+    Build a url with the given array of nodes for the url and return path and url respectively
+    Ordering is important
+    """
+    path = str.join('/', nodes)
+    url = str.join('/', [get_api_url(), path])
+    return path, url
 
 
 def pretty_print_string_as_json(text):

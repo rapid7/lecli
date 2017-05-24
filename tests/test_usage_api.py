@@ -1,11 +1,39 @@
 import json
+import uuid
 
 import httpretty
 from mock import patch
 
-from examples import misc_examples as misc_ex
-from examples import response_examples as resp_ex
 from lecli.usage import api
+
+MOCK_API_URL = 'http://mydummylink.com'
+SAMPLE_USAGE_RESPONSE = {
+    "id": "123456789012345678901234567890123456",
+    "name": "Test",
+    "period": {
+        "to": "2016-06-01",
+        "from": "2016-01-01"
+    },
+    "period_usage": 170129010,
+    "daily_usage": [
+        {
+            "usage": 30618,
+            "day": "2016-06-01"
+        },
+        {
+            "usage": 6397,
+            "day": "2016-05-31"
+        },
+        {
+            "usage": 1606,
+            "day": "2016-05-30"
+        },
+        {
+            "usage": 2406,
+            "day": "2016-05-29"
+        }
+    ]
+}
 
 
 @httpretty.activate
@@ -13,20 +41,16 @@ from lecli.usage import api
 @patch('lecli.api_utils.get_rw_apikey')
 @patch('lecli.usage.api._url')
 def test_get_usage(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
-    mocked_url.return_value = misc_ex.MOCK_USAGE_URL
-    mocked_rw_apikey.return_value = misc_ex.TEST_APIKEY_WITH_VALID_LENGTH
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USAGE_URL,
-                           status=200,
+    mocked_url.return_value = '', MOCK_API_URL
+    mocked_rw_apikey.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL, status=200,
                            content_type='application/json',
-                           body=json.dumps(resp_ex.usage_response))
-    expected_total = 170129010
-    expected_name = 'Test'
-    expected_id = '123456789012345678901234567890123456'
+                           body=json.dumps(SAMPLE_USAGE_RESPONSE))
 
-    api.get_usage(misc_ex.USAGE_DATE_FROM, misc_ex.USAGE_DATE_TO)
+    api.get_usage('start', 'end')
 
     out, err = capsys.readouterr()
-    assert "Total usage:\t%s" % expected_total in out
-    assert "Account name:\t%s" % expected_name in out
-    assert "Account ID:\t%s" % expected_id in out
+    assert "Total usage:\t" in out
+    assert "Account name:\t" in out
+    assert "Account ID:\t" in out

@@ -1,12 +1,19 @@
 import json
+import uuid
 
 import httpretty
 import requests
 from mock import patch
 from tabulate import tabulate
 
-from examples import misc_examples as misc_ex
 from lecli.user import api
+
+MOCK_API_URL = 'http://mydummylink.com'
+DUMMY_USER_RESPONSE = {"user": {"first_name": "",
+                                "last_name": "",
+                                "login_name": "",
+                                "email": "",
+                                "id": ""}}
 
 
 @httpretty.activate
@@ -16,13 +23,12 @@ from lecli.user import api
 @patch('lecli.user.api._url')
 def test_get_owner(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
                    mocked_account_resource_id, capsys):
-    mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
-    mocked_owner_apikey_id.return_value = misc_ex.TEST_OWNER_APIKEY_ID
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    mocked_url.return_value = misc_ex.MOCK_USERAPI_URL
+    mocked_owner_apikey.return_value = str(uuid.uuid4())
+    mocked_owner_apikey_id.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    mocked_url.return_value = '', MOCK_API_URL
 
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USERAPI_URL,
-                           body='{"owners": "ownerinfo"}',
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL, body='{"owners": "ownerinfo"}',
                            content_type='application/json', )
 
     api.get_owner()
@@ -38,15 +44,15 @@ def test_get_owner(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
 @patch('lecli.user.api._url')
 def test_delete_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
                      mocked_account_resource_id, capsys):
-    mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
-    mocked_owner_apikey_id.return_value = misc_ex.TEST_OWNER_APIKEY_ID
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    mocked_url.return_value = misc_ex.MOCK_USERAPI_URL
+    mocked_owner_apikey.return_value = str(uuid.uuid4())
+    mocked_owner_apikey_id.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    mocked_url.return_value = '', MOCK_API_URL
 
-    dest_url = misc_ex.MOCK_USERAPI_URL + '/' + str(misc_ex.TEST_USER_KEY)
-    httpretty.register_uri(httpretty.DELETE, dest_url, status=204)
+    user_key = str(uuid.uuid4())
+    httpretty.register_uri(httpretty.DELETE, MOCK_API_URL, status=204)
 
-    api.delete_user(misc_ex.TEST_USER_KEY)
+    api.delete_user(user_key)
 
     out, err = capsys.readouterr()
     assert 'Deleted user' in out
@@ -59,18 +65,16 @@ def test_delete_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
 @patch('lecli.user.api._url')
 def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
                            mocked_account_resource_id, capsys):
-    mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
-    mocked_owner_apikey_id.return_value = misc_ex.TEST_OWNER_APIKEY_ID
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    mocked_url.return_value = misc_ex.MOCK_USERAPI_URL
+    mocked_owner_apikey.return_value = str(uuid.uuid4())
+    mocked_owner_apikey_id.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    mocked_url.return_value = '', MOCK_API_URL
 
-    dest_url = misc_ex.MOCK_USERAPI_URL + '/' + str(misc_ex.TEST_USER_KEY)
-    httpretty.register_uri(httpretty.POST, dest_url,
-                           body=json.dumps(misc_ex.DUMMY_USER_CONTENT),
-                           status=200,
-                           content_type='application/json')
+    user_key = str(uuid.uuid4())
+    httpretty.register_uri(httpretty.POST, MOCK_API_URL, body=json.dumps(DUMMY_USER_RESPONSE),
+                           status=200, content_type='application/json')
 
-    api.add_existing_user(misc_ex.TEST_USER_KEY)
+    api.add_existing_user(user_key)
 
     out, err = capsys.readouterr()
     assert "Added user to account" in out
@@ -83,15 +87,13 @@ def test_add_existing_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_
 @patch('lecli.user.api._url')
 def test_add_new_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
                       mocked_account_resource_id, capsys):
-    mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
-    mocked_owner_apikey_id.return_value = misc_ex.TEST_OWNER_APIKEY_ID
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    mocked_url.return_value = misc_ex.MOCK_USERAPI_URL
+    mocked_owner_apikey.return_value = str(uuid.uuid4())
+    mocked_owner_apikey_id.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    mocked_url.return_value = '', MOCK_API_URL
 
-    httpretty.register_uri(httpretty.POST, misc_ex.MOCK_USERAPI_URL,
-                           body=json.dumps(misc_ex.DUMMY_USER_CONTENT),
-                           status=200,
-                           content_type='application/json')
+    httpretty.register_uri(httpretty.POST, MOCK_API_URL, body=json.dumps(DUMMY_USER_RESPONSE),
+                           status=200, content_type='application/json')
 
     api.add_new_user("first_name", "last_name", "email")
 
@@ -106,13 +108,12 @@ def test_add_new_user(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
 @patch('lecli.user.api._url')
 def test_list_users(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
                     mocked_account_resource_id, capsys):
-    mocked_owner_apikey.return_value = misc_ex.TEST_OWNER_APIKEY
-    mocked_owner_apikey_id.return_value = misc_ex.TEST_OWNER_APIKEY_ID
-    mocked_account_resource_id.return_value = misc_ex.TEST_ACCOUNT_RESOURCE_ID
-    mocked_url.return_value = misc_ex.MOCK_USERAPI_URL
+    mocked_owner_apikey.return_value = str(uuid.uuid4())
+    mocked_owner_apikey_id.return_value = str(uuid.uuid4())
+    mocked_account_resource_id.return_value = str(uuid.uuid4())
+    mocked_url.return_value = '', MOCK_API_URL
 
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USERAPI_URL,
-                           body='{"users":"userinfo"}',
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL, body='{"users":"userinfo"}',
                            content_type="application/json")
 
     api.list_users()
@@ -124,11 +125,9 @@ def test_list_users(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 def test_handle_create_user_response_status_200_with_success(mocked_account_resource_id, capsys):
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USERAPI_URL,
-                           content_type="application/json",
-                           status=200,
-                           body=json.dumps(misc_ex.DUMMY_USER_CONTENT))
-    response = requests.get(misc_ex.MOCK_USERAPI_URL)
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL, content_type="application/json",
+                           status=200, body=json.dumps(DUMMY_USER_RESPONSE))
+    response = requests.get(MOCK_API_URL)
 
     api.handle_create_user_response(response)
 
@@ -140,11 +139,9 @@ def test_handle_create_user_response_status_200_with_success(mocked_account_reso
 @patch('lecli.api_utils.get_account_resource_id')
 def test_handle_create_user_response_status_200_with_already_exists_error(
         mocked_account_resource_id, capsys):
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USERAPI_URL,
-                           content_type="application/json",
-                           status=201,
-                           body=json.dumps(misc_ex.DUMMY_USER_CONTENT))
-    response = requests.get(misc_ex.MOCK_USERAPI_URL)
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL, content_type="application/json",
+                           status=201, body=json.dumps(DUMMY_USER_RESPONSE))
+    response = requests.get(MOCK_API_URL)
 
     api.handle_create_user_response(response)
 
@@ -155,11 +152,9 @@ def test_handle_create_user_response_status_200_with_already_exists_error(
 @httpretty.activate
 @patch('lecli.api_utils.get_account_resource_id')
 def test_handle_create_user_response_status_201(mocked_account_resource_id, capsys):
-    httpretty.register_uri(httpretty.GET, misc_ex.MOCK_USERAPI_URL,
-                           content_type="application/json",
-                           status=201,
-                           body=json.dumps(misc_ex.DUMMY_USER_CONTENT))
-    response = requests.get(misc_ex.MOCK_USERAPI_URL)
+    httpretty.register_uri(httpretty.GET, MOCK_API_URL, content_type="application/json",
+                           status=201, body=json.dumps(DUMMY_USER_RESPONSE))
+    response = requests.get(MOCK_API_URL)
 
     api.handle_create_user_response(response)
 

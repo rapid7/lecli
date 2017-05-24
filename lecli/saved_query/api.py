@@ -9,11 +9,13 @@ from lecli import api_utils
 from lecli import response_utils
 
 
-def _url():
+def _url(provided_path_parts=()):
     """
     Get rest query url of account resource id.
     """
-    return 'https://rest.logentries.com/query/saved_queries'
+    ordered_path_parts = ['query', 'saved_queries']
+    ordered_path_parts.extend(provided_path_parts)
+    return api_utils.build_url(ordered_path_parts)
 
 
 def _pretty_print_saved_query(query):
@@ -64,9 +66,9 @@ def get_saved_query(query_id=None):
     If query id is provided, get this specific saved query or get them all
     :param query_id: uuid of saved query to be retrieved(optional)
     """
-    endpoint_url = _url()
+    endpoint_url = _url()[1]
     if query_id:
-        endpoint_url = _url() + "/" + query_id
+        endpoint_url = _url((query_id,))[1]
     headers = api_utils.generate_headers('rw')
     try:
         response = requests.get(endpoint_url, headers=headers)
@@ -89,9 +91,9 @@ def delete_saved_query(query_id):
     """
     headers = api_utils.generate_headers('rw')
     try:
-        response = requests.delete(_url() + "/" + query_id, headers=headers)
+        response = requests.delete(_url((query_id,))[1], headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Delete saved query failed, status code: %d' % response.status_code)
+            sys.stderr.write('Delete saved query failed.\n')
         elif response.status_code == 204:
             click.echo('Deleted saved query with id: %s' % query_id)
     except requests.exceptions.RequestException as error:
@@ -127,9 +129,9 @@ def create_saved_query(name, statement, from_ts=None, to_ts=None, time_range=Non
     }
 
     try:
-        response = requests.post(_url(), json=params, headers=headers)
+        response = requests.post(_url()[1], json=params, headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Creating saved query failed, status code: %d' % response.status_code)
+            sys.stderr.write('Creating saved query failed.\n')
             _pretty_print_saved_query_error(response)
         elif response.status_code == 201:
             click.echo('Saved query created with name: %s' % name)
@@ -179,9 +181,9 @@ def update_saved_query(query_id, name=None, statement=None, from_ts=None, to_ts=
         params['saved_query']['leql'] = leql
 
     try:
-        response = requests.patch(_url() + "/" + query_id, json=params, headers=headers)
+        response = requests.patch(_url((query_id,))[1], json=params, headers=headers)
         if response_utils.response_error(response):
-            sys.stderr.write('Updating saved query failed, status code: %d' % response.status_code)
+            sys.stderr.write('Updating saved query failed.\n')
             _pretty_print_saved_query_error(response)
         elif response.status_code == 200:
             click.echo('Saved query with id %s updated.' % query_id)
