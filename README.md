@@ -163,9 +163,8 @@ testlog = 12345678-aaaa-bbbb-1234-1234cb123456
 Log groups allow an alias for a list of log Ids to be created. These can be setup in the LogGroups section of the configuration file. 
 ```
 [LogGroups]
-testgroup =
-    12345678-aaaa-bbbb-1234-1234cb123456
-    12345678-aaaa-bbbb-1234-1234cb123457
+testgroup = 12345678-aaaa-bbbb-1234-1234cb123456
+            12345678-aaaa-bbbb-1234-1234cb123457
 ```
 
 ####Query Nicknames
