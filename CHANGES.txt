@@ -11,3 +11,12 @@ v0.6, 13/12/2016  -- Saved query management support.
 v0.7  01/02/2017  -- Log management support.
                      Commands now follow <action> <resource> pattern.
                      Deprecated old commands.
+v1.0 29/05/2017   -- Logset management support.
+                     Live tail support.
+                     Api key management support.
+                     Bug fixes/enhancements around configuration file and api url(s).
+                     Breaking change: Removed deprecated commands: addusertoteam, adduser,
+                     createsavedquery, createteam, deletesavedquery, deleteteam, deleteuser,
+                     deleteuserfromteam, events, getowner, getsavedqueries, getsavedquery,
+                     getteams, getteam, listusers, recentevents, renameteam, updatesavedquery,
+                     usage

@@ -13,7 +13,6 @@ from lecli.user import commands as user_commands
 from lecli.log import commands as log_commands
 from lecli.logset import commands as logset_commands
 from lecli.api_key import commands as api_key_commands
-from lecli import deprecated_commands
 
 
 @click.group()
@@ -114,23 +113,3 @@ delete.add_command(logset_commands.deletelogset, "logset")
 delete.add_command(api_key_commands.delete_api_key, "apikey")
 
 tail.add_command(query_commands.tail_events, "events")
-
-cli.add_command(deprecated_commands.addusertoteam)
-cli.add_command(deprecated_commands.adduser)
-cli.add_command(deprecated_commands.createsavedquery)
-cli.add_command(deprecated_commands.createteam)
-cli.add_command(deprecated_commands.deletesavedquery)
-cli.add_command(deprecated_commands.deleteteam)
-cli.add_command(deprecated_commands.deleteuser)
-cli.add_command(deprecated_commands.deleteuserfromteam)
-cli.add_command(deprecated_commands.events)
-cli.add_command(deprecated_commands.getowner)
-cli.add_command(deprecated_commands.getsavedqueries)
-cli.add_command(deprecated_commands.getsavedquery)
-cli.add_command(deprecated_commands.getteams)
-cli.add_command(deprecated_commands.getteam)
-cli.add_command(deprecated_commands.listusers)
-cli.add_command(deprecated_commands.recentevents)
-cli.add_command(deprecated_commands.renameteam)
-cli.add_command(deprecated_commands.updatesavedquery)
-cli.add_command(deprecated_commands.usage)
