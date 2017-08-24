@@ -47,28 +47,52 @@ def test_userlist(mocked_list_users):
     mocked_list_users.assert_called_once_with()
 
 
-@patch('lecli.query.api.get_recent_events')
-def test_recentevents(mocked_recent_events):
+@patch('lecli.query.api.query')
+def test_recentevents(mocked_query):
     runner = CliRunner()
     runner.invoke(cli.query_commands.get_recent_events, ['test'])
 
-    assert mocked_recent_events.called
+    assert mocked_query.called
 
 
-@patch('lecli.query.api.get_recent_events')
-def test_recentevents_with_relative_range(mocked_recent_events):
+@patch('lecli.query.api.query')
+def test_recentevents_with_saved_query(mocked_query):
+    runner = CliRunner()
+    runner.invoke(cli.query_commands.get_recent_events, ['test', '-s', str(uuid.uuid4())])
+
+    assert mocked_query.called
+
+
+@patch('lecli.query.api.query')
+def test_recentevents_with_relative_range(mocked_query):
     runner = CliRunner()
     runner.invoke(cli.query_commands.get_recent_events, ['test', '-r', 'last 3 min'])
 
-    assert mocked_recent_events.called
+    assert mocked_query.called
 
 
-@patch('lecli.query.api.get_events')
-def test_events(mocked_get_events):
+@patch('lecli.query.api.query')
+def test_events(mocked_query):
     runner = CliRunner()
     runner.invoke(cli.query_commands.get_events, ['', '-f', int(time.time()), '-t', int(time.time())])
 
-    assert mocked_get_events.called
+    assert mocked_query.called
+
+
+@patch('lecli.query.api.query')
+def test_events_with_relative_range(mocked_query):
+    runner = CliRunner()
+    runner.invoke(cli.query_commands.get_events, ['', '-r', 'last 3 min'])
+
+    assert mocked_query.called
+
+
+@patch('lecli.query.api.query')
+def test_events_with_saved_query(mocked_query):
+    runner = CliRunner()
+    runner.invoke(cli.query_commands.get_events, ['123123123', '-s', str(uuid.uuid4())])
+
+    assert mocked_query.called
 
 
 @patch('lecli.query.api.tail_logs')
@@ -79,15 +103,15 @@ def test_live_tail(mocked_tail_logs):
     assert mocked_tail_logs.called
 
 
-@patch('lecli.query.api.get_events')
-def test_events_with_relative_range(mocked_get_events):
+@patch('lecli.query.api.tail_logs')
+def test_live_tail_with_saved_query(mocked_tail_logs):
     runner = CliRunner()
-    runner.invoke(cli.query_commands.get_events, ['', '-r', 'last 3 min'])
+    runner.invoke(cli.query_commands.tail_events, ['', '-s', str(uuid.uuid4())])
 
-    assert mocked_get_events.called
+    assert mocked_tail_logs.called
 
 
-@patch('lecli.query.api.post_query')
+@patch('lecli.query.api.query')
 def test_query(mocked_post_query):
     runner = CliRunner()
     runner.invoke(cli.query_commands.query, [str(uuid.uuid4()), '-l', 'where(event)', '-f',
@@ -95,10 +119,18 @@ def test_query(mocked_post_query):
     assert mocked_post_query.called
 
 
-@patch('lecli.query.api.post_query')
+@patch('lecli.query.api.query')
 def test_query_with_relative_range(mocked_post_query):
     runner = CliRunner()
     runner.invoke(cli.query_commands.query, ['', '-l', '', '-r', 'last 3 min'])
+
+    assert mocked_post_query.called
+
+
+@patch('lecli.query.api.query')
+def test_query_with_saved_query(mocked_post_query):
+    runner = CliRunner()
+    runner.invoke(cli.query_commands.query, ['', '-s', str(uuid.uuid4())])
 
     assert mocked_post_query.called
 

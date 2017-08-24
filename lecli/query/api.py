@@ -83,111 +83,183 @@ def continue_request(response, progress_bar):
         handle_response(new_response, progress_bar)
 
 
-def fetch_results(provided_url):
+def fetch_results(provided_url, params=None):
     """
     Make the get request to the url and return the response.
     """
     try:
-        response = requests.get(provided_url, headers=api_utils.generate_headers('rw'))
+        response = requests.get(provided_url, headers=api_utils.generate_headers('rw'),
+                                params=params)
         return response
     except requests.exceptions.RequestException as error:
-        click.echo(error)
+        click.echo(error, err=True)
         sys.exit(1)
 
 
-def get_recent_events(log_keys, last_x_seconds=1200, time_range=None):
+def validate_query(**kwargs):
     """
-    Get recent events belonging to provided log_keys in the last_x_seconds.
+    Validate query options
     """
-    if time_range:
-        leql = {"during": {"time_range": time_range}, "statement": ALL_EVENTS_QUERY}
-    else:
-        to_ts = int(time.time()) * 1000
-        from_ts = (int(time.time()) - last_x_seconds) * 1000
-        leql = {"during": {"from": from_ts, "to": to_ts}, "statement": ALL_EVENTS_QUERY}
-    payload = {"logs": log_keys, "leql": leql}
+    date_from = kwargs.get('date_from')
+    time_from = kwargs.get('time_from')
+    relative_time_range = kwargs.get('relative_time_range')
+    saved_query_id = kwargs.get('saved_query_id')
+    query_string = kwargs.get('query_string')
+    log_keys = kwargs.get('log_keys')
+    querynick = kwargs.get('querynick')
+    lognick = kwargs.get('lognick')
+    loggroup = kwargs.get('loggroup')
 
-    try:
-        response = requests.post(_url(('logs',))[1], headers=api_utils.generate_headers('rw'),
-                                 json=payload)
-        with click.progressbar(length=100, label='Progress') as progress_bar:
-            handle_response(response, progress_bar)
-    except requests.exceptions.RequestException as error:
-        click.echo(error)
-        sys.exit(1)
+    valid = True
+    if all([any([lognick, loggroup]), log_keys]):
+        valid = False
+        click.echo('Cannot define lognicks or loggroups and logkeys together in the same query '
+                   'request.', err=True)
+    if all([time_from, date_from]):
+        valid = False
+        click.echo('Cannot define start time(epoch) and start date(ISO-8601) in the same query '
+                   'request.', err=True)
+    if all([saved_query_id, any([querynick, query_string]), query_string != ALL_EVENTS_QUERY]):
+        valid = False
+        click.echo('Cannot define saved query and LEQL/query nickname in the same query request.',
+                   err=True)
+    if all([query_string, querynick]):
+        valid = False
+        click.echo('Cannot define a LEQL query and query nickname in the same query request.',
+                   err=True)
+    if all([lognick, loggroup]):
+        valid = False
+        click.echo('Cannot define a log nickname and a log group in the same query request.',
+                   err=True)
+    if all([relative_time_range, any([time_from, date_from])]):
+        valid = False
+        click.echo('Cannot define relative time range and start time/date in the same query '
+                   'request.', err=True)
+    if not any([log_keys, lognick, loggroup, saved_query_id]):
+        valid = False
+        click.echo('Either of log keys, log nick, log group or saved query must be supplied.',
+                   err=True)
+    if not any([time_from, date_from, relative_time_range, saved_query_id]):
+        valid = False
+        click.echo('Either of start time, start date or relative time range must be supplied.',
+                   err=True)
+    return valid
 
 
-def get_events(log_keys, time_from=None, time_to=None, date_from=None, date_to=None,
-               time_range=None):
-    """
-    Get events belonging to log_keys and within the time range provided.
-    """
-    if date_from and date_to:
-        from_ts = int(time.mktime(time.strptime(date_from, "%Y-%m-%d %H:%M:%S"))) * 1000
-        to_ts = int(time.mktime(time.strptime(date_to, "%Y-%m-%d %H:%M:%S"))) * 1000
-        leql = {"during": {"from": from_ts, "to": to_ts}, "statement": ALL_EVENTS_QUERY}
-    elif time_to and time_from:
-        from_ts = time_from * 1000
-        to_ts = time_to * 1000
-        leql = {"during": {"from": from_ts, "to": to_ts}, "statement": ALL_EVENTS_QUERY}
-    else:
-        leql = {"during": {"time_range": time_range}, "statement": ALL_EVENTS_QUERY}
-
-    payload = {"logs": log_keys, "leql": leql}
-
-    try:
-        response = requests.post(_url(('logs',))[1], headers=api_utils.generate_headers('rw'),
-                                 json=payload)
-        with click.progressbar(length=100, label='Progress') as progress_bar:
-            handle_response(response, progress_bar)
-    except requests.exceptions.RequestException as error:
-        click.echo(error)
-        sys.exit(1)
-
-
-def post_query(log_keys, query_string, time_from=None, time_to=None, date_from=None,
-               date_to=None, time_range=None):
+def query(**kwargs):
     """
     Post query to Logentries.
     """
-    if date_from and date_to:
+    date_from = kwargs.get('date_from')
+    date_to = kwargs.get('date_to')
+    time_from = kwargs.get('time_from')
+    time_to = kwargs.get('time_to')
+    relative_time_range = kwargs.get('relative_time_range')
+    saved_query_id = kwargs.get('saved_query_id')
+    query_string = kwargs.get('query_string')
+    log_keys = kwargs.get('log_keys')
+    querynick = kwargs.get('querynick')
+    lognick = kwargs.get('lognick')
+    loggroup = kwargs.get('loggroup')
+    if not validate_query(date_from=date_from, time_from=time_from, query_string=query_string,
+                          relative_time_range=relative_time_range, saved_query_id=saved_query_id,
+                          log_keys=log_keys, querynick=querynick, lognick=lognick,
+                          loggroup=loggroup):
+        return False
+
+    time_range = prepare_time_range(time_from, time_to, relative_time_range, date_from, date_to)
+    if querynick:
+        query_string = api_utils.get_named_query(querynick)
+
+    if lognick:
+        log_keys = api_utils.get_named_logkey(lognick)
+    if loggroup:
+        log_keys = api_utils.get_named_logkey_group(loggroup)
+
+    try:
+        if saved_query_id:
+            response = run_saved_query(saved_query_id, time_range, log_keys)
+        else:
+            response = post_query(log_keys, query_string, time_range)
+        with click.progressbar(length=100, label='Progress\t') as progress_bar:
+            handle_response(response, progress_bar)
+        return True
+    except requests.exceptions.RequestException as error:
+        click.echo(error)
+        sys.exit(1)
+
+
+def post_query(log_keys, query_string, time_range):
+    """
+    POST a request to Rest Query API
+
+    :param log_keys: list of log keys
+    :param query_string: leql query statement
+    :param time_range: time range including either relative time range or start and end times
+    :return: response
+    """
+    payload = {"logs": log_keys, "leql": {"statement": query_string, "during": time_range}}
+    response = requests.post(_url(('logs',))[1], headers=api_utils.generate_headers('rw'),
+                             json=payload)
+    return response
+
+
+def prepare_time_range(time_from, time_to, relative_time_range, date_from=None, date_to=None):
+    """
+    Prepare time range based on given options. Options are validated in advance.
+    """
+    if relative_time_range:
+        return {"time_range": relative_time_range}
+    elif time_from and time_to:
+        return {"from": int(time_from) * 1000, "to": int(time_to) * 1000}
+    elif date_from and date_to:
         from_ts = int(time.mktime(time.strptime(date_from, "%Y-%m-%d %H:%M:%S"))) * 1000
         to_ts = int(time.mktime(time.strptime(date_to, "%Y-%m-%d %H:%M:%S"))) * 1000
-        leql = {"during": {"from": from_ts, "to": to_ts}, "statement": query_string}
-    elif time_from and time_to:
-        leql = {"during": {"from": time_from * 1000, "to": time_to * 1000},
-                "statement": query_string}
+        return {"from": from_ts, "to": to_ts}
+
+
+def tail_logs(logkeys, leql, poll_interval, lognick=None, loggroup=None, saved_query_id=None):
+    """
+    Tail given logs
+    """
+    if lognick:
+        logkeys = api_utils.get_named_logkey(lognick)
+    elif loggroup:
+        logkeys = api_utils.get_named_logkey_group(loggroup)
+
+    if saved_query_id:
+        if logkeys:
+            url = _url(('live', 'logs', ':'.join(logkeys), str(saved_query_id)))[1]
+        else:
+            url = _url(('live', 'saved_query', str(saved_query_id)))[1]
     else:
-        leql = {"during": {"time_range": time_range}, "statement": query_string}
-
-    payload = {"logs": log_keys, "leql": leql}
-
+        url = _url(('live', 'logs'))[1]
     try:
-        response = requests.post(_url(('logs',))[1], headers=api_utils.generate_headers('rw'),
-                                 json=payload)
-        with click.progressbar(length=100, label='Progress') as progress_bar:
-            handle_response(response, progress_bar)
-    except requests.exceptions.RequestException as error:
-        click.echo(error)
-        sys.exit(1)
+        if saved_query_id:
+            response = requests.get(url, headers=api_utils.generate_headers('rw'))
+        else:
+            payload = {'logs': logkeys}
+            if leql:
+                payload.update({'leql': {'statement': leql}})
 
-
-def tail_logs(logkeys, leql, poll_interval):
-    """
-    tail given logs
-    """
-    payload = {'logs': logkeys}
-
-    if leql:
-        payload.update({'leql': {'statement': leql}})
-
-    try:
-        response = requests.post(_url(('live', 'logs'))[1],
-                                 headers=api_utils.generate_headers('rw'), json=payload)
+            response = requests.post(url, headers=api_utils.generate_headers('rw'), json=payload)
         handle_tail(response, poll_interval)
+        return True
     except requests.exceptions.RequestException as error:
-        click.echo(error)
+        click.echo(error, err=True)
         sys.exit(1)
+
+
+def run_saved_query(saved_query_id, params, log_keys):
+    """
+    Run the given saved query
+    """
+    if log_keys:
+        url = _url(('logs', ':'.join(log_keys), str(saved_query_id)))[1]
+    else:
+        url = _url(('saved_query', str(saved_query_id)))[1]
+
+    return fetch_results(url, params)
 
 
 def print_response(response):

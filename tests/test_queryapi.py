@@ -211,7 +211,7 @@ def test_post_query_with_time(mocked_url, mocked_generate_headers, capsys):
     httpretty.register_uri(httpretty.POST, MOCK_API_URL,
                            content_type='application/json',
                            body=json.dumps(SAMPLE_EVENTS_RESPONSE))
-    api.post_query('', '', time_from='from', time_to='to')
+    api.query(query_string='foo', log_keys='foo', time_from='123456', time_to='123456')
 
     out, err = capsys.readouterr()
 
@@ -231,7 +231,7 @@ def test_post_query_with_date(mocked_url, mocked_generate_headers, capsys):
     httpretty.register_uri(httpretty.POST, MOCK_API_URL,
                            content_type='application/json',
                            body=json.dumps(SAMPLE_EVENTS_RESPONSE))
-    api.post_query('', '', date_from=DATE_FROM, date_to=DATE_TO)
+    api.query(query_string='foo', log_keys='foo', date_from=DATE_FROM, date_to=DATE_TO)
 
     out, err = capsys.readouterr()
 
@@ -251,50 +251,7 @@ def test_post_query_with_relative_range(mocked_url, mocked_generate_headers, cap
     httpretty.register_uri(httpretty.POST, MOCK_API_URL,
                            content_type='application/json',
                            body=json.dumps(SAMPLE_EVENTS_RESPONSE))
-    api.post_query('', '',
-                   time_range='last 3 min', date_to=DATE_TO)
-
-    out, err = capsys.readouterr()
-
-    assert mocked_generate_headers.called
-    assert "Message contents1" in out
-    assert "Message contents2" in out
-    assert "Message contents3" in out
-
-    teardown_httpretty()
-
-
-@patch('lecli.api_utils.generate_headers')
-@patch('lecli.query.api._url')
-def test_get_events(mocked_url, mocked_generate_headers, capsys):
-    setup_httpretty()
-    mocked_url.return_value = '', MOCK_API_URL
-
-    httpretty.register_uri(httpretty.POST, MOCK_API_URL,
-                           content_type='application/json',
-                           body=json.dumps(SAMPLE_EVENTS_RESPONSE))
-    api.get_events('', '', date_from=DATE_FROM, date_to=DATE_TO)
-
-    out, err = capsys.readouterr()
-
-    assert mocked_generate_headers.called
-    assert "Message contents1" in out
-    assert "Message contents2" in out
-    assert "Message contents3" in out
-
-    teardown_httpretty()
-
-
-@patch('lecli.api_utils.generate_headers')
-@patch('lecli.query.api._url')
-def test_get_recent_events(mocked_url, mocked_generate_headers, capsys):
-    setup_httpretty()
-    mocked_url.return_value = '', MOCK_API_URL
-
-    httpretty.register_uri(httpretty.POST, MOCK_API_URL,
-                           content_type='application/json',
-                           body=json.dumps(SAMPLE_EVENTS_RESPONSE))
-    api.get_recent_events('')
+    api.query(query_string='foo', log_keys='foo', relative_time_range='last 3 min')
 
     out, err = capsys.readouterr()
 
@@ -388,3 +345,48 @@ def test_handle_response(capsys):
 
     teardown_httpretty()
 
+
+def test_validate_query():
+    # general query
+    assert api.validate_query(query_string='foo', log_keys='bar', time_from=123) is True
+    assert api.validate_query(querynick='foo', log_keys='bar', time_from=123) is True
+    assert api.validate_query(querynick='foo', loggroup='bar', time_from=123) is True
+    assert api.validate_query(querynick='foo', lognick='bar', time_from=123) is True
+    assert api.validate_query(loggroup='foo', lognick='bar', time_from=123) is False
+    assert api.validate_query(foo='bar') is False
+    assert api.validate_query(query_string='foo') is False
+    assert api.validate_query(log_keys='foo') is False
+
+    # saved query
+    assert api.validate_query(saved_query_id='foo') is True
+    assert api.validate_query(saved_query_id='foo', time_from=123456) is True
+    assert api.validate_query(saved_query_id='foo', date_from=123456) is True
+    assert api.validate_query(saved_query_id='foo', relative_time_range='bar') is True
+    assert api.validate_query(saved_query_id='foo', log_keys='bar') is True
+    assert api.validate_query(saved_query_id='foo', query_string='bar') is False
+
+
+def test_prepare_time_range_from_to():
+    leql_time_range = api.prepare_time_range(time_from=1, time_to=2, relative_time_range=None)
+    assert 'from' in leql_time_range
+    assert 'to' in leql_time_range
+    assert leql_time_range['from'] == 1 * 1000
+    assert leql_time_range['to'] == 2 * 1000
+    assert 'time_range' not in leql_time_range
+
+
+def test_prepare_time_range_relative_range():
+    leql_time_range = api.prepare_time_range(None, None, relative_time_range='last 10 min')
+    assert 'from' not in leql_time_range
+    assert 'to' not in leql_time_range
+    assert 'time_range' in leql_time_range
+    assert leql_time_range['time_range'] == 'last 10 min'
+
+
+def test_prepare_time_range_with_iso_dates():
+    leql_time_range = api.prepare_time_range(None, None, relative_time_range=None,
+                                             date_from='1970-01-01 00:00:00',
+                                             date_to='1970-01-01 00:00:00')
+    assert 'from' in leql_time_range
+    assert 'to' in leql_time_range
+    assert 'time_range' not in leql_time_range
