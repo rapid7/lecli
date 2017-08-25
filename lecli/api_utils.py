@@ -105,7 +105,8 @@ def get_ro_apikey():
         else:
             return ro_api_key
     except ConfigParser.NoOptionError:
-        print_config_error_and_exit(AUTH_SECTION, 'Read-only API key(%s)' % config_key)
+        # because read-write api key is a superset of read-only api key
+        return get_rw_apikey()
 
 
 def get_rw_apikey():
