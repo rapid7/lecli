@@ -10,6 +10,8 @@ import os
 import json
 
 import datetime
+
+import click
 import validators
 from appdirs import user_config_dir
 
@@ -27,16 +29,16 @@ def print_config_error_and_exit(section=None, config_key=None, value=None):
     Print appropriate apiutils error message and exit.
     """
     if not section:
-        print "Error: Configuration file '%s' not found" % CONFIG_FILE_PATH
+        click.echo("Error: Configuration file '%s' not found" % CONFIG_FILE_PATH, err=True)
     elif not config_key:
-        print "Error: Section '%s' was not found in configuration file(%s)" % (
-            section, CONFIG_FILE_PATH)
+        click.echo("Error: Section '%s' was not found in configuration file(%s)" %
+                   (section, CONFIG_FILE_PATH), err=True)
     elif not value:
-        print "Error: Configuration key for %s was not found in configuration file(%s) in '%s' " \
-              "section" % (config_key, CONFIG_FILE_PATH, section)
+        click.echo("Error: Configuration key for %s was not found in configuration file(%s) in "
+                   "'%s' section" % (config_key, CONFIG_FILE_PATH, section), err=True)
     else:
-        print "Error: %s = '%s' is not of correct length in section: '%s' of your configuration " \
-              "file: '%s'" % (config_key, value, section, CONFIG_FILE_PATH)
+        click.echo("Error: %s = '%s' is not in section: '%s' of your configuration file: '%s'" %
+                   (config_key, value, section, CONFIG_FILE_PATH), err=True)
 
     sys.exit(1)
 
@@ -67,12 +69,11 @@ def init_config():
 
         dummy_config.write(config_file)
         config_file.close()
-        print "An empty config file created in path %s, please check and configure it. To learn " \
-              "how to get necessary api keys, go to this Logentries documentation page: " \
-              "https://docs.logentries.com/docs/api-keys" % \
-              CONFIG_FILE_PATH
+        click.echo("An empty config file created in path %s, please check and configure it. To "
+                   "learn how to get necessary api keys, go to this Logentries documentation "
+                   "page: https://docs.logentries.com/docs/api-keys" % CONFIG_FILE_PATH)
     else:
-        print "Config file exists in the path: " + CONFIG_FILE_PATH
+        click.echo("Config file exists in the path: " + CONFIG_FILE_PATH, err=True)
 
     sys.exit(1)
 
@@ -84,7 +85,8 @@ def load_config():
     """
     files_read = CONFIG.read(CONFIG_FILE_PATH)
     if len(files_read) != 1:
-        print "Error: Config file '%s' not found, generating one..." % CONFIG_FILE_PATH
+        click.echo("Error: Config file '%s' not found, generating one..." % CONFIG_FILE_PATH,
+                   err=True)
         init_config()
         print_config_error_and_exit()
     if not CONFIG.has_section(AUTH_SECTION):
@@ -99,13 +101,13 @@ def get_ro_apikey():
     config_key = 'ro_api_key'
     try:
         ro_api_key = CONFIG.get(AUTH_SECTION, config_key)
-        if len(ro_api_key) != 36:
-            print_config_error_and_exit(AUTH_SECTION, 'Read-only API key(%s)' % config_key,
-                                        ro_api_key)
+        if not validators.uuid(ro_api_key):
+            return get_rw_apikey()
         else:
             return ro_api_key
     except ConfigParser.NoOptionError:
-        print_config_error_and_exit(AUTH_SECTION, 'Read-only API key(%s)' % config_key)
+        # because read-write api key is a superset of read-only api key
+        return get_rw_apikey()
 
 
 def get_rw_apikey():
@@ -116,7 +118,7 @@ def get_rw_apikey():
     config_key = 'rw_api_key'
     try:
         rw_api_key = CONFIG.get(AUTH_SECTION, config_key)
-        if len(rw_api_key) != 36:
+        if not validators.uuid(rw_api_key):
             print_config_error_and_exit(AUTH_SECTION, 'Read/Write API key(%s)' % config_key,
                                         rw_api_key)
         else:
@@ -133,7 +135,7 @@ def get_owner_apikey():
     config_key = 'owner_api_key'
     try:
         owner_api_key = CONFIG.get(AUTH_SECTION, config_key)
-        if len(owner_api_key) != 36:
+        if not validators.uuid(owner_api_key):
             print_config_error_and_exit(AUTH_SECTION, 'Owner API key(%s)' % config_key,
                                         owner_api_key)
             return
@@ -151,7 +153,7 @@ def get_owner_apikey_id():
     config_key = 'owner_api_key_id'
     try:
         owner_apikey_id = CONFIG.get(AUTH_SECTION, config_key)
-        if len(owner_apikey_id) != 36:
+        if not validators.uuid(owner_apikey_id):
             print_config_error_and_exit(AUTH_SECTION, 'Owner API key ID(%s)' % config_key,
                                         owner_apikey_id)
             return
@@ -169,7 +171,7 @@ def get_account_resource_id():
     config_key = 'account_resource_id'
     try:
         account_resource_id = CONFIG.get(AUTH_SECTION, config_key)
-        if len(account_resource_id) != 36:
+        if not validators.uuid(account_resource_id):
             print_config_error_and_exit(AUTH_SECTION, 'Account Resource ID(%s)' % config_key,
                                         account_resource_id)
             return
@@ -193,7 +195,7 @@ def get_named_logkey_group(name):
         if name in groups:
             logkeys = [line for line in str(groups[name]).splitlines() if line is not None]
             for logkey in logkeys:
-                if len(logkey) != 36:
+                if not validators.uuid(logkey):
                     print_config_error_and_exit(section, 'Named Logkey Group(%s)' % name, logkey)
             return logkeys
         else:
@@ -216,7 +218,7 @@ def get_named_logkey(name):
         name = name.lower()
         if name in named_logkeys:
             logkey = (named_logkeys[name],)
-            if len(logkey[0]) != 36:
+            if not validators.uuid(logkey[0]):
                 print_config_error_and_exit(section, 'Named Logkey(%s)' % name, logkey)
             else:
                 return logkey

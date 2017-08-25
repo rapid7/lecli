@@ -73,6 +73,20 @@ def test_get_valid_ro_apikey():
         assert ro_api_key == ID_WITH_VALID_LENGTH
 
 
+def raise_no_option_error_on_read_only_key(*args):
+    if args[1] == 'ro_api_key':
+        raise ConfigParser.NoOptionError('option', 'section')
+    elif args[1] == 'rw_api_key':
+        return ID_WITH_VALID_LENGTH
+
+
+@patch.object(ConfigParser.ConfigParser, 'get', side_effect=raise_no_option_error_on_read_only_key)
+def test_get_rw_apikey_if_ro_apikey_not_present(mock_get):
+    read_write_api_key = ID_WITH_VALID_LENGTH
+    api_key = api_utils.get_ro_apikey()
+    assert api_key == read_write_api_key
+
+
 def test_get_invalid_ro_apikey(capsys):
     with patch.object(ConfigParser.ConfigParser, 'get',
                       return_value=ID_WITH_INVALID_LENGTH):
