@@ -24,7 +24,7 @@ def get_saved_query(query_id):
 @click.argument('statement', type=click.STRING)
 @click.option('-f', '--timefrom', help='Time to query from (unix epoch)', type=int)
 @click.option('-t', '--timeto', help='Time to query to (unix epoch)', type=int)
-@click.option('-r', '--relative_range', help='Relative time range (ex: last x :timeunit)',
+@click.option('-r', '--relative-range', help='Relative time range (ex: last x :timeunit)',
               type=click.STRING)
 @click.option('-l', '--logs', help='Logs(colon delimited if multiple)', type=click.STRING)
 def create_saved_query(name, statement, timefrom, timeto, relative_range, logs):
@@ -38,7 +38,7 @@ def create_saved_query(name, statement, timefrom, timeto, relative_range, logs):
 @click.option('-s', '--statement', help='LEQL statement', type=click.STRING)
 @click.option('-f', '--timefrom', help='Time to query from (unix epoch)', type=int)
 @click.option('-t', '--timeto', help='Time to query to (unix epoch)', type=int)
-@click.option('-r', '--relative_range', help='Relative time range (ex: last x :timeunit)',
+@click.option('-r', '--relative-range', help='Relative time range (ex: last x :timeunit)',
               type=click.STRING)
 @click.option('-l', '--logs', help='Logs(colon delimited if multiple)', type=click.STRING)
 def update_saved_query(query_id, name, statement, timefrom, timeto, relative_range, logs):
