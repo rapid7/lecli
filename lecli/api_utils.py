@@ -62,8 +62,7 @@ def init_config():
         dummy_config.set(AUTH_SECTION, 'rw_api_key', '')
         dummy_config.set(AUTH_SECTION, 'ro_api_key', '')
 
-        dummy_config.add_section('LogNicknames')
-        dummy_config.add_section("LogGroups")
+        dummy_config.add_section('CLI_Favorites')
         dummy_config.add_section('Url')
         dummy_config.set(URL_SECTION, 'api_url', 'https://rest.logentries.com')
 
@@ -183,12 +182,12 @@ def get_account_resource_id():
 
 def get_named_logkey_group(name):
     """
-    Get named log-key group from the config file.
+    Get named log-key list from the config file.
 
-    :param name: name of the group
+    :param name: name of the log key list
     """
 
-    section = 'LogGroups'
+    section = 'CLI_Favorites'
     try:
         groups = dict(CONFIG.items(section))
         name = name.lower()
@@ -200,51 +199,6 @@ def get_named_logkey_group(name):
             return logkeys
         else:
             print_config_error_and_exit(section, 'Named Logkey Group(%s)' % name)
-    except ConfigParser.NoSectionError:
-        print_config_error_and_exit(section)
-
-
-def get_named_logkey(name):
-    """
-    Get named log-key from the config file.
-
-    :param name: name of the log key
-    """
-
-    section = 'LogNicknames'
-
-    try:
-        named_logkeys = dict(CONFIG.items(section))
-        name = name.lower()
-        if name in named_logkeys:
-            logkey = (named_logkeys[name],)
-            if not validators.uuid(logkey[0]):
-                print_config_error_and_exit(section, 'Named Logkey(%s)' % name, logkey)
-            else:
-                return logkey
-        else:
-            print_config_error_and_exit(section, 'Named Logkey(%s)' % name)
-    except ConfigParser.NoSectionError:
-        print_config_error_and_exit(section)
-
-
-def get_named_query(name):
-    """
-    Get named query from config file.
-
-    :param name: query nick
-    """
-
-    section = 'QueryNicknames'
-
-    try:
-        named_queries = dict(CONFIG.items(section))
-        name = name.lower()
-        if name in named_queries:
-            query = named_queries[name]
-            return query
-        else:
-            print_config_error_and_exit(section, 'Named Query(%s)' % name)
     except ConfigParser.NoSectionError:
         print_config_error_and_exit(section)
 

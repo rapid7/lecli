@@ -349,10 +349,7 @@ def test_handle_response(capsys):
 def test_validate_query():
     # general query
     assert api.validate_query(query_string='foo', log_keys='bar', time_from=123) is True
-    assert api.validate_query(querynick='foo', log_keys='bar', time_from=123) is True
-    assert api.validate_query(querynick='foo', loggroup='bar', time_from=123) is True
-    assert api.validate_query(querynick='foo', lognick='bar', time_from=123) is True
-    assert api.validate_query(loggroup='foo', lognick='bar', time_from=123) is False
+    assert api.validate_query(logset='foo', favorites='bar', time_from=123) is False
     assert api.validate_query(foo='bar') is False
     assert api.validate_query(query_string='foo') is False
     assert api.validate_query(log_keys='foo') is False

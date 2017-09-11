@@ -14,6 +14,7 @@ from termcolor import colored
 
 from lecli import api_utils
 from lecli import response_utils
+from lecli.logset import api
 
 ALL_EVENTS_QUERY = "where(/.*/)"
 
@@ -106,38 +107,33 @@ def validate_query(**kwargs):
     saved_query_id = kwargs.get('saved_query_id')
     query_string = kwargs.get('query_string')
     log_keys = kwargs.get('log_keys')
-    querynick = kwargs.get('querynick')
-    lognick = kwargs.get('lognick')
-    loggroup = kwargs.get('loggroup')
+    favorites = kwargs.get('favorites')
+    logset = kwargs.get('logset')
 
     valid = True
-    if all([any([lognick, loggroup]), log_keys]):
+    if all([any([favorites, logset]), log_keys]):
         valid = False
-        click.echo('Cannot define lognicks or loggroups and logkeys together in the same query '
+        click.echo('Cannot define favorites or logsets and logkeys together in the same query '
                    'request.', err=True)
     if all([time_from, date_from]):
         valid = False
         click.echo('Cannot define start time(epoch) and start date(ISO-8601) in the same query '
                    'request.', err=True)
-    if all([saved_query_id, any([querynick, query_string]), query_string != ALL_EVENTS_QUERY]):
+    if all([saved_query_id, query_string, query_string != ALL_EVENTS_QUERY]):
         valid = False
-        click.echo('Cannot define saved query and LEQL/query nickname in the same query request.',
+        click.echo('Cannot define saved query and LEQL in the same query request.',
                    err=True)
-    if all([query_string, querynick]):
+    if all([favorites, logset]):
         valid = False
-        click.echo('Cannot define a LEQL query and query nickname in the same query request.',
-                   err=True)
-    if all([lognick, loggroup]):
-        valid = False
-        click.echo('Cannot define a log nickname and a log group in the same query request.',
+        click.echo('Cannot define a log alias and a log set in the same query request.',
                    err=True)
     if all([relative_time_range, any([time_from, date_from])]):
         valid = False
         click.echo('Cannot define relative time range and start time/date in the same query '
                    'request.', err=True)
-    if not any([log_keys, lognick, loggroup, saved_query_id]):
+    if not any([log_keys, favorites, logset, saved_query_id]):
         valid = False
-        click.echo('Either of log keys, log nick, log group or saved query must be supplied.',
+        click.echo('Either of log keys, log favorites, log set or saved query must be supplied.',
                    err=True)
     if not any([time_from, date_from, relative_time_range, saved_query_id]):
         valid = False
@@ -158,24 +154,18 @@ def query(**kwargs):
     saved_query_id = kwargs.get('saved_query_id')
     query_string = kwargs.get('query_string')
     log_keys = kwargs.get('log_keys')
-    querynick = kwargs.get('querynick')
-    lognick = kwargs.get('lognick')
-    loggroup = kwargs.get('loggroup')
+    favorites = kwargs.get('favorites')
+    logset = kwargs.get('logset')
     if not validate_query(date_from=date_from, time_from=time_from, query_string=query_string,
                           relative_time_range=relative_time_range, saved_query_id=saved_query_id,
-                          log_keys=log_keys, querynick=querynick, lognick=lognick,
-                          loggroup=loggroup):
+                          log_keys=log_keys, favorites=favorites, logset=logset):
         return False
 
     time_range = prepare_time_range(time_from, time_to, relative_time_range, date_from, date_to)
-    if querynick:
-        query_string = api_utils.get_named_query(querynick)
-
-    if lognick:
-        log_keys = api_utils.get_named_logkey(lognick)
-    if loggroup:
-        log_keys = api_utils.get_named_logkey_group(loggroup)
-
+    if favorites:
+        log_keys = api_utils.get_named_logkey_group(favorites)
+    if logset:
+        log_keys = api.get_log_keys_from_logset(logset)
     try:
         if saved_query_id:
             response = run_saved_query(saved_query_id, time_range, log_keys)
@@ -218,15 +208,14 @@ def prepare_time_range(time_from, time_to, relative_time_range, date_from=None, 
         return {"from": from_ts, "to": to_ts}
 
 
-def tail_logs(logkeys, leql, poll_interval, lognick=None, loggroup=None, saved_query_id=None):
+def tail_logs(logkeys, leql, poll_interval, favorites=None, logset=None, saved_query_id=None):
     """
     Tail given logs
     """
-    if lognick:
-        logkeys = api_utils.get_named_logkey(lognick)
-    elif loggroup:
-        logkeys = api_utils.get_named_logkey_group(loggroup)
-
+    if favorites:
+        logkeys = api_utils.get_named_logkey_group(favorites)
+    elif logset:
+        logkeys = api.get_log_keys_from_logset(logset)
     if saved_query_id:
         if logkeys:
             url = _url(('live', 'logs', ':'.join(logkeys), str(saved_query_id)))[1]

@@ -176,52 +176,25 @@ def test_get_invalid_account_resource_id(capsys):
             assert 'is not of correct length' in out
 
 
-def test_get_valid_named_logkey():
-    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
-                                                                         ID_WITH_VALID_LENGTH)]):
-        logkey = api_utils.get_named_logkey('test-logkey-nick')
-        assert logkey == (ID_WITH_VALID_LENGTH,)
-
-
-def test_case_insensitivity_of_named_logkey():
-    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
-                                                                         ID_WITH_VALID_LENGTH)]):
-        logkey = api_utils.get_named_logkey('TEST-logkey-nick')
-        assert logkey == (ID_WITH_VALID_LENGTH,)
-
-
-def test_get_invalid_named_logkey(capsys):
-    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
-                                                                         ID_WITH_VALID_LENGTH)]):
-        with pytest.raises(SystemExit):
-            nick_to_query = 'test-logkey-nick_invalid'
-            logkey = api_utils.get_named_logkey(nick_to_query)
-            out, err = capsys.readouterr()
-
-            assert logkey is None
-            assert nick_to_query in out
-            assert 'was not found' in out
-
-
 def test_get_valid_named_group_key():
     with patch.object(ConfigParser.ConfigParser, 'items',
-                      return_value=[('test-log-group-nick', ID_WITH_VALID_LENGTH)]):
-        logkeys = api_utils.get_named_logkey_group('test-log-group-nick')
+                      return_value=[('test-log-group-favs', ID_WITH_VALID_LENGTH)]):
+        logkeys = api_utils.get_named_logkey_group('test-log-group-favs')
         assert logkeys == filter(None, ID_WITH_VALID_LENGTH.splitlines())
 
 
 def test_case_insensitivity_of_named_groups_key():
     with patch.object(ConfigParser.ConfigParser, 'items',
-                      return_value=[('test-log-group-nick', '')]):
-        logkeys = api_utils.get_named_logkey_group('TEST-log-group-nick')
+                      return_value=[('test-log-group-favs', '')]):
+        logkeys = api_utils.get_named_logkey_group('TEST-log-group-favs')
         assert logkeys == filter(None, ''.splitlines())
 
 
 def test_get_invalid_named_group_key(capsys):
     with patch.object(ConfigParser.ConfigParser, 'items',
-                      return_value=[('test-log-group-nick', ["test-log-key1", "test-log-key2"])]):
+                      return_value=[('test-log-group-favs', ["test-log-key1", "test-log-key2"])]):
         with pytest.raises(SystemExit):
-            nick_to_query = 'test-log-group-nick-invalid'
+            nick_to_query = 'test-log-group-favs-invalid'
             result = api_utils.get_named_logkey_group(nick_to_query)
             out, err = capsys.readouterr()
 
