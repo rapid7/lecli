@@ -19,6 +19,8 @@ import lecli
 
 AUTH_SECTION = 'Auth'
 URL_SECTION = 'Url'
+LOGGROUPS_SECTION = 'LogGroups'
+CLI_FAVORITES_SECTION = 'CLI_Favorites'
 CONFIG = ConfigParser.ConfigParser()
 CONFIG_FILE_PATH = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
 DEFAULT_API_URL = 'https://rest.logentries.com'
@@ -90,6 +92,25 @@ def load_config():
         print_config_error_and_exit()
     if not CONFIG.has_section(AUTH_SECTION):
         print_config_error_and_exit(section=AUTH_SECTION)
+    if CONFIG.has_section(LOGGROUPS_SECTION):
+        remove_loggroup_section()
+
+
+def remove_loggroup_section():
+    """
+    If config has legacy LogGroup section, take all its items and add
+    them to the CLI_Favorites section - then delete the legacy section.
+    Update the config file with the changes.
+    """
+    existing_groups = CONFIG.items(LOGGROUPS_SECTION)
+    if not CONFIG.has_section(CLI_FAVORITES_SECTION):
+        CONFIG.add_section(CLI_FAVORITES_SECTION)
+    for group in existing_groups:
+        CONFIG.set(CLI_FAVORITES_SECTION, group[0], group[1])
+    CONFIG.remove_section(LOGGROUPS_SECTION)
+    config_file = open(CONFIG_FILE_PATH, 'w')
+    CONFIG.write(config_file)
+    config_file.close()
 
 
 def get_ro_apikey():
