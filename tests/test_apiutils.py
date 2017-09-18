@@ -203,6 +203,18 @@ def test_get_invalid_named_group_key(capsys):
             assert 'was not found' in out
 
 
+@patch('ConfigParser.ConfigParser')
+def test_replace_loggroup_section(mocked_configparser_class):
+    loggroups_section = api_utils.LOGGROUPS_SECTION
+    config_parser_mock = mocked_configparser_class.return_value
+    config_parser_mock.add_section(loggroups_section)
+    with patch.object(api_utils.CONFIG, 'items',
+                       return_value=[('test-log-group-favs', ["test-log-key1", "test-log-key2"])]):
+        api_utils.replace_loggroup_section()
+        assert not api_utils.CONFIG.has_section(loggroups_section)
+        assert config_parser_mock.has_section('CLI_Favorites')
+
+
 @patch('lecli.api_utils.get_api_url')
 def test_generate_api_url(mocked_api_url):
     mocked_api_url.return_value = MOCK_API_URL

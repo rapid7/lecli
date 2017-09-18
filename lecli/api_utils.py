@@ -93,10 +93,10 @@ def load_config():
     if not CONFIG.has_section(AUTH_SECTION):
         print_config_error_and_exit(section=AUTH_SECTION)
     if CONFIG.has_section(LOGGROUPS_SECTION):
-        remove_loggroup_section()
+        replace_loggroup_section()
 
 
-def remove_loggroup_section():
+def replace_loggroup_section():
     """
     If config has legacy LogGroup section, take all its items and add
     them to the CLI_Favorites section - then delete the legacy section.
