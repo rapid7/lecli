@@ -1,11 +1,12 @@
 import ConfigParser
 import hmac
 import uuid
+import os
 
 import pytest
 from mock import patch, Mock
 
-from lecli import api_utils
+from lecli import api_utils, cli
 
 ID_WITH_VALID_LENGTH = str(uuid.uuid4())
 ID_WITH_INVALID_LENGTH = str(uuid.uuid4()) + 'invalid'
@@ -205,6 +206,12 @@ def test_get_invalid_named_group_key(capsys):
 
 @patch('ConfigParser.ConfigParser')
 def test_replace_loggroup_section(mocked_configparser_class):
+
+    config_dir = api_utils.user_config_dir(cli.lecli.__name__)
+    if not os.path.exists(api_utils.CONFIG_FILE_PATH):
+        if not os.path.exists(config_dir):
+            os.makedirs(config_dir)
+
     loggroups_section = api_utils.LOGGROUPS_SECTION
     config_parser_mock = mocked_configparser_class.return_value
     config_parser_mock.add_section(loggroups_section)
@@ -214,6 +221,11 @@ def test_replace_loggroup_section(mocked_configparser_class):
         assert not api_utils.CONFIG.has_section(loggroups_section)
         assert config_parser_mock.has_section('CLI_Favorites')
 
+    try:
+        os.remove(api_utils.CONFIG_FILE_PATH)
+        os.rmdir(config_dir)
+    except OSError:
+        pass
 
 @patch('lecli.api_utils.get_api_url')
 def test_generate_api_url(mocked_api_url):
