@@ -219,7 +219,7 @@ def test_replace_loggroup_section(mocked_configparser_class):
                        return_value=[('test-log-group-favs', ["test-log-key1", "test-log-key2"])]):
         api_utils.replace_loggroup_section()
         assert not api_utils.CONFIG.has_section(loggroups_section)
-        assert config_parser_mock.has_section('CLI_Favorites')
+        assert config_parser_mock.has_section(api_utils.CLI_FAVORITES_SECTION)
 
     try:
         os.remove(api_utils.CONFIG_FILE_PATH)

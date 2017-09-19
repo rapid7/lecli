@@ -71,7 +71,7 @@ The event and query functionality of the CLI supports a number of different ways
 ####Recent Events
 
 The 'get recentevents' command allows you to retrieve the most recent log events that have been sent to Logentries.
-The logs to retrieve events from can be specified in a few ways. The Log IDs can be passed directly as a space separated list of log Ids, or you can take advantage of log sets and CLI Favorites. Log Ids can be obtained from the settings page or logsets page of a log in the Logentries UI (https://logentries.com). CLI favorites can be passed using the '--favorites' '-c' arguments, logset ID can be passed using the '--logset' '-g' arguments. For more information in setting up CLI Favorites and using log sets, see the 'CLI Favorites and Log Sets' section below.
+The logs to retrieve events from can be specified in a few ways. The Log IDs can be passed directly as a space separated list of log Ids, or you can take advantage of log sets and CLI Favorites. Log Ids can be obtained from the settings page or logsets page of a log in the Logentries UI (https://logentries.com). CLI favorites can be passed using the '--favorites' '-c' arguments, logset ID can be passed using the '--logset' '-g' arguments. For more information in setting up CLI Favorites and using log sets, see the 'Cli Favorites and Log Sets' section below.
 By default the 'get recentevents' command will return events for the last 20 minutes. The command also takes an optional time argument that allows you to specify how far back in time you wish to get events from; this is passed using '--last' or '-l' argument.
 It is also possible to provide '-r' (--relative-range) to use relative time range functionality of the Logentries REST API. Check [supported patterns](#supported-relative-time-patterns).
 
@@ -156,12 +156,12 @@ First get the saved query id to run with `get savedqueries` command, then use th
 
 **CLI favorites and Log Sets**
 --------------------------------------------------
-The CLI supports the use in query commands of CLI Favorites (log alias) via the configuration file and log sets from the Logentries account. This makes searching well known or large lists of logs much simpler as you do not need to pass in lists of log Ids.
+The CLI supports command line favorites (CLI Favorites) for query commands as well as log sets from the Logentries account. This makes searching well known or large lists of logs much simpler as you do not need to pass in lists of log Ids.
 
 #### CLI Favorites
-CLI Favorites allow an alias for a single log or a list of log Ids to be configured, this is done in the CLI_Favorites section of the configuration file. 
+CLI Favorites allow an alias for a single log or a list of log Ids to be configured, this is done in the 'Cli_Favorites' section of the configuration file. 
 ```
-[CLI_Favorites]
+[Cli_Favorites]
 favlog =    12345678-aaaa-bbbb-1234-1234cb123456
 favlist =   12345678-aaaa-bbbb-1234-1234cb123456
             12345678-aaaa-bbbb-1234-1234cb123457

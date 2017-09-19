@@ -20,7 +20,7 @@ import lecli
 AUTH_SECTION = 'Auth'
 URL_SECTION = 'Url'
 LOGGROUPS_SECTION = 'LogGroups'
-CLI_FAVORITES_SECTION = 'CLI_Favorites'
+CLI_FAVORITES_SECTION = 'Cli_Favorites'
 CONFIG = ConfigParser.ConfigParser()
 CONFIG_FILE_PATH = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
 DEFAULT_API_URL = 'https://rest.logentries.com'
@@ -64,8 +64,8 @@ def init_config():
         dummy_config.set(AUTH_SECTION, 'rw_api_key', '')
         dummy_config.set(AUTH_SECTION, 'ro_api_key', '')
 
-        dummy_config.add_section('CLI_Favorites')
-        dummy_config.add_section('Url')
+        dummy_config.add_section(CLI_FAVORITES_SECTION)
+        dummy_config.add_section(URL_SECTION)
         dummy_config.set(URL_SECTION, 'api_url', 'https://rest.logentries.com')
 
         dummy_config.write(config_file)
@@ -208,7 +208,7 @@ def get_named_logkey_group(name):
     :param name: name of the log key list
     """
 
-    section = 'CLI_Favorites'
+    section = CLI_FAVORITES_SECTION
     try:
         groups = dict(CONFIG.items(section))
         name = name.lower()
