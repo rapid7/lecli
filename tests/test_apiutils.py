@@ -1,11 +1,12 @@
 import ConfigParser
 import hmac
 import uuid
+import os
 
 import pytest
 from mock import patch, Mock
 
-from lecli import api_utils
+from lecli import api_utils, cli
 
 ID_WITH_VALID_LENGTH = str(uuid.uuid4())
 ID_WITH_INVALID_LENGTH = str(uuid.uuid4()) + 'invalid'
@@ -176,52 +177,25 @@ def test_get_invalid_account_resource_id(capsys):
             assert 'is not of correct length' in out
 
 
-def test_get_valid_named_logkey():
-    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
-                                                                         ID_WITH_VALID_LENGTH)]):
-        logkey = api_utils.get_named_logkey('test-logkey-nick')
-        assert logkey == (ID_WITH_VALID_LENGTH,)
-
-
-def test_case_insensitivity_of_named_logkey():
-    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
-                                                                         ID_WITH_VALID_LENGTH)]):
-        logkey = api_utils.get_named_logkey('TEST-logkey-nick')
-        assert logkey == (ID_WITH_VALID_LENGTH,)
-
-
-def test_get_invalid_named_logkey(capsys):
-    with patch.object(ConfigParser.ConfigParser, 'items', return_value=[('test-logkey-nick',
-                                                                         ID_WITH_VALID_LENGTH)]):
-        with pytest.raises(SystemExit):
-            nick_to_query = 'test-logkey-nick_invalid'
-            logkey = api_utils.get_named_logkey(nick_to_query)
-            out, err = capsys.readouterr()
-
-            assert logkey is None
-            assert nick_to_query in out
-            assert 'was not found' in out
-
-
 def test_get_valid_named_group_key():
     with patch.object(ConfigParser.ConfigParser, 'items',
-                      return_value=[('test-log-group-nick', ID_WITH_VALID_LENGTH)]):
-        logkeys = api_utils.get_named_logkey_group('test-log-group-nick')
+                      return_value=[('test-log-group-favs', ID_WITH_VALID_LENGTH)]):
+        logkeys = api_utils.get_named_logkey_group('test-log-group-favs')
         assert logkeys == filter(None, ID_WITH_VALID_LENGTH.splitlines())
 
 
 def test_case_insensitivity_of_named_groups_key():
     with patch.object(ConfigParser.ConfigParser, 'items',
-                      return_value=[('test-log-group-nick', '')]):
-        logkeys = api_utils.get_named_logkey_group('TEST-log-group-nick')
+                      return_value=[('test-log-group-favs', '')]):
+        logkeys = api_utils.get_named_logkey_group('TEST-log-group-favs')
         assert logkeys == filter(None, ''.splitlines())
 
 
 def test_get_invalid_named_group_key(capsys):
     with patch.object(ConfigParser.ConfigParser, 'items',
-                      return_value=[('test-log-group-nick', ["test-log-key1", "test-log-key2"])]):
+                      return_value=[('test-log-group-favs', ["test-log-key1", "test-log-key2"])]):
         with pytest.raises(SystemExit):
-            nick_to_query = 'test-log-group-nick-invalid'
+            nick_to_query = 'test-log-group-favs-invalid'
             result = api_utils.get_named_logkey_group(nick_to_query)
             out, err = capsys.readouterr()
 
@@ -229,6 +203,29 @@ def test_get_invalid_named_group_key(capsys):
             assert nick_to_query in out
             assert 'was not found' in out
 
+
+@patch('ConfigParser.ConfigParser')
+def test_replace_loggroup_section(mocked_configparser_class):
+
+    config_dir = api_utils.user_config_dir(cli.lecli.__name__)
+    if not os.path.exists(api_utils.CONFIG_FILE_PATH):
+        if not os.path.exists(config_dir):
+            os.makedirs(config_dir)
+
+    loggroups_section = api_utils.LOGGROUPS_SECTION
+    config_parser_mock = mocked_configparser_class.return_value
+    config_parser_mock.add_section(loggroups_section)
+    with patch.object(api_utils.CONFIG, 'items',
+                       return_value=[('test-log-group-favs', ["test-log-key1", "test-log-key2"])]):
+        api_utils.replace_loggroup_section()
+        assert not api_utils.CONFIG.has_section(loggroups_section)
+        assert config_parser_mock.has_section(api_utils.CLI_FAVORITES_SECTION)
+
+    try:
+        os.remove(api_utils.CONFIG_FILE_PATH)
+        os.rmdir(config_dir)
+    except OSError:
+        pass
 
 @patch('lecli.api_utils.get_api_url')
 def test_generate_api_url(mocked_api_url):

@@ -19,6 +19,8 @@ import lecli
 
 AUTH_SECTION = 'Auth'
 URL_SECTION = 'Url'
+LOGGROUPS_SECTION = 'LogGroups'
+CLI_FAVORITES_SECTION = 'Cli_Favorites'
 CONFIG = ConfigParser.ConfigParser()
 CONFIG_FILE_PATH = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
 DEFAULT_API_URL = 'https://rest.logentries.com'
@@ -62,9 +64,8 @@ def init_config():
         dummy_config.set(AUTH_SECTION, 'rw_api_key', '')
         dummy_config.set(AUTH_SECTION, 'ro_api_key', '')
 
-        dummy_config.add_section('LogNicknames')
-        dummy_config.add_section("LogGroups")
-        dummy_config.add_section('Url')
+        dummy_config.add_section(CLI_FAVORITES_SECTION)
+        dummy_config.add_section(URL_SECTION)
         dummy_config.set(URL_SECTION, 'api_url', 'https://rest.logentries.com')
 
         dummy_config.write(config_file)
@@ -91,6 +92,25 @@ def load_config():
         print_config_error_and_exit()
     if not CONFIG.has_section(AUTH_SECTION):
         print_config_error_and_exit(section=AUTH_SECTION)
+    if CONFIG.has_section(LOGGROUPS_SECTION):
+        replace_loggroup_section()
+
+
+def replace_loggroup_section():
+    """
+    If config has legacy LogGroup section, take all its items and add
+    them to the CLI_Favorites section - then delete the legacy section.
+    Update the config file with the changes.
+    """
+    existing_groups = CONFIG.items(LOGGROUPS_SECTION)
+    if not CONFIG.has_section(CLI_FAVORITES_SECTION):
+        CONFIG.add_section(CLI_FAVORITES_SECTION)
+    for group in existing_groups:
+        CONFIG.set(CLI_FAVORITES_SECTION, group[0], group[1])
+    CONFIG.remove_section(LOGGROUPS_SECTION)
+    config_file = open(CONFIG_FILE_PATH, 'w')
+    CONFIG.write(config_file)
+    config_file.close()
 
 
 def get_ro_apikey():
@@ -183,12 +203,12 @@ def get_account_resource_id():
 
 def get_named_logkey_group(name):
     """
-    Get named log-key group from the config file.
+    Get named log-key list from the config file.
 
-    :param name: name of the group
+    :param name: name of the log key list
     """
 
-    section = 'LogGroups'
+    section = CLI_FAVORITES_SECTION
     try:
         groups = dict(CONFIG.items(section))
         name = name.lower()
@@ -200,51 +220,6 @@ def get_named_logkey_group(name):
             return logkeys
         else:
             print_config_error_and_exit(section, 'Named Logkey Group(%s)' % name)
-    except ConfigParser.NoSectionError:
-        print_config_error_and_exit(section)
-
-
-def get_named_logkey(name):
-    """
-    Get named log-key from the config file.
-
-    :param name: name of the log key
-    """
-
-    section = 'LogNicknames'
-
-    try:
-        named_logkeys = dict(CONFIG.items(section))
-        name = name.lower()
-        if name in named_logkeys:
-            logkey = (named_logkeys[name],)
-            if not validators.uuid(logkey[0]):
-                print_config_error_and_exit(section, 'Named Logkey(%s)' % name, logkey)
-            else:
-                return logkey
-        else:
-            print_config_error_and_exit(section, 'Named Logkey(%s)' % name)
-    except ConfigParser.NoSectionError:
-        print_config_error_and_exit(section)
-
-
-def get_named_query(name):
-    """
-    Get named query from config file.
-
-    :param name: query nick
-    """
-
-    section = 'QueryNicknames'
-
-    try:
-        named_queries = dict(CONFIG.items(section))
-        name = name.lower()
-        if name in named_queries:
-            query = named_queries[name]
-            return query
-        else:
-            print_config_error_and_exit(section, 'Named Query(%s)' % name)
     except ConfigParser.NoSectionError:
         print_config_error_and_exit(section)
 

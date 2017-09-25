@@ -175,6 +175,31 @@ def extract_log_from_logset(logset, log_id):
         sys.exit(1)
 
 
+def get_log_keys_from_logset(logset_id):
+    """Helper method to get list of log IDs in a logset"""
+    headers = api_utils.generate_headers('ro')
+    log_ids = []
+    try:
+        response = requests.get(_url((logset_id,))[1], headers=headers)
+        if response_utils.response_error(response):
+            sys.stderr.write('Attempt to access logset %s failed\n' % logset_id)
+            sys.exit(1)
+        elif response.status_code == 200:
+            existing_logset = response.json()
+            if 'logs_info' in existing_logset['logset']:
+                for log in existing_logset['logset']['logs_info']:
+                    log_ids.append(log['id'])
+    except requests.exceptions.RequestException as error:
+        sys.stderr.write(error)
+        sys.exit(1)
+
+    if log_ids is not []:
+        return log_ids
+    else:
+        sys.stderr.write("No logs found in logset %s " % logset_id)
+        sys.exit(1)
+
+
 def delete_log(logset_id, log_id):
     """
     Delete a log from the logset

@@ -71,7 +71,7 @@ The event and query functionality of the CLI supports a number of different ways
 ####Recent Events
 
 The 'get recentevents' command allows you to retrieve the most recent log events that have been sent to Logentries.
-The logs to retrieve events from can be specified in a few ways. The Log IDs can be passed directly as a space separated list of log Ids, or you can take advantage of log groups and log nicknames. Log Ids can be obtained from the settings page or log set page of a log in the Logentries UI (https://logentries.com). Log nicknames can be passed using the '--lognick' '-n' arguments, log groups can be passed using the '--loggroup' '-g' arguments. For more information in setting up log nicknames and log groups, see the 'Log Nicknames and Groups' section below.
+The logs to retrieve events from can be specified in a few ways. The Log IDs can be passed directly as a space separated list of log Ids, or you can take advantage of log sets and CLI Favorites. Log Ids can be obtained from the settings page or logsets page of a log in the Logentries UI (https://logentries.com). CLI favorites can be passed using the '--favorites' '-c' arguments, logset ID can be passed using the '--logset' '-g' arguments. For more information in setting up CLI Favorites and using log sets, see the 'Cli Favorites and Log Sets' section below.
 By default the 'get recentevents' command will return events for the last 20 minutes. The command also takes an optional time argument that allows you to specify how far back in time you wish to get events from; this is passed using '--last' or '-l' argument.
 It is also possible to provide '-r' (--relative-range) to use relative time range functionality of the Logentries REST API. Check [supported patterns](#supported-relative-time-patterns).
 
@@ -79,13 +79,13 @@ Example usage:
 ```
 lecli get recentevents 12345678-aaaa-bbbb-1234-1234cb123456 -l 200
 lecli get recentevents 12345678-aaaa-bbbb-1234-1234cb123456 -r 'last 2 hours'
-lecli get recentevents -n mynicknamedlog -l 200
-lecli get recentevents -g myloggroup -l 200
-lecli get recentevents -g myloggroup -r 'last 1 week'
+lecli get recentevents -c mylogalias -l 200
+lecli get recentevents --logset 12345678-aaaa-bbbb-1234-1234cb123457 -l 200
+lecli get recentevents -g 12345678-aaaa-bbbb-1234-1234cb123457 -r 'last 1 week'
 ```
 
 ####Events
-The 'get events' command allows for the retrieval of log events within defined time ranges. As with 'get recentevents', logs can be passed to the 'get events' command as a space separated list of log Ids, or you can take advantage of log groups and log nicknames.
+The 'get events' command allows for the retrieval of log events within defined time ranges. As with 'get recentevents', logs can be passed to the 'get events' command as a space separated list of log Ids, or you can take advantage of log sets and CLI Favorites.
 The 'get events' command accepts time ranges in ISO-8601 human readable time format (YYYY-MM-DD HH:MM:SS); time ranges in this format can be passed using the '--datefrom' and '--dateto' arguments. Note, all time values are in UTC timezone. 
 The command also accepts epoch time with second granularity. Epoch format time parameters can be passed using the '--timefrom' '-f' and '--timeto' '-t' arguments. 
 It is also possible to provide '-r' (--relative-range) to use relative time range functionality of the Logentries REST API. Check [supported patterns](#supported-relative-time-patterns).
@@ -95,31 +95,24 @@ Example usage:
 lecli get events 12345678-aaaa-bbbb-1234-1234cb123456 -f 1465370400 -t 1465370500
 lecli get events 12345678-aaaa-bbbb-1234-1234cb123456 --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
 lecli get events 12345678-aaaa-bbbb-1234-1234cb123456 -r 'yesterday'
-lecli get events --loggroup myloggroup --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
-lecli get events --lognick mynicknamedlog --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
-lecli get events --lognick mynicknamedlog -r 'last 3 weeks'
+lecli get events --logset 12345678-aaaa-bbbb-1234-1234cb123457 --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
+lecli get events --favorites mylogalias --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
+lecli get events --favorites mylogalias -r 'last 3 weeks'
 ```
 
 ####Query
-The 'query' command allows you to run LEQL queries on logs from the command line. Logs can be passed to the 'query' command using a space separated list of log Ids, log groups or log nicknames.
+The 'query' command allows you to run LEQL queries on logs from the command line. Logs can be passed to the 'query' command using a space separated list of log Ids, log sets or CLI Favorites.
 As with the 'events' command, 'query' accepts time ranges in ISO-8601 human readable time format (YYYY-MM-DD HH:MM:SS); time ranges in this format can be passed using the '--datefrom' and '--dateto' arguments.
 It also accepts epoch time with second granularity. Epoch format time parameters can be passed using the '--timefrom' '-f' and '--timeto' '-t' arguments.
 It is also possible to provide '-r' (--relative-range) to use relative time range functionality of the Logentries REST API. Check [supported patterns](#supported-relative-time-patterns).
 
 Any LEQL query type that can be used in the advanced mode in the Logentries UI can also be used with the 'query' command. The LEQL query is passed as a string using the '--leql' '-l' argument. For detailed information on using LEQL see https://logentries.com/doc/search/
-A query can return three types of results. For searches just using a where() and without any calculate or groupby functions then the CLI will print the list of matching log events. Other queries will return either statistical or timeseries data, the CLI willretty print both of these.
-
-Similar to log nicknames, query nicknames allow well known queries to be set in the configuration file and easily used as part of a query command. A query shortcut can be used instead of a leql query using the '--querynick' '-q' argument.
+A query can return three types of results. For searches just using a where() and without any calculate or groupby functions then the CLI will print the list of matching log events. Other queries will return either statistical or timeseries data, the CLI will pretty print both of these.
 
 Example usage:
 ```
-lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q 'where(method=GET) calculate(count)' -f 1465370400 -t 1465370500
-lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q 'where(method=GET) calculate(count)'  --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
-lecli query 12345678-aaaa-bbbb-1234-1234cb123456 -q 'where(method=GET) calculate(count)'  -r 'last 2 days'
-lecli query --loggroup myloggroup --leql 'where(method=GET) calculate(count)' --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
-lecli query --lognick mynicknamedlog --leql 'where(method=GET) calculate(count)' --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
-lecli query --lognick mynicknamedlog -q testquery --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
-lecli query --lognick mynicknamedlog -q testquery -r 'last 15 mins'
+lecli query --logset 12345678-aaaa-bbbb-1234-1234cb123457 --leql 'where(method=GET) calculate(count)' --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
+lecli query --favorites mylogalias --leql 'where(method=GET) calculate(count)' --datefrom '2016-05-18 11:04:00' --dateto '2016-05-18 11:09:59'
 ```
 
 ####Supported Relative Time Patterns
@@ -136,16 +129,15 @@ Logentries REST API also supports relative time ranges instead of absolute `star
   - year, years
 
 ####Live Tail
-Logentries REST API supports tailing log events in real time. Lecli makes use of this with `tail events` command. While logkeys(space separated log keys) is a mandatory argument for this command, `--leql`, `--lognick` and `--loggroup` options are supported for this command.
+Logentries REST API supports tailing log events in real time. Lecli makes use of this with `tail events` command. While logkeys(space separated log keys) is a mandatory argument for this command, `--leql`, `--favorites` and `--logset` options are supported for this command.
 Another option is `--poll-interval` or `-i`, which is the request interval to the live tail API. Defaults to 1.0 seconds. As this may affect api key limits, it should be used carefully.
 
 Example usage:
 
     lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456
     lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456 -i 5.0 --leql 'where(event=login)'
-    lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456 -q 'where(event)'
-    lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456 --loggroup myloggroup
-    lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456 --lognick mylognick
+    lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456 --logset 12345678-aaaa-bbbb-1234-1234cb123457
+    lecli tail events 12345678-aaaa-bbbb-1234-1234cb123456 --favorites mylogalias
 
 ####Running Saved Queries
 Logentries REST API supports running saved queries with its configurated parameters. Events, recent events, query and live tail commands support running saved queries directly from lecli. If your saved query has the log and time range information, no other information need to be supplied to the command. If any these information are not part of the saved query, they must be supplied in the command as well.
@@ -162,30 +154,24 @@ First get the saved query id to run with `get savedqueries` command, then use th
 
     
 
-**Log Nicknames, Log Groups, and Query Nicknames**
+**CLI favorites and Log Sets**
 --------------------------------------------------
-The CLI supports the use of log nicknames and log groups via the configuration file. This makes searching well known or large lists of logs much simpler as you do not need to pass in lists of log Ids.
+The CLI supports command line favorites (CLI Favorites) for query commands as well as log sets from the Logentries account. This makes searching well known or large lists of logs much simpler as you do not need to pass in lists of log Ids.
 
-####Log Nicknames
-Log nicknames allow an alias for a single log to be configured, this is done in the LogNicknames section of the configuration file. 
+#### CLI Favorites
+CLI Favorites allow an alias for a single log or a list of log Ids to be configured, this is done in the 'Cli_Favorites' section of the configuration file. 
 ```
-[LogNicknames]
-testlog = 12345678-aaaa-bbbb-1234-1234cb123456
-```
-
-####Log Groups
-Log groups allow an alias for a list of log Ids to be created. These can be setup in the LogGroups section of the configuration file. 
-```
-[LogGroups]
-testgroup = 12345678-aaaa-bbbb-1234-1234cb123456
+[Cli_Favorites]
+favlog =    12345678-aaaa-bbbb-1234-1234cb123456
+favlist =   12345678-aaaa-bbbb-1234-1234cb123456
             12345678-aaaa-bbbb-1234-1234cb123457
 ```
 
-####Query Nicknames
-Query nicknames provide an easy way to add aliases for long or frequently run queries. These are setup in the QueryNicknames section of the configuration file.
+#### Log Sets
+The Logset '-g' or '--logset' option allows for a list of log Ids to be used from an existing logset (see below for details on logset management). Where a logset Id is used a request is made on the server to get a list of any log Ids that are present in that logset. That list of log Ids are then used in the command. No information from the logset is retained in the config file.
 ```
-[QueryNicknames]
-testquery = where(logID) groupby(logID) calculate(count) sort(desc) limit(3)
+lecli query --logset 12345678-aaaa-bbbb-1234-1234cb123457 --leql 'calculate(count)' -r 'last 3 days'
+lecli query -g 12345678-aaaa-bbbb-1234-1234cb123457 --leql 'calculate(count)' -r 'last 3 days'
 ```
 
 **User and Account Management**
