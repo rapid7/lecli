@@ -7,4 +7,4 @@ python:
 install: "pip install -r dev-requirements.pip"
 script:
   - pylint lecli && py.test tests
-  - cd docker && docker-compose run
+  - cd docker && docker-compose run lecli
