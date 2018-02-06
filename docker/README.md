@@ -13,7 +13,7 @@ then edit `root/.config/config.ini` and add your logentries api keys
 `docker-compose run --rm lecli lecli get apikeys`
 
 ## live tail
-`docker-compose run --rm lecli letail {logset_name}`
+`docker-compose run --rm lecli letail {logs_name}`
 
 ## tested on
 ubuntu 16.04 LTS
