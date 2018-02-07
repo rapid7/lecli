@@ -17,5 +17,8 @@ then edit `root/.config/config.ini` and add your logentries api keys
 
 ## tested on
 ubuntu 16.04 LTS
+
 Docker version 17.05.0-ce, build 89658be
-docker-compose version 1.17.1, build 6d101fb   
+
+docker-compose version 1.17.1, build 6d101fb
+
