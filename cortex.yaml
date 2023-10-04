@@ -1,0 +1,25 @@
+---
+info:
+  title: Lecli
+  description: Seamlessly view recent events, run queries and manage your account
+    from the command line
+  x-cortex-git:
+    github:
+      alias: r7org
+      repository: rapid7/lecli
+  x-cortex-tag: lecli
+  x-cortex-type: service
+  x-cortex-groups:
+  - target:library
+  - strategy:cloud
+  - status:deprecated
+  - exposure:internal-ship
+  x-cortex-owners:
+  - name: rapid7/dublin-raphael
+    type: group
+    provider: GITHUB
+  x-cortex-domain-parents:
+  - tag: logsearch-raphael
+openapi: 3.0.1
+servers:
+- url: "/"
